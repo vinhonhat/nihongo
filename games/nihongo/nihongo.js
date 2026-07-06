@@ -135,7 +135,33 @@ function speakNihongo(text) {
 function renderNihongoDisplay(data) {
     const jp = data.kind === 'listen' ? '？？？' : data.jp;
     const hint = data.kind === 'listen' ? 'Nghe trước, xem đáp án sau' : (data.reading || '');
-    return `<div class="nihongo-card nihongo-kind-${data.kind}"><div class="nihongo-card-top"><span class="nihongo-chip">${data.title}</span><button class="nihongo-speak-btn" type="button" onclick="speakNihongo(decodeURIComponent('${escapeForClick(data.speakText)}'))">🔊</button></div><div class="nihongo-prompt">${data.prompt}</div><div class="nihongo-jp">${jp}</div><div class="nihongo-reading">${hint}</div></div>`;
+
+    // ID trong HTML để chỉnh tay dễ trong CSS:
+    // - #nihongo-question-card: khung logic phủ full khu câu hỏi
+    // - #nihongo-question-bg: ảnh mờ nền, PC dùng ảnh ngang, iPhone dùng ảnh dọc
+    // - #nihongo-question-top: chip bài học + nút loa nổi lên mép trên
+    // - #nihongo-question-center: cụm câu hỏi / chữ Nhật / cách đọc
+    return `
+        <div id="nihongo-question-card" class="nihongo-card nihongo-kind-${data.kind}">
+            <div id="nihongo-question-bg" class="nihongo-question-bg" aria-hidden="true"></div>
+
+            <div id="nihongo-question-top" class="nihongo-card-top">
+                <span id="nihongo-question-chip" class="nihongo-chip">${data.title}</span>
+                <button
+                    id="nihongo-question-speaker"
+                    class="nihongo-speak-btn"
+                    type="button"
+                    onclick="speakNihongo(decodeURIComponent('${escapeForClick(data.speakText)}'))"
+                    aria-label="Nghe tiếng Nhật">🔊</button>
+            </div>
+
+            <div id="nihongo-question-center" class="nihongo-question-center">
+                <div id="nihongo-question-text" class="nihongo-prompt">${data.prompt}</div>
+                <div id="nihongo-question-japanese" class="nihongo-jp">${jp}</div>
+                <div id="nihongo-question-reading" class="nihongo-reading">${hint}</div>
+            </div>
+        </div>
+    `;
 }
 
 function makeNihongoGame(gameId) {

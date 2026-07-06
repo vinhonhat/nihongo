@@ -809,3 +809,473 @@
         font-size: clamp(2.45rem, 10.8vw, 4.55rem) !important;
     }
 }
+
+
+/* =====================================================
+   NIHONGO QUESTION LAYOUT PATCH V1.1.1
+   Mục tiêu:
+   - Bỏ khung câu hỏi nhỏ bên trong.
+   - Khu câu hỏi lớn .display-area là khung chính.
+   - Ảnh nền phủ full toàn khung câu hỏi bằng background-size: cover.
+   - PC/iPad dùng ảnh ngang: img/nihongo-watermark-pc.svg
+   - iPhone/Android dùng ảnh dọc: img/nihongo-watermark-mobile.svg
+
+   CHỈNH TAY NHANH:
+   1) Chiều cao khu câu hỏi / đáp án:
+      --NQ-question-row và --NQ-answer-row
+   2) Kích thước ảnh nền:
+      --NQ-bg-size: cover / contain / 100% 100% / 120% auto
+   3) Vị trí ảnh nền:
+      --NQ-bg-position: center / top center / 50% 45%
+   4) Độ mờ ảnh nền:
+      --NQ-bg-opacity: 0.18 đến 1
+   5) Cỡ chữ Nhật:
+      --NQ-jp-size và --NQ-kanji-size
+===================================================== */
+
+/* ===== BIẾN CHỈNH TAY MẶC ĐỊNH CHO TOÀN BỘ NIHONGO ===== */
+#game-screen.game-view[class*='game-nihongo'] {
+    /* Tỷ lệ chia màn: câu hỏi ở trên, đáp án ở dưới */
+    --NQ-question-row: minmax(0, 1fr);
+    --NQ-answer-row: auto;
+    --NQ-body-gap: 8px;
+
+    /* Khoảng cách trong khung câu hỏi lớn */
+    --NQ-question-padding: 0px;
+    --NQ-question-radius: 20px;
+
+    /* Ảnh nền trong khu câu hỏi */
+    --NQ-bg-inset-top: 0px;
+    --NQ-bg-inset-right: 0px;
+    --NQ-bg-inset-bottom: 0px;
+    --NQ-bg-inset-left: 0px;
+    --NQ-bg-size: cover;
+    --NQ-bg-position: center center;
+    --NQ-bg-opacity: 0.1;
+
+    /* Vị trí chip bài học và nút loa phía trên */
+    --NQ-top-y: 12px;
+    --NQ-side-x: 12px;
+    --NQ-chip-font: .78rem;
+    --NQ-chip-height: 30px;
+    --NQ-speaker-size: 38px;
+
+    /* Cụm câu hỏi ở giữa */
+    --NQ-center-padding: 58px 18px 84px;
+    --NQ-prompt-size: clamp(.82rem, 1.7vw, 1rem);
+    --NQ-jp-size: clamp(2rem, 5.2vw, 4.4rem);
+    --NQ-kanji-size: clamp(2.35rem, 5.8vw, 5rem);
+    --NQ-reading-size: clamp(.7rem, 1.45vw, .88rem);
+
+    /* Đáp án */
+    --NQ-answer-gap: 8px;
+    --NQ-answer-min-height: 58px;
+    --NQ-answer-font: clamp(.76rem, 1.25vw, .98rem);
+}
+
+/* ===== PC / LAPTOP / IPAD NGANG: dùng ảnh nền ngang ===== */
+@media (min-width: 768px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        /* Muốn khu câu hỏi thấp/cao hơn thì chỉnh dòng này */
+        --NQ-question-row: minmax(0, 1fr);
+        --NQ-answer-row: auto;
+        --NQ-body-gap: 10px;
+
+        /* Ảnh ngang phủ hết khung. Đổi cover thành contain nếu muốn thấy đủ ảnh */
+        --NQ-bg-image: url("../../img/nihongo-watermark-pc.svg");
+        --NQ-bg-size: cover;
+        --NQ-bg-position: center center;
+        --NQ-bg-opacity: .78;
+
+        /* Đẩy chip/loa lên mép trên của khung câu hỏi */
+        --NQ-top-y: 14px;
+        --NQ-side-x: 16px;
+        --NQ-speaker-size: 40px;
+
+        /* Cỡ chữ PC/iPad */
+        --NQ-center-padding: 62px 24px 28px;
+        --NQ-jp-size: clamp(2.1rem, 4.8vw, 4.2rem);
+        --NQ-kanji-size: clamp(2.45rem, 5.2vw, 4.8rem);
+
+        /* Đáp án PC/iPad: 1 hàng 4 cột */
+        --NQ-answer-min-height: 58px;
+        --NQ-answer-font: clamp(.78rem, 1.15vw, 1rem);
+    }
+}
+
+/* ===== IPHONE / ANDROID: dùng ảnh nền dọc ===== */
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        /* iPhone giữ đáp án tự cao, phần còn lại dành cho câu hỏi */
+        --NQ-question-row: minmax(0, 1fr);
+        --NQ-answer-row: auto;
+        --NQ-body-gap: 7px;
+
+        /* Ảnh dọc phủ hết khung câu hỏi. cover sẽ crop cạnh thừa cho kín nền */
+        --NQ-bg-image: url("../../img/nihongo-watermark-mobile.svg");
+        --NQ-bg-size: cover;
+        --NQ-bg-position: center center;
+        --NQ-bg-opacity: .80;
+
+        /* Muốn chip/loa tràn lên sát trên hơn: giảm --NQ-top-y, có thể dùng -4px */
+        --NQ-top-y: 12px;
+        --NQ-side-x: 10px;
+        --NQ-chip-font: .68rem;
+        --NQ-chip-height: 28px;
+        --NQ-speaker-size: 34px;
+
+        /* Cỡ chữ iPhone */
+        --NQ-center-padding: 56px 12px 20px;
+        --NQ-prompt-size: clamp(.72rem, 2.6vw, .86rem);
+        --NQ-jp-size: clamp(1.8rem, 9.2vw, 3.7rem);
+        --NQ-kanji-size: clamp(2.15rem, 10vw, 4.25rem);
+        --NQ-reading-size: clamp(.66rem, 2.35vw, .8rem);
+
+        /* Đáp án iPhone: 2 hàng 2 cột */
+        --NQ-answer-gap: 7px;
+        --NQ-answer-min-height: 54px;
+        --NQ-answer-font: clamp(.68rem, 2.45vw, .86rem);
+    }
+}
+
+/* ===== MÁY NHỎ / MÀN THẤP: nén nhẹ để không lẹm đáy ===== */
+@media (max-width: 360px), (max-height: 700px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        --NQ-body-gap: 5px;
+        --NQ-top-y: 9px;
+        --NQ-side-x: 9px;
+        --NQ-speaker-size: 31px;
+        --NQ-chip-height: 25px;
+        --NQ-chip-font: .64rem;
+        --NQ-center-padding: 48px 10px 16px;
+        --NQ-jp-size: clamp(1.55rem, 8.3vw, 3.1rem);
+        --NQ-kanji-size: clamp(1.9rem, 9.3vw, 3.55rem);
+        --NQ-answer-min-height: 48px;
+        --NQ-answer-font: .68rem;
+    }
+}
+
+/* ===== Áp dụng biến chia màn vào khung game ===== */
+.game-view[class*='game-nihongo'] .game-body {
+    grid-template-rows: var(--NQ-question-row) var(--NQ-answer-row) !important;
+    gap: var(--NQ-body-gap) !important;
+}
+
+/* ===== Khung câu hỏi lớn: đây là khung chính, không còn card nhỏ ===== */
+.game-view[class*='game-nihongo'] .display-area {
+    padding: var(--NQ-question-padding) !important;
+    border-radius: var(--NQ-question-radius) !important;
+    background: #fffdf9 !important;
+    overflow: hidden !important;
+    display: block !important;
+    position: relative !important;
+}
+
+/* ===== Card cũ giờ chỉ là lớp layout phủ full khung câu hỏi, không vẽ nền/viền ===== */
+#nihongo-question-card.nihongo-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: inherit !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    position: relative !important;
+    display: block !important;
+    text-align: center !important;
+}
+
+/* Tắt nền chữ cũ của .nihongo-card::after để tránh bị chồng ảnh */
+#nihongo-question-card.nihongo-card::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* ===== Ảnh mờ nền: chỉnh kích thước/vị trí tại biến --NQ-bg-* phía trên ===== */
+#nihongo-question-bg.nihongo-question-bg {
+    position: absolute !important;
+    z-index: 0 !important;
+    top: var(--NQ-bg-inset-top) !important;
+    right: var(--NQ-bg-inset-right) !important;
+    bottom: var(--NQ-bg-inset-bottom) !important;
+    left: var(--NQ-bg-inset-left) !important;
+    background-image: var(--NQ-bg-image) !important;
+    background-repeat: no-repeat !important;
+    background-position: var(--NQ-bg-position) !important;
+    background-size: var(--NQ-bg-size) !important;
+    opacity: var(--NQ-bg-opacity) !important;
+    pointer-events: none !important;
+}
+
+/* ===== Chip bài học + nút loa nổi trên khung câu hỏi lớn ===== */
+#nihongo-question-top.nihongo-card-top {
+    position: absolute !important;
+    z-index: 3 !important;
+    top: var(--NQ-top-y) !important;
+    left: var(--NQ-side-x) !important;
+    right: var(--NQ-side-x) !important;
+    width: auto !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+}
+
+#nihongo-question-chip.nihongo-chip {
+    min-height: var(--NQ-chip-height) !important;
+    max-width: calc(100% - var(--NQ-speaker-size) - 12px) !important;
+    padding: 4px 10px !important;
+    font-size: var(--NQ-chip-font) !important;
+    line-height: 1.1 !important;
+}
+
+#nihongo-question-speaker.nihongo-speak-btn {
+    width: var(--NQ-speaker-size) !important;
+    height: var(--NQ-speaker-size) !important;
+    flex: 0 0 var(--NQ-speaker-size) !important;
+    font-size: calc(var(--NQ-speaker-size) * .42) !important;
+}
+
+/* ===== Cụm nội dung chính nằm giữa toàn bộ khung câu hỏi ===== */
+#nihongo-question-center.nihongo-question-center {
+    position: absolute !important;
+    z-index: 2 !important;
+    inset: 0 !important;
+    padding: var(--NQ-center-padding) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+}
+
+#nihongo-question-text.nihongo-prompt {
+    margin: 0 !important;
+    color: #075f78 !important;
+    font-size: var(--NQ-prompt-size) !important;
+    line-height: 1.24 !important;
+    font-weight: 900 !important;
+}
+
+#nihongo-question-japanese.nihongo-jp {
+    margin-top: 7px !important;
+    font-size: var(--NQ-jp-size) !important;
+    line-height: 1.02 !important;
+}
+
+.nihongo-kind-kanji #nihongo-question-japanese.nihongo-jp {
+    font-size: var(--NQ-kanji-size) !important;
+}
+
+#nihongo-question-reading.nihongo-reading {
+    min-height: 0 !important;
+    margin-top: 7px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #6a4f5c !important;
+    font-size: var(--NQ-reading-size) !important;
+    line-height: 1.2 !important;
+}
+
+/* ===== Khung đáp án bên dưới ===== */
+.game-view[class*='game-nihongo'] .answer-panel {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+}
+
+.game-view[class*='game-nihongo'] .nihongo-options-grid {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    gap: var(--NQ-answer-gap) !important;
+    grid-auto-rows: auto !important;
+}
+
+/* PC/iPad: 1 hàng 4 đáp án */
+@media (min-width: 768px) {
+    .game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+/* iPhone/Android: 2 hàng 2 đáp án */
+@media (max-width: 767px) {
+    .game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+.game-view[class*='game-nihongo'] .nihongo-option-btn {
+    min-height: var(--NQ-answer-min-height) !important;
+    font-size: var(--NQ-answer-font) !important;
+}
+
+
+/* =====================================================
+   NIHONGO CHỈNH TAY RIÊNG PC / IPAD / IPHONE
+   DÁN ĐOẠN NÀY Ở CUỐI FILE nihongo.css
+===================================================== */
+
+
+/* =====================================================
+   1. PC / LAPTOP RỘNG
+   Từ 1181px trở lên
+===================================================== */
+@media (min-width: 1181px) {
+
+    #game-screen.game-view[class*='game-nihongo'] {
+        /* Chia màn: câu hỏi / đáp án */
+        --NQ-question-row: minmax(0, 1fr);
+        --NQ-answer-row: auto;
+        --NQ-body-gap: 10px;
+
+        /* Ảnh nền */
+        --NQ-bg-opacity: 0.28;
+        --NQ-bg-size: cover;
+        --NQ-bg-position: center center;
+
+        /* Khoảng cách nội dung trong câu hỏi */
+        --NQ-center-padding: 62px 24px 28px;
+
+        /* CHỈNH CỠ CHỮ CÂU HỎI TIẾNG VIỆT */
+        --NQ-prompt-size: 1.05rem;
+
+        /* Cỡ chữ Nhật / Kanji */
+        --NQ-jp-size: clamp(2rem, 4vw, 4rem);
+        --NQ-kanji-size: clamp(2.4rem, 4.6vw, 4.8rem);
+
+        /* Cỡ chữ cách đọc */
+        --NQ-reading-size: 0.86rem;
+
+        /* Đáp án */
+        --NQ-answer-min-height: 58px;
+        --NQ-answer-font: 0.92rem;
+    }
+
+    /* PC: đáp án 1 hàng ngang */
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =====================================================
+   2. IPAD / TABLET
+   Từ 768px đến 1180px
+===================================================== */
+@media (min-width: 768px) and (max-width: 1180px) {
+
+    #game-screen.game-view[class*='game-nihongo'] {
+        /* Chia màn trên iPad */
+        --NQ-question-row: minmax(0, 1fr);
+        --NQ-answer-row: auto;
+        --NQ-body-gap: 9px;
+
+        /* Ảnh nền iPad */
+        --NQ-bg-opacity: 0.24;
+        --NQ-bg-size: cover;
+        --NQ-bg-position: center center;
+
+        /* Nội dung câu hỏi */
+        --NQ-center-padding: 56px 18px 24px;
+
+        /* CHỈNH CỠ CHỮ CÂU HỎI TIẾNG VIỆT TRÊN IPAD */
+        --NQ-prompt-size: 0.95rem;
+
+        /* Chữ Nhật / Kanji iPad */
+        --NQ-jp-size: clamp(1.9rem, 5.2vw, 3.8rem);
+        --NQ-kanji-size: clamp(2.2rem, 5.8vw, 4.3rem);
+
+        /* Cách đọc */
+        --NQ-reading-size: 0.8rem;
+
+        /* Đáp án */
+        --NQ-answer-min-height: 56px;
+        --NQ-answer-font: 0.86rem;
+    }
+
+    /* iPad: đáp án 1 hàng ngang */
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =====================================================
+   3. IPHONE / ĐIỆN THOẠI
+   Dưới 768px
+===================================================== */
+@media (max-width: 767px) {
+
+    #game-screen.game-view[class*='game-nihongo'] {
+        /* Chia màn trên iPhone */
+        --NQ-question-row: minmax(0, 1fr);
+        --NQ-answer-row: auto;
+        --NQ-body-gap: 7px;
+
+        /* Ảnh nền iPhone */
+        --NQ-bg-opacity: 0.20;
+        --NQ-bg-size: cover;
+        --NQ-bg-position: center center;
+
+        /* Nội dung câu hỏi */
+        --NQ-center-padding: 54px 12px 18px;
+
+        /* CHỈNH CỠ CHỮ CÂU HỎI TIẾNG VIỆT TRÊN IPHONE */
+        --NQ-prompt-size: 0.88rem;
+
+        /* Chữ Nhật / Kanji iPhone */
+        --NQ-jp-size: clamp(1.7rem, 8.4vw, 3.2rem);
+        --NQ-kanji-size: clamp(2rem, 9vw, 3.7rem);
+
+        /* Cách đọc */
+        --NQ-reading-size: 0.72rem;
+
+        /* Đáp án */
+        --NQ-answer-min-height: 52px;
+        --NQ-answer-font: 0.72rem;
+    }
+
+    /* iPhone: đáp án 2 hàng, 2 cột */
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+
+/* =====================================================
+   4. IPHONE MÀN THẤP / MÁY NHỎ
+   Ví dụ iPhone SE, hoặc khi thanh trình duyệt chiếm nhiều chỗ
+===================================================== */
+@media (max-width: 430px) and (max-height: 760px) {
+
+    #game-screen.game-view[class*='game-nihongo'] {
+        --NQ-body-gap: 5px;
+
+        /* Ảnh nền máy nhỏ */
+        --NQ-bg-opacity: 0.16;
+
+        /* Nén nội dung lại một chút */
+        --NQ-center-padding: 46px 10px 14px;
+
+        /* Chữ nhỏ hơn để không bị chật */
+        --NQ-prompt-size: 0.78rem;
+        --NQ-jp-size: clamp(1.5rem, 8vw, 2.8rem);
+        --NQ-kanji-size: clamp(1.75rem, 8.8vw, 3.2rem);
+        --NQ-reading-size: 0.66rem;
+
+        --NQ-answer-min-height: 46px;
+        --NQ-answer-font: 0.66rem;
+    }
+}
