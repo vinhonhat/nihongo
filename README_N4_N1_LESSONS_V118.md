@@ -80,3 +80,4 @@ sentence: [
 - `index.js` của từng cấp tự nạp `lesson01.js` đến `lesson25.js`, nên `index.html` không bị quá dài.
 - `vocab.js`, `kanji.js`, `listening.js`, `grammar.js` chỉ còn là file giữ tương thích, không nên nhập dữ liệu mới vào đó nữa.
 - Sau này làm N4/N3/N2/N1 chỉ cần nhập dữ liệu theo từng bài.
+
