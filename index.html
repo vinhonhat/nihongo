@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Nihongo Quest - Học tiếng Nhật</title>
+
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#E85D75">
+    <link rel="apple-touch-icon" href="img/logo1.png">
+    <link rel="icon" href="/img/logoQV.png" type="image/x-icon">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/game-core.css">
+</head>
+<body>
+
+    <!-- Màn hình mở khóa âm thanh -->
+    <div class="overlay" id="start-overlay">
+        <div class="nihongo-splash-mark">日本語</div>
+        <h1 class="app-title">Nihongo Quest</h1>
+        <p class="splash-subtitle">Học tiếng Nhật từ Nhập môn đến N1</p>
+        
+        <button id="start-btn" class="start-btn" type="button">
+            ▶️ BẮT ĐẦU HỌC
+        </button>
+        <div id="update-hint" class="update-hint" style="display:none;">
+            Có bản cập nhật mới. Nhấn đúp “Bắt đầu học” để cập nhật.
+        </div>
+        <button id="pwa-install-btn" class="install-btn" type="button" style="display:none;">
+            📲 Cài App Học Nhật
+        </button>
+        <div class="splash-version">v3.2 Nihongo</div>
+        <div id="ios-guide" class="install-guide" style="display:none;">
+            <p class="install-guide-title">Để cài trên iPhone:</p>
+            <p class="install-guide-text">
+                Bấm <b>Chia sẻ</b>
+                <img 
+                    src="https://img.icons8.com/ios-glyphs/30/000000/share-rounded.png" 
+                    class="install-share-icon"
+                    alt="share">
+                chọn <b>"Thêm vào MH chính"</b>
+            </p>
+        </div>
+    </div>
+
+    <!--
+    Menu chính được dựng tự động bằng js/game-menu.js
+    - Lần đầu: chọn cấp độ tiếng Nhật.
+    - Lần sau: vào thẳng menu theo cấp độ đã lưu.
+    - Nút Phụ huynh/Test hiển thị toàn bộ bài học để kiểm tra nhanh.
+    -->
+    <div class="app-container">
+        <div class="menu-view" id="menu-screen">
+            <div id="smart-menu-root" class="smart-menu-root"></div>
+        </div>
+
+        <div class="game-view" id="game-screen" style="display:none;"></div>
+    </div>
+
+    <script src="js/asset.js"></script>
+    <script src="js/audio.js"></script>
+    <script src="js/game-core.js"></script>
+    <script src="js/game-menu.js"></script>
+    <script src="js/core.js"></script>
+</body>
+</html>
