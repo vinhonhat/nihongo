@@ -532,3 +532,280 @@
         border-radius: 15px !important;
     }
 }
+
+/* =====================================================
+   NIHONGO FINAL GAME PATCH V1.1
+   - Bỏ nền trang trí nửa vời
+   - Chia màn rõ: câu hỏi ở trên, đáp án cố định dưới
+   - PC/iPad: đáp án 1 hàng 4 cột
+   - iPhone: đáp án 2 hàng 2 cột
+===================================================== */
+.game-view[class*='game-nihongo'] {
+    background: #fff6f1 !important;
+    --game-body-gap: 10px;
+    --question-padding: 10px;
+    --answer-top-padding: 0px;
+    --answer-gap: 8px;
+    font-family: var(--font-main) !important;
+}
+
+.game-view[class*='game-nihongo'] .game-body {
+    grid-template-rows: minmax(0, 1fr) auto !important;
+    gap: var(--game-body-gap) !important;
+}
+
+.game-view[class*='game-nihongo'] .display-area {
+    min-height: 0 !important;
+    padding: var(--question-padding) !important;
+    background: #fffdf9 !important;
+    border-radius: 20px !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+.game-view[class*='game-nihongo'] .answer-panel {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding-top: 0 !important;
+    overflow: visible !important;
+}
+
+.game-view[class*='game-nihongo'] .replay-btn {
+    display: none !important;
+}
+
+.nihongo-card {
+    width: min(100%, 620px) !important;
+    max-width: 620px !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: clamp(12px, 2.2vw, 22px) !important;
+    border-radius: 22px !important;
+    background: #ffffff !important;
+    border: 2px solid rgba(232, 93, 117, .14) !important;
+    box-shadow: 0 10px 22px rgba(80, 46, 62, .09) !important;
+}
+
+.nihongo-card::after {
+    display: none !important;
+}
+
+.nihongo-card-top {
+    margin-bottom: 4px !important;
+}
+
+.nihongo-chip {
+    min-height: 26px !important;
+    padding: 3px 10px !important;
+    font-size: clamp(.68rem, 1.6vw, .84rem) !important;
+}
+
+.nihongo-speak-btn {
+    width: 34px !important;
+    height: 34px !important;
+    flex: 0 0 34px !important;
+    font-size: .95rem !important;
+}
+
+.nihongo-prompt {
+    color: #12667a !important;
+    font-size: clamp(.78rem, 1.7vw, 1rem) !important;
+    line-height: 1.25 !important;
+}
+
+.nihongo-jp {
+    margin-top: 6px !important;
+    font-family: var(--font-jp) !important;
+    font-size: clamp(2rem, 5.4vw, 4.6rem) !important;
+    line-height: 1.02 !important;
+}
+
+.nihongo-kind-kanji .nihongo-jp {
+    font-size: clamp(2.35rem, 6.2vw, 5.2rem) !important;
+}
+
+.nihongo-reading {
+    min-height: 24px !important;
+    margin-top: 6px !important;
+    padding: 4px 10px !important;
+    border-radius: 12px !important;
+    font-size: clamp(.68rem, 1.55vw, .88rem) !important;
+}
+
+.nihongo-options-grid {
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    align-content: stretch !important;
+    grid-auto-rows: auto !important;
+    gap: var(--answer-gap) !important;
+}
+
+.nihongo-option-btn {
+    height: auto !important;
+    min-height: 54px !important;
+    padding: 8px 10px !important;
+    border-radius: 16px !important;
+    border-width: 2px !important;
+    font-family: var(--font-main) !important;
+    font-size: clamp(.72rem, 1.55vw, .98rem) !important;
+    line-height: 1.22 !important;
+    box-shadow: 0 4px 0 rgba(232, 93, 117, .12), 0 6px 12px rgba(0,0,0,.045) !important;
+}
+
+/* PC và iPad: đáp án 1 hàng */
+@media (min-width: 768px) {
+    .game-view[class*='game-nihongo'] {
+        padding: 12px !important;
+        --game-body-gap: 10px;
+        --answer-gap: 8px;
+    }
+
+    .game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    }
+
+    .game-view[class*='game-nihongo'] .display-area {
+        padding: 14px !important;
+    }
+
+    .nihongo-option-btn {
+        min-height: 58px !important;
+        font-size: clamp(.78rem, 1.25vw, 1rem) !important;
+    }
+}
+
+/* iPhone/Android: đáp án 2 hàng */
+@media (max-width: 767px) {
+    .game-view[class*='game-nihongo'] {
+        padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left)) !important;
+        --game-body-gap: 7px;
+        --answer-gap: 7px;
+    }
+
+    .game-view[class*='game-nihongo'] .nihongo-options-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+
+    .nihongo-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px !important;
+        border-radius: 19px !important;
+    }
+
+    .nihongo-jp {
+        font-size: clamp(1.8rem, 8.8vw, 3.7rem) !important;
+    }
+
+    .nihongo-kind-kanji .nihongo-jp {
+        font-size: clamp(2.2rem, 10vw, 4.2rem) !important;
+    }
+
+    .nihongo-option-btn {
+        min-height: 54px !important;
+        font-size: clamp(.7rem, 2.5vw, .88rem) !important;
+    }
+}
+
+@media (max-width: 360px), (max-height: 700px) {
+    .nihongo-option-btn {
+        min-height: 48px !important;
+        font-size: .68rem !important;
+        border-radius: 14px !important;
+    }
+
+    .nihongo-jp {
+        font-size: clamp(1.55rem, 8.2vw, 3.1rem) !important;
+    }
+
+    .nihongo-kind-kanji .nihongo-jp {
+        font-size: clamp(1.95rem, 9.4vw, 3.55rem) !important;
+    }
+}
+
+
+/* =====================================================
+   NIHONGO V1.1 GAME PATCH
+   - Câu hỏi rộng hơn, tận dụng hết khung trắng
+   - Hình mờ đã chuyển thành file SVG, nằm gọn trong card
+   - Desktop/iPad: đáp án 1 hàng; iPhone: đáp án 2 hàng
+===================================================== */
+.game-view[class*='game-nihongo'] .display-area {
+    padding: clamp(8px, 1.6vw, 16px) !important;
+}
+
+.nihongo-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: clamp(158px, 28vh, 255px) !important;
+    justify-content: center !important;
+}
+
+.nihongo-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.nihongo-card::after {
+    content: "" !important;
+    display: block !important;
+    position: absolute !important;
+    z-index: 0 !important;
+    right: 10px !important;
+    bottom: 8px !important;
+    width: clamp(92px, 28%, 260px) !important;
+    height: clamp(70px, 34%, 140px) !important;
+    background-image: url("../../img/nihongo-watermark-rect.svg") !important;
+    background-repeat: no-repeat !important;
+    background-position: center !important;
+    background-size: contain !important;
+    opacity: .72 !important;
+    pointer-events: none !important;
+    transform: none !important;
+    letter-spacing: normal !important;
+}
+
+@media (min-width: 768px) {
+    .nihongo-card {
+        max-width: 960px !important;
+        min-height: clamp(180px, 30vh, 280px) !important;
+        padding: clamp(18px, 2vw, 30px) !important;
+    }
+
+    .nihongo-card::after {
+        width: clamp(180px, 32%, 330px) !important;
+        height: clamp(84px, 38%, 165px) !important;
+    }
+}
+
+@media (max-width: 767px) {
+    .game-view[class*='game-nihongo'] .display-area {
+        padding: 8px !important;
+    }
+
+    .nihongo-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: clamp(140px, 25vh, 210px) !important;
+    }
+
+    .nihongo-card::after {
+        right: 8px !important;
+        bottom: 8px !important;
+        width: clamp(74px, 24vw, 104px) !important;
+        height: clamp(74px, 24vw, 104px) !important;
+        background-image: url("../../img/nihongo-watermark-square.svg") !important;
+        opacity: .68 !important;
+    }
+
+    .nihongo-jp {
+        font-size: clamp(2.05rem, 9.5vw, 4rem) !important;
+    }
+
+    .nihongo-kind-kanji .nihongo-jp {
+        font-size: clamp(2.45rem, 10.8vw, 4.55rem) !important;
+    }
+}

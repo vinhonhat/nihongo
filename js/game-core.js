@@ -1,5 +1,5 @@
 // js/game-core.js
-// Hàm dùng chung cho khung game v3.2.
+// Hàm dùng chung cho khung game V1.1.
 
 let globalScore = 0;
 

@@ -1,12 +1,12 @@
 // js/core.js
-// Điều khiển app v3.2: mở khóa audio, hiện menu, load CSS/JS game khi bấm.
+// Điều khiển app V1.1: mở khóa audio, hiện menu, load CSS/JS game khi bấm.
 // =====================================================
 // PHIÊN BẢN APP
 // Khi cập nhật web/app, chỉ cần tăng số này.
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '3.2.12-nihongo-compact';
+const APP_VERSION = '1.1.0-nihongo';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
@@ -29,68 +29,68 @@ let gamePausedByNoInteraction = false;
 let gameStartedOnce = false;
 
 const GAME_CONFIG = {
-    "nihongo_intro_kana": {
-        "title": "Bảng Hiragana",
+    "nihongo_n0_kana": {
+        "title": "Hiragana",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_intro_kana",
+        "moduleId": "nihongo_n0_kana",
         "type": "registered"
     },
-    "nihongo_intro_katakana": {
-        "title": "Bảng Katakana",
+    "nihongo_n0_katakana": {
+        "title": "Katakana",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_intro_katakana",
+        "moduleId": "nihongo_n0_katakana",
         "type": "registered"
     },
-    "nihongo_intro_vocab": {
+    "nihongo_n0_vocab": {
         "title": "Từ đầu tiên",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_intro_vocab",
+        "moduleId": "nihongo_n0_vocab",
         "type": "registered"
     },
-    "nihongo_intro_listen": {
-        "title": "Nghe âm Kana",
+    "nihongo_n0_kanji": {
+        "title": "Kanji nhập môn",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_intro_listen",
+        "moduleId": "nihongo_n0_kanji",
         "type": "registered"
     },
-    "nihongo_intro_quiz": {
+    "nihongo_n0_grammar": {
+        "title": "Mẫu câu nhập môn",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n0_grammar",
+        "type": "registered"
+    },
+    "nihongo_n0_listen": {
+        "title": "Nghe nhập môn",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n0_listen",
+        "type": "registered"
+    },
+    "nihongo_n0_quiz": {
         "title": "Kiểm tra nhập môn",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_intro_quiz",
+        "moduleId": "nihongo_n0_quiz",
         "type": "registered"
     },
     "nihongo_n5_vocab_learn": {
-        "title": "Học từ vựng N5",
+        "title": "Từ vựng N5",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n5_vocab_learn",
-        "type": "registered"
-    },
-    "nihongo_n5_vocab_practice": {
-        "title": "Luyện từ vựng N5",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n5_vocab_practice",
-        "type": "registered"
-    },
-    "nihongo_n5_listening": {
-        "title": "Luyện nghe N5",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n5_listening",
         "type": "registered"
     },
     "nihongo_n5_kanji": {
@@ -117,6 +117,22 @@ const GAME_CONFIG = {
         "moduleId": "nihongo_n5_sentence",
         "type": "registered"
     },
+    "nihongo_n5_vocab_practice": {
+        "title": "Luyện từ N5",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n5_vocab_practice",
+        "type": "registered"
+    },
+    "nihongo_n5_listening": {
+        "title": "Luyện nghe N5",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n5_listening",
+        "type": "registered"
+    },
     "nihongo_n5_mock_test": {
         "title": "Thi thử N5",
         "folder": "nihongo",
@@ -126,27 +142,11 @@ const GAME_CONFIG = {
         "type": "registered"
     },
     "nihongo_n4_vocab_learn": {
-        "title": "Học từ vựng N4",
+        "title": "Từ vựng N4",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n4_vocab_learn",
-        "type": "registered"
-    },
-    "nihongo_n4_vocab_practice": {
-        "title": "Luyện từ vựng N4",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n4_vocab_practice",
-        "type": "registered"
-    },
-    "nihongo_n4_listening": {
-        "title": "Luyện nghe N4",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n4_listening",
         "type": "registered"
     },
     "nihongo_n4_kanji": {
@@ -173,6 +173,22 @@ const GAME_CONFIG = {
         "moduleId": "nihongo_n4_sentence",
         "type": "registered"
     },
+    "nihongo_n4_vocab_practice": {
+        "title": "Luyện từ N4",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n4_vocab_practice",
+        "type": "registered"
+    },
+    "nihongo_n4_listening": {
+        "title": "Luyện nghe N4",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n4_listening",
+        "type": "registered"
+    },
     "nihongo_n4_mock_test": {
         "title": "Thi thử N4",
         "folder": "nihongo",
@@ -182,27 +198,11 @@ const GAME_CONFIG = {
         "type": "registered"
     },
     "nihongo_n3_vocab_learn": {
-        "title": "Học từ vựng N3",
+        "title": "Từ vựng N3",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n3_vocab_learn",
-        "type": "registered"
-    },
-    "nihongo_n3_vocab_practice": {
-        "title": "Luyện từ vựng N3",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n3_vocab_practice",
-        "type": "registered"
-    },
-    "nihongo_n3_listening": {
-        "title": "Luyện nghe N3",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n3_listening",
         "type": "registered"
     },
     "nihongo_n3_kanji": {
@@ -229,6 +229,22 @@ const GAME_CONFIG = {
         "moduleId": "nihongo_n3_sentence",
         "type": "registered"
     },
+    "nihongo_n3_vocab_practice": {
+        "title": "Luyện từ N3",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n3_vocab_practice",
+        "type": "registered"
+    },
+    "nihongo_n3_listening": {
+        "title": "Luyện nghe N3",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n3_listening",
+        "type": "registered"
+    },
     "nihongo_n3_mock_test": {
         "title": "Thi thử N3",
         "folder": "nihongo",
@@ -238,27 +254,11 @@ const GAME_CONFIG = {
         "type": "registered"
     },
     "nihongo_n2_vocab_learn": {
-        "title": "Học từ vựng N2",
+        "title": "Từ vựng N2",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n2_vocab_learn",
-        "type": "registered"
-    },
-    "nihongo_n2_vocab_practice": {
-        "title": "Luyện từ vựng N2",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n2_vocab_practice",
-        "type": "registered"
-    },
-    "nihongo_n2_listening": {
-        "title": "Luyện nghe N2",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n2_listening",
         "type": "registered"
     },
     "nihongo_n2_kanji": {
@@ -285,6 +285,22 @@ const GAME_CONFIG = {
         "moduleId": "nihongo_n2_sentence",
         "type": "registered"
     },
+    "nihongo_n2_vocab_practice": {
+        "title": "Luyện từ N2",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n2_vocab_practice",
+        "type": "registered"
+    },
+    "nihongo_n2_listening": {
+        "title": "Luyện nghe N2",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n2_listening",
+        "type": "registered"
+    },
     "nihongo_n2_mock_test": {
         "title": "Thi thử N2",
         "folder": "nihongo",
@@ -294,27 +310,11 @@ const GAME_CONFIG = {
         "type": "registered"
     },
     "nihongo_n1_vocab_learn": {
-        "title": "Học từ vựng N1",
+        "title": "Từ vựng N1",
         "folder": "nihongo",
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n1_vocab_learn",
-        "type": "registered"
-    },
-    "nihongo_n1_vocab_practice": {
-        "title": "Luyện từ vựng N1",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n1_vocab_practice",
-        "type": "registered"
-    },
-    "nihongo_n1_listening": {
-        "title": "Luyện nghe N1",
-        "folder": "nihongo",
-        "css": "games/nihongo/nihongo.css",
-        "js": "games/nihongo/nihongo.js",
-        "moduleId": "nihongo_n1_listening",
         "type": "registered"
     },
     "nihongo_n1_kanji": {
@@ -339,6 +339,22 @@ const GAME_CONFIG = {
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n1_sentence",
+        "type": "registered"
+    },
+    "nihongo_n1_vocab_practice": {
+        "title": "Luyện từ N1",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n1_vocab_practice",
+        "type": "registered"
+    },
+    "nihongo_n1_listening": {
+        "title": "Luyện nghe N1",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n1_listening",
         "type": "registered"
     },
     "nihongo_n1_mock_test": {

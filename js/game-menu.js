@@ -1,23 +1,20 @@
 // js/game-menu.js
-// =====================================================
-// MENU THÔNG MINH CHO APP HỌC TIẾNG NHẬT V3.2
-// Giữ luồng Hybrid Game Design: chọn cấp học lần đầu, lần sau vào thẳng menu.
-// Bánh răng: giữ 1 giây mở Test, nhấp 10 lần để reset về chọn cấp học.
-// =====================================================
+// Menu thông minh cho Nihongo Quest V1.1.
+// Chọn cấp học lần đầu, lần sau vào thẳng menu đã lưu.
 
 const MENU_STORAGE_KEY_LEVEL = 'nihongo_selected_level';
 const MENU_STORAGE_KEY_GROUP = 'nihongo_selected_skill_group';
 
 const NIHONGO_LEVELS = {
-    "intro": {
+    "n0": {
         "label": "Nhập môn",
         "icon": "🌸",
-        "note": "Hiragana, Katakana, cách đọc cơ bản"
+        "note": "Bảng chữ cái, phát âm, từ đầu tiên"
     },
     "n5": {
         "label": "N5",
         "icon": "🗻",
-        "note": "Từ vựng, mẫu câu và Kanji nền tảng"
+        "note": "Từ vựng, Kanji và ngữ pháp nền tảng"
     },
     "n4": {
         "label": "N4",
@@ -59,58 +56,80 @@ const GAME_GROUPS = [
 ];
 const GAME_MENU_DATA = [
     {
-        "id": "nihongo_intro_kana",
+        "id": "nihongo_n0_kana",
         "label": "Hiragana",
         "icon": "あ",
         "group": "vocab",
         "levels": [
-            "intro"
+            "n0"
         ],
-        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
-        "badge": "Nhập môn"
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "badge": "N0"
     },
     {
-        "id": "nihongo_intro_katakana",
+        "id": "nihongo_n0_katakana",
         "label": "Katakana",
         "icon": "ア",
         "group": "vocab",
         "levels": [
-            "intro"
+            "n0"
         ],
-        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
-        "badge": "Nhập môn"
+        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "badge": "N0"
     },
     {
-        "id": "nihongo_intro_vocab",
+        "id": "nihongo_n0_vocab",
         "label": "Từ đầu tiên",
         "icon": "🍙",
         "group": "vocab",
         "levels": [
-            "intro"
-        ],
-        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
-        "badge": "Nhập môn"
-    },
-    {
-        "id": "nihongo_intro_listen",
-        "label": "Nghe Kana",
-        "icon": "👂あ",
-        "group": "practice",
-        "levels": [
-            "intro"
+            "n0"
         ],
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
-        "badge": "Nhập môn"
+        "badge": "N0"
     },
     {
-        "id": "nihongo_intro_quiz",
-        "label": "Kiểm tra",
+        "id": "nihongo_n0_kanji",
+        "label": "Kanji nhập môn",
+        "icon": "日",
+        "group": "vocab",
+        "levels": [
+            "n0"
+        ],
+        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+        "badge": "N0"
+    },
+    {
+        "id": "nihongo_n0_grammar",
+        "label": "Mẫu câu nhập môn",
+        "icon": "🧩",
+        "group": "grammar",
+        "levels": [
+            "n0"
+        ],
+        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+        "badge": "N0"
+    },
+    {
+        "id": "nihongo_n0_listen",
+        "label": "Nghe nhập môn",
+        "icon": "👂",
+        "group": "practice",
+        "levels": [
+            "n0"
+        ],
+        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+        "badge": "Nghe"
+    },
+    {
+        "id": "nihongo_n0_quiz",
+        "label": "Kiểm tra nhập môn",
         "icon": "🌸",
         "group": "practice",
         "levels": [
-            "intro"
+            "n0"
         ],
-        "color": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
         "badge": "Mini"
     },
     {
@@ -121,8 +140,41 @@ const GAME_MENU_DATA = [
         "levels": [
             "n5"
         ],
-        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Học"
+    },
+    {
+        "id": "nihongo_n5_kanji",
+        "label": "Kanji N5",
+        "icon": "漢",
+        "group": "vocab",
+        "levels": [
+            "n5"
+        ],
+        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+        "badge": "Kanji"
+    },
+    {
+        "id": "nihongo_n5_grammar",
+        "label": "Ngữ pháp N5",
+        "icon": "🧩",
+        "group": "grammar",
+        "levels": [
+            "n5"
+        ],
+        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+        "badge": "NP"
+    },
+    {
+        "id": "nihongo_n5_sentence",
+        "label": "Mẫu câu N5",
+        "icon": "💬",
+        "group": "grammar",
+        "levels": [
+            "n5"
+        ],
+        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+        "badge": "Mẫu"
     },
     {
         "id": "nihongo_n5_vocab_practice",
@@ -137,47 +189,14 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n5_listening",
-        "label": "Nghe N5",
+        "label": "Luyện nghe N5",
         "icon": "👂",
         "group": "practice",
         "levels": [
             "n5"
         ],
-        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
-        "badge": "Nghe"
-    },
-    {
-        "id": "nihongo_n5_kanji",
-        "label": "Kanji N5",
-        "icon": "漢",
-        "group": "vocab",
-        "levels": [
-            "n5"
-        ],
-        "color": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-        "badge": "Kanji"
-    },
-    {
-        "id": "nihongo_n5_grammar",
-        "label": "Ngữ pháp N5",
-        "icon": "🧩",
-        "group": "grammar",
-        "levels": [
-            "n5"
-        ],
         "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        "badge": "NP"
-    },
-    {
-        "id": "nihongo_n5_sentence",
-        "label": "Mẫu câu N5",
-        "icon": "💬",
-        "group": "grammar",
-        "levels": [
-            "n5"
-        ],
-        "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-        "badge": "Mẫu"
+        "badge": "Nghe"
     },
     {
         "id": "nihongo_n5_mock_test",
@@ -187,7 +206,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n5"
         ],
-        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     },
     {
@@ -198,30 +217,8 @@ const GAME_MENU_DATA = [
         "levels": [
             "n4"
         ],
-        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
-        "badge": "Học"
-    },
-    {
-        "id": "nihongo_n4_vocab_practice",
-        "label": "Luyện từ N4",
-        "icon": "🎯",
-        "group": "practice",
-        "levels": [
-            "n4"
-        ],
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
-        "badge": "Luyện"
-    },
-    {
-        "id": "nihongo_n4_listening",
-        "label": "Nghe N4",
-        "icon": "👂",
-        "group": "practice",
-        "levels": [
-            "n4"
-        ],
-        "color": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-        "badge": "Nghe"
+        "badge": "Học"
     },
     {
         "id": "nihongo_n4_kanji",
@@ -231,7 +228,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n4"
         ],
-        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
         "badge": "Kanji"
     },
     {
@@ -242,7 +239,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n4"
         ],
-        "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
         "badge": "NP"
     },
     {
@@ -257,6 +254,28 @@ const GAME_MENU_DATA = [
         "badge": "Mẫu"
     },
     {
+        "id": "nihongo_n4_vocab_practice",
+        "label": "Luyện từ N4",
+        "icon": "🎯",
+        "group": "practice",
+        "levels": [
+            "n4"
+        ],
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "badge": "Luyện"
+    },
+    {
+        "id": "nihongo_n4_listening",
+        "label": "Luyện nghe N4",
+        "icon": "👂",
+        "group": "practice",
+        "levels": [
+            "n4"
+        ],
+        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "badge": "Nghe"
+    },
+    {
         "id": "nihongo_n4_mock_test",
         "label": "Thi thử N4",
         "icon": "📝",
@@ -264,7 +283,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n4"
         ],
-        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     },
     {
@@ -279,28 +298,6 @@ const GAME_MENU_DATA = [
         "badge": "Học"
     },
     {
-        "id": "nihongo_n3_vocab_practice",
-        "label": "Luyện từ N3",
-        "icon": "🎯",
-        "group": "practice",
-        "levels": [
-            "n3"
-        ],
-        "color": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
-        "badge": "Luyện"
-    },
-    {
-        "id": "nihongo_n3_listening",
-        "label": "Nghe N3",
-        "icon": "👂",
-        "group": "practice",
-        "levels": [
-            "n3"
-        ],
-        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        "badge": "Nghe"
-    },
-    {
         "id": "nihongo_n3_kanji",
         "label": "Kanji N3",
         "icon": "漢",
@@ -308,7 +305,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n3"
         ],
-        "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
+        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
         "badge": "Kanji"
     },
     {
@@ -319,7 +316,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n3"
         ],
-        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
         "badge": "NP"
     },
     {
@@ -330,8 +327,30 @@ const GAME_MENU_DATA = [
         "levels": [
             "n3"
         ],
-        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
         "badge": "Mẫu"
+    },
+    {
+        "id": "nihongo_n3_vocab_practice",
+        "label": "Luyện từ N3",
+        "icon": "🎯",
+        "group": "practice",
+        "levels": [
+            "n3"
+        ],
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "badge": "Luyện"
+    },
+    {
+        "id": "nihongo_n3_listening",
+        "label": "Luyện nghe N3",
+        "icon": "👂",
+        "group": "practice",
+        "levels": [
+            "n3"
+        ],
+        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "badge": "Nghe"
     },
     {
         "id": "nihongo_n3_mock_test",
@@ -341,7 +360,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n3"
         ],
-        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     },
     {
@@ -352,30 +371,8 @@ const GAME_MENU_DATA = [
         "levels": [
             "n2"
         ],
-        "color": "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Học"
-    },
-    {
-        "id": "nihongo_n2_vocab_practice",
-        "label": "Luyện từ N2",
-        "icon": "🎯",
-        "group": "practice",
-        "levels": [
-            "n2"
-        ],
-        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        "badge": "Luyện"
-    },
-    {
-        "id": "nihongo_n2_listening",
-        "label": "Nghe N2",
-        "icon": "👂",
-        "group": "practice",
-        "levels": [
-            "n2"
-        ],
-        "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-        "badge": "Nghe"
     },
     {
         "id": "nihongo_n2_kanji",
@@ -385,7 +382,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n2"
         ],
-        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
+        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
         "badge": "Kanji"
     },
     {
@@ -396,7 +393,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n2"
         ],
-        "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
+        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
         "badge": "NP"
     },
     {
@@ -407,8 +404,30 @@ const GAME_MENU_DATA = [
         "levels": [
             "n2"
         ],
-        "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
+        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
         "badge": "Mẫu"
+    },
+    {
+        "id": "nihongo_n2_vocab_practice",
+        "label": "Luyện từ N2",
+        "icon": "🎯",
+        "group": "practice",
+        "levels": [
+            "n2"
+        ],
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "badge": "Luyện"
+    },
+    {
+        "id": "nihongo_n2_listening",
+        "label": "Luyện nghe N2",
+        "icon": "👂",
+        "group": "practice",
+        "levels": [
+            "n2"
+        ],
+        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "badge": "Nghe"
     },
     {
         "id": "nihongo_n2_mock_test",
@@ -418,7 +437,7 @@ const GAME_MENU_DATA = [
         "levels": [
             "n2"
         ],
-        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     },
     {
@@ -429,30 +448,8 @@ const GAME_MENU_DATA = [
         "levels": [
             "n1"
         ],
-        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Học"
-    },
-    {
-        "id": "nihongo_n1_vocab_practice",
-        "label": "Luyện từ N1",
-        "icon": "🎯",
-        "group": "practice",
-        "levels": [
-            "n1"
-        ],
-        "color": "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
-        "badge": "Luyện"
-    },
-    {
-        "id": "nihongo_n1_listening",
-        "label": "Nghe N1",
-        "icon": "👂",
-        "group": "practice",
-        "levels": [
-            "n1"
-        ],
-        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
-        "badge": "Nghe"
     },
     {
         "id": "nihongo_n1_kanji",
@@ -484,8 +481,30 @@ const GAME_MENU_DATA = [
         "levels": [
             "n1"
         ],
-        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "color": "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
         "badge": "Mẫu"
+    },
+    {
+        "id": "nihongo_n1_vocab_practice",
+        "label": "Luyện từ N1",
+        "icon": "🎯",
+        "group": "practice",
+        "levels": [
+            "n1"
+        ],
+        "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
+        "badge": "Luyện"
+    },
+    {
+        "id": "nihongo_n1_listening",
+        "label": "Luyện nghe N1",
+        "icon": "👂",
+        "group": "practice",
+        "levels": [
+            "n1"
+        ],
+        "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        "badge": "Nghe"
     },
     {
         "id": "nihongo_n1_mock_test",
@@ -507,7 +526,8 @@ function safeSetStorage(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
 }
 function getCurrentNihongoLevel() {
-    const level = safeGetStorage(MENU_STORAGE_KEY_LEVEL, '');
+    let level = safeGetStorage(MENU_STORAGE_KEY_LEVEL, '');
+    if (level === 'intro') { level = 'n0'; safeSetStorage(MENU_STORAGE_KEY_LEVEL, 'n0'); }
     return NIHONGO_LEVELS[level] ? level : '';
 }
 function getLevelGames(level) {
