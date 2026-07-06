@@ -34,6 +34,7 @@ Mở đúng bài, ví dụ `lesson10.js`, thêm vào mảng `vocab`:
 }
 ```
 
+
 ## Ghi chú
 
 Dữ liệu từ file `vocab.js` bạn gửi đã được tách vào lesson01 đến lesson09 theo thứ tự hiện có.
