@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.1.6
+// Nihongo Quest V1.1.7
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -59,9 +59,50 @@ function parseNihongoGameId(gameId) {
     return match ? { level: match[1], mode: match[2] } : { level: 'n0', mode: 'quiz' };
 }
 
+function getSelectedNihongoLessonId(level) {
+    try {
+        return localStorage.getItem('nihongo_selected_lesson_' + level) || 'all';
+    } catch (err) {
+        return 'all';
+    }
+}
+
+function mapLessonItems(list, lessonId, lessonTitle) {
+    return Array.isArray(list)
+        ? list.map(item => ({ ...item, lessonId, lessonTitle }))
+        : [];
+}
+
 function getLevelPool(level) {
     const bank = nihongoBank();
-    return bank[level] || bank.n0 || { vocab: [], kanji: [], listening: [], grammar: [] };
+    const fallback = bank.n0 || { vocab: [], kanji: [], listening: [], grammar: [] };
+    const base = bank[level] || fallback;
+    const lessonId = getSelectedNihongoLessonId(level);
+
+    if (lessonId && lessonId !== 'all' && base.lessons && base.lessons[lessonId]) {
+        const lesson = base.lessons[lessonId];
+        const lessonTitle = lesson.title || lesson.label || lessonId;
+        const vocab = mapLessonItems(lesson.vocab, lessonId, lessonTitle);
+        const kanji = mapLessonItems(lesson.kanji, lessonId, lessonTitle);
+        const grammar = mapLessonItems(lesson.grammar, lessonId, lessonTitle);
+        const listening = mapLessonItems(lesson.listening, lessonId, lessonTitle);
+
+        return {
+            ...base,
+            selectedLessonId: lessonId,
+            selectedLessonTitle: lessonTitle,
+            // Từ vựng lọc đúng theo bài đã chọn.
+            vocab,
+            // Các phần chưa nhập theo bài thì tạm dùng dữ liệu chung của cấp để app không bị trống.
+            kanji: kanji.length ? kanji : (base.kanji || []),
+            grammar: grammar.length ? grammar : (base.grammar || []),
+            // Listening ưu tiên listening riêng; nếu chưa có thì dùng vocab của bài để nghe từ trong bài.
+            listening: listening.length ? listening : (vocab.length ? vocab : (base.listening || [])),
+            sentence: Array.isArray(lesson.sentence) && lesson.sentence.length ? mapLessonItems(lesson.sentence, lessonId, lessonTitle) : (base.sentence || [])
+        };
+    }
+
+    return { ...base, selectedLessonId: 'all', selectedLessonTitle: '' };
 }
 
 function getAllItems(kind) {
@@ -74,6 +115,10 @@ function getLevelVocabMixed(level) {
     const vocab = Array.isArray(levelPool.vocab) ? levelPool.vocab.map(item => ({ ...item, sourceKind: 'vocab' })) : [];
     const kanji = Array.isArray(levelPool.kanji) ? levelPool.kanji.map(item => ({ ...item, sourceKind: 'kanji' })) : [];
     return [...vocab, ...kanji].filter(item => item.jp && item.vi);
+}
+
+function getLessonTitleSuffix(levelPool) {
+    return levelPool && levelPool.selectedLessonTitle ? ' · ' + levelPool.selectedLessonTitle : '';
 }
 
 function makeMeaningOption(item) {
@@ -164,6 +209,7 @@ function buildKanaQuestion(gameId) {
 
 function buildVocabQuestion(level, mode) {
     const levelPool = getLevelPool(level);
+    const lessonSuffix = getLessonTitleSuffix(levelPool);
     const pureVocab = levelPool.vocab || [];
     const mixedPool = mode.indexOf('practice') >= 0 ? getLevelVocabMixed(level) : pureVocab;
     const pool = mixedPool.length ? mixedPool : pureVocab;
@@ -177,7 +223,7 @@ function buildVocabQuestion(level, mode) {
         const options = buildOptionsFromItems(item, pool, makeJapaneseOption, ['vocab', 'kanji']);
         return {
             kind: 'vocab',
-            title: mode.indexOf('learn') >= 0 ? 'Học từ vựng' : 'Luyện từ vựng',
+            title: (mode.indexOf('learn') >= 0 ? 'Học từ vựng' : 'Luyện từ vựng') + lessonSuffix,
             prompt: 'Chọn từ tiếng Nhật đúng nghĩa.',
             displayType: 'vi',
             jp: item.jp,
@@ -194,7 +240,7 @@ function buildVocabQuestion(level, mode) {
     const options = buildOptionsFromItems(item, pool, makeMeaningOption, ['vocab', 'kanji']);
     return {
         kind: item.sourceKind === 'kanji' ? 'kanji vocab' : 'vocab',
-        title: 'Luyện từ vựng',
+        title: 'Luyện từ vựng' + lessonSuffix,
         prompt: 'Nghĩa tiếng Việt là gì?',
         displayType: 'jp',
         jp: item.jp,
@@ -210,11 +256,12 @@ function buildVocabQuestion(level, mode) {
 
 function buildListeningQuestion(level) {
     const levelPool = getLevelPool(level);
+    const lessonSuffix = getLessonTitleSuffix(levelPool);
     const pool = (levelPool.listening && levelPool.listening.length) ? levelPool.listening : (levelPool.vocab || []);
     const item = nihongoPick(pool, level + ':listen', 12) || { jp: '日本語', reading: 'にほんご', vi: 'Tiếng Nhật' };
     return {
         kind: 'listen',
-        title: 'Luyện nghe',
+        title: 'Luyện nghe' + lessonSuffix,
         prompt: 'Bấm loa nghe từ, rồi chọn nghĩa đúng.',
         displayType: 'listen',
         jp: '？？？',
@@ -229,11 +276,13 @@ function buildListeningQuestion(level) {
 }
 
 function buildKanjiQuestion(level) {
-    const pool = getLevelPool(level).kanji || [];
+    const levelPool = getLevelPool(level);
+    const lessonSuffix = getLessonTitleSuffix(levelPool);
+    const pool = levelPool.kanji || [];
     const item = nihongoPick(pool, level + ':kanji', 10) || { jp: '日', reading: 'にち / ひ', vi: 'Ngày, mặt trời' };
     return {
         kind: 'kanji',
-        title: 'Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim(),
+        title: 'Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
         prompt: 'Kanji này có nghĩa gì?',
         displayType: 'jp',
         jp: item.jp,
@@ -263,7 +312,9 @@ function renderGrammarExample(item) {
 }
 
 function buildGrammarQuestion(level, mode) {
-    const pool = getLevelPool(level).grammar || [];
+    const levelPool = getLevelPool(level);
+    const lessonSuffix = getLessonTitleSuffix(levelPool);
+    const pool = levelPool.grammar || [];
     const item = nihongoPick(pool, level + ':grammar:' + mode, 10) || {
         jp: 'A は B です',
         pattern: 'A は B です',
@@ -275,7 +326,7 @@ function buildGrammarQuestion(level, mode) {
 
     return {
         kind: 'grammar',
-        title: mode === 'sentence' ? 'Mẫu câu' : 'Ngữ pháp',
+        title: (mode === 'sentence' ? 'Mẫu câu' : 'Ngữ pháp') + lessonSuffix,
         prompt: 'Phần tô đậm trong câu dùng để làm gì?',
         displayType: 'grammar',
         jp: item.pattern || item.jp,
@@ -302,7 +353,9 @@ function splitSentenceParts(item) {
 }
 
 function buildSentenceBuildQuestion(level) {
-    const pool = (getLevelPool(level).grammar || []).filter(item => item.example || item.sentence || item.jp);
+    const levelPool = getLevelPool(level);
+    const lessonSuffix = getLessonTitleSuffix(levelPool);
+    const pool = (levelPool.grammar || []).filter(item => item.example || item.sentence || item.jp);
     const item = nihongoPick(pool, level + ':sentence_build', 10) || {
         jp: 'A は B です',
         example: '私は学生です。',
@@ -316,7 +369,7 @@ function buildSentenceBuildQuestion(level) {
 
     return {
         kind: 'sentence-build',
-        title: 'Ghép câu',
+        title: 'Ghép câu' + lessonSuffix,
         prompt: 'Chọn câu tiếng Nhật được ghép đúng.',
         displayType: 'sentence-build',
         jp: item.example || item.sentence || item.jp,

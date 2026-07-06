@@ -1695,3 +1695,24 @@ body {
 .settings-mini-title {
     font-size: var(--NQ-settings-text-size) !important;
 }
+
+
+/* =====================================================
+   NIHONGO LESSON SELECTOR V1.1.7
+   Chọn Toàn bộ N5 hoặc từng bài: Bài 1, Bài 2...
+===================================================== */
+.smart-lesson-line {
+    margin-top: 6px;
+}
+.smart-lesson-select {
+    min-width: 170px;
+}
+@media (max-width: 767px) {
+    .smart-lesson-line {
+        width: 100%;
+    }
+    .smart-lesson-select {
+        width: 100%;
+        min-width: 0;
+    }
+}

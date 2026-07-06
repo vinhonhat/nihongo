@@ -4,6 +4,7 @@
 
 const MENU_STORAGE_KEY_LEVEL = 'nihongo_selected_level';
 const MENU_STORAGE_KEY_GROUP = 'nihongo_selected_skill_group';
+const MENU_STORAGE_KEY_LESSON_PREFIX = 'nihongo_selected_lesson_';
 
 const NIHONGO_LEVELS = {
     "n0": {
@@ -557,6 +558,42 @@ function getCurrentGroup(level) {
     safeSetStorage(MENU_STORAGE_KEY_GROUP, groups[0].id);
     return groups[0].id;
 }
+
+function getLessonsForLevel(level) {
+    const data = window.NIHONGO_DATA && window.NIHONGO_DATA[level];
+    const meta = data && Array.isArray(data.lessonsMeta) ? data.lessonsMeta : [];
+    return meta.filter(item => item && item.id);
+}
+function getCurrentLesson(level) {
+    const lessons = getLessonsForLevel(level);
+    if (!lessons.length) return 'all';
+    const key = MENU_STORAGE_KEY_LESSON_PREFIX + level;
+    const saved = safeGetStorage(key, 'all');
+    if (saved === 'all' || lessons.some(item => item.id === saved)) return saved;
+    safeSetStorage(key, 'all');
+    return 'all';
+}
+function renderLessonSelector(level) {
+    const lessons = getLessonsForLevel(level);
+    if (!lessons.length) return '';
+    const current = getCurrentLesson(level);
+    const levelLabel = (NIHONGO_LEVELS[level] && NIHONGO_LEVELS[level].label) || level.toUpperCase();
+    const options = [
+        `<option value="all" ${current === 'all' ? 'selected' : ''}>📚 Toàn bộ ${levelLabel}</option>`
+    ].concat(lessons.map(item => {
+        const count = Number(item.vocabCount || 0);
+        const countText = count ? ` - ${count} từ` : ' - trống';
+        return `<option value="${item.id}" ${item.id === current ? 'selected' : ''}>${item.label || item.title || item.id}${countText}</option>`;
+    })).join('');
+
+    return `<div class="smart-level-line smart-lesson-line"><span>Bài:</span><select class="smart-level-select smart-lesson-select" onchange="selectNihongoLesson(this.value)">${options}</select></div>`;
+}
+function selectNihongoLesson(lessonId) {
+    const level = getCurrentNihongoLevel();
+    if (!level) return;
+    safeSetStorage(MENU_STORAGE_KEY_LESSON_PREFIX + level, lessonId || 'all');
+    renderGameMenu();
+}
 function renderGameMenu() {
     const root = document.getElementById('smart-menu-root');
     if (!root) return;
@@ -704,6 +741,7 @@ function renderMainGameMenu(root, level) {
     const currentGroup = getCurrentGroup(level);
     const games = getLevelGames(level).filter(game => game.group === currentGroup);
     const levelOptions = Object.entries(NIHONGO_LEVELS).map(([levelId, item]) => `<option value="${levelId}" ${levelId === level ? 'selected' : ''}>${item.icon} ${item.label}</option>`).join('');
+    const lessonSelector = renderLessonSelector(level);
     const groupTabs = groups.map(group => `
         <button class="menu-group-tab ${group.id === currentGroup ? 'active' : ''}" type="button" onclick="setGameMenuGroup('${group.id}')">
             <span>${group.icon}</span><span>${group.label}</span>
@@ -715,6 +753,7 @@ function renderMainGameMenu(root, level) {
                     <div class="nihongo-mini-title">Nihongo Quest</div>
                     <h1 class="smart-menu-title">Chọn bài học</h1>
                     <div class="smart-level-line"><span>Cấp độ:</span><select class="smart-level-select" onchange="selectNihongoLevel(this.value)">${levelOptions}</select></div>
+                    ${lessonSelector}
                     <div class="nihongo-level-note">${levelInfo.note}</div>
                 </div>
                 <div class="smart-level-badge" title="${levelInfo.note}"><span>${levelInfo.icon}</span></div>
@@ -756,6 +795,7 @@ function closeAdminTestMenu() { const overlay = document.getElementById('admin-t
 window.renderGameMenu = renderGameMenu;
 window.selectNihongoLevel = selectNihongoLevel;
 window.setGameMenuGroup = setGameMenuGroup;
+window.selectNihongoLesson = selectNihongoLesson;
 window.startGameFromSmartMenu = startGameFromSmartMenu;
 window.openAdminTestMenu = openAdminTestMenu;
 window.closeAdminTestMenu = closeAdminTestMenu;
