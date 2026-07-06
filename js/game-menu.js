@@ -1,14 +1,14 @@
 // js/game-menu.js
 // =====================================================
 // MENU THÔNG MINH CHO APP HỌC TIẾNG NHẬT V3.2
-// Giữ luồng Hybrid Game Design: chọn cấp lần đầu, lần sau vào thẳng menu.
-// Bánh răng: giữ 1 giây mở Test, nhấp 10 lần để reset về chọn cấp.
+// Giữ luồng Hybrid Game Design: chọn cấp học lần đầu, lần sau vào thẳng menu.
+// Bánh răng: giữ 1 giây mở Test, nhấp 10 lần để reset về chọn cấp học.
 // =====================================================
 
-const MENU_STORAGE_KEY_AGE = 'nihongo_selected_level';
+const MENU_STORAGE_KEY_LEVEL = 'nihongo_selected_level';
 const MENU_STORAGE_KEY_GROUP = 'nihongo_selected_skill_group';
 
-const AGE_GROUPS = {
+const NIHONGO_LEVELS = {
     "intro": {
         "label": "Nhập môn",
         "icon": "🌸",
@@ -512,16 +512,6 @@ const GAME_MENU_DATA = [
         ],
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
-    },
-    {
-        "id": "frame_test",
-        "label": "Test Khung",
-        "icon": "🧪",
-        "group": "test",
-        "levels": [],
-        "color": "linear-gradient(135deg,#777 0%,#bbb 100%)",
-        "badge": "Test",
-        "testOnly": true
     }
 ];
 
@@ -531,19 +521,19 @@ function safeGetStorage(key, fallback = '') {
 function safeSetStorage(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
 }
-function getCurrentAgeGroup() {
-    const age = safeGetStorage(MENU_STORAGE_KEY_AGE, '');
-    return AGE_GROUPS[age] ? age : '';
+function getCurrentNihongoLevel() {
+    const level = safeGetStorage(MENU_STORAGE_KEY_LEVEL, '');
+    return NIHONGO_LEVELS[level] ? level : '';
 }
-function getAgeGames(age) {
-    return GAME_MENU_DATA.filter(game => !game.testOnly && Array.isArray(game.levels) && game.levels.includes(age));
+function getLevelGames(level) {
+    return GAME_MENU_DATA.filter(game => !game.testOnly && Array.isArray(game.levels) && game.levels.includes(level));
 }
-function getAvailableGroups(age) {
-    const games = getAgeGames(age);
+function getAvailableGroups(level) {
+    const games = getLevelGames(level);
     return GAME_GROUPS.filter(group => games.some(game => game.group === group.id));
 }
-function getCurrentGroup(age) {
-    const groups = getAvailableGroups(age);
+function getCurrentGroup(level) {
+    const groups = getAvailableGroups(level);
     if (!groups.length) return '';
     const saved = safeGetStorage(MENU_STORAGE_KEY_GROUP, groups[0].id);
     if (groups.some(group => group.id === saved)) return saved;
@@ -553,86 +543,86 @@ function getCurrentGroup(age) {
 function renderGameMenu() {
     const root = document.getElementById('smart-menu-root');
     if (!root) return;
-    const age = getCurrentAgeGroup();
-    if (!age) return renderAgeSelectScreen(root);
-    renderMainGameMenu(root, age);
+    const level = getCurrentNihongoLevel();
+    if (!level) return renderLevelSelectScreen(root);
+    renderMainGameMenu(root, level);
 }
 
-let parentGearTestTimer = null;
-let parentGearActionDone = false;
-let parentGearClickCount = 0;
-let parentGearClickResetTimer = null;
-const PARENT_GEAR_RESET_CLICK_COUNT = 10;
+let adminGearTestTimer = null;
+let adminGearActionDone = false;
+let adminGearClickCount = 0;
+let adminGearClickResetTimer = null;
+const ADMIN_GEAR_RESET_CLICK_COUNT = 10;
 
-function renderParentGearButton() {
+function renderAdminGearButton() {
     return `
-        <button class="parent-gear-btn" type="button" aria-label="Phụ huynh / Test"
-            title="Giữ 1 giây để mở Test. Nhấp ${PARENT_GEAR_RESET_CLICK_COUNT} lần liên tiếp để xoá cài đặt và chọn lại cấp học."
-            onpointerdown="startParentGearHold(event)" onpointerup="endParentGearHold(event)"
-            onpointercancel="cancelParentGearHold()" onpointerleave="cancelParentGearHold()"
-            onclick="handleParentGearClick(event)">⚙</button>`;
+        <button class="admin-gear-btn" type="button" aria-label="Quản trị / Test"
+            title="Giữ 1 giây để mở Test. Nhấp ${ADMIN_GEAR_RESET_CLICK_COUNT} lần liên tiếp để xoá cài đặt và chọn lại cấp học."
+            onpointerdown="startAdminGearHold(event)" onpointerup="endAdminGearHold(event)"
+            onpointercancel="cancelAdminGearHold()" onpointerleave="cancelAdminGearHold()"
+            onclick="handleAdminGearClick(event)">⚙</button>`;
 }
-function startParentGearHold(event) {
+function startAdminGearHold(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
-    cancelParentGearHold();
-    parentGearActionDone = false;
-    parentGearTestTimer = setTimeout(() => {
-        parentGearTestTimer = null;
-        parentGearActionDone = true;
-        openParentTestMenu();
+    cancelAdminGearHold();
+    adminGearActionDone = false;
+    adminGearTestTimer = setTimeout(() => {
+        adminGearTestTimer = null;
+        adminGearActionDone = true;
+        openAdminTestMenu();
     }, 1000);
 }
-function endParentGearHold(event) {
+function endAdminGearHold(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
-    cancelParentGearHold();
+    cancelAdminGearHold();
 }
-function cancelParentGearHold() {
-    if (parentGearTestTimer) { clearTimeout(parentGearTestTimer); parentGearTestTimer = null; }
+function cancelAdminGearHold() {
+    if (adminGearTestTimer) { clearTimeout(adminGearTestTimer); adminGearTestTimer = null; }
 }
-function handleParentGearClick(event) {
+function handleAdminGearClick(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
-    if (parentGearActionDone) { parentGearActionDone = false; return; }
-    parentGearClickCount += 1;
-    if (parentGearClickResetTimer) clearTimeout(parentGearClickResetTimer);
-    parentGearClickResetTimer = setTimeout(() => { parentGearClickCount = 0; parentGearClickResetTimer = null; }, 3000);
-    if (parentGearClickCount >= PARENT_GEAR_RESET_CLICK_COUNT) {
-        parentGearClickCount = 0;
-        if (parentGearClickResetTimer) { clearTimeout(parentGearClickResetTimer); parentGearClickResetTimer = null; }
-        closeParentTestMenu();
-        resetKidMenuFromGear();
+    if (adminGearActionDone) { adminGearActionDone = false; return; }
+    adminGearClickCount += 1;
+    if (adminGearClickResetTimer) clearTimeout(adminGearClickResetTimer);
+    adminGearClickResetTimer = setTimeout(() => { adminGearClickCount = 0; adminGearClickResetTimer = null; }, 3000);
+    if (adminGearClickCount >= ADMIN_GEAR_RESET_CLICK_COUNT) {
+        adminGearClickCount = 0;
+        if (adminGearClickResetTimer) { clearTimeout(adminGearClickResetTimer); adminGearClickResetTimer = null; }
+        closeAdminTestMenu();
+        resetNihongoMenuFromGear();
     }
 }
-function resetKidMenuFromGear() {
-    cancelParentGearHold();
+function resetNihongoMenuFromGear() {
+    cancelAdminGearHold();
     const ok = confirm('Xoá cài đặt hiện tại và quay lại chọn cấp học từ đầu?\n\nThao tác này sẽ xoá lựa chọn cấp học, nhóm học và dữ liệu tạm trong app.');
-    if (!ok) { parentGearActionDone = false; return; }
+    if (!ok) { adminGearActionDone = false; return; }
     try { localStorage.clear(); sessionStorage.clear(); } catch (err) { console.warn('Không xoá được storage:', err); }
-    closeParentTestMenu();
+    closeAdminTestMenu();
     const root = document.getElementById('smart-menu-root');
-    if (root) renderAgeSelectScreen(root); else renderGameMenu();
+    if (root) renderLevelSelectScreen(root); else renderGameMenu();
 }
-function renderAgeSelectScreen(root) {
-    const cards = Object.entries(AGE_GROUPS).map(([ageId, age]) => `
-        <button class="age-card level-card level-card-${ageId}" type="button" onclick="selectKidAge('${ageId}')">
-            <span class="age-card-icon">${age.icon}</span>
-            <span class="age-card-label">${age.label}</span>
-            <span class="age-card-note">${age.note}</span>
+function renderLevelSelectScreen(root) {
+    const cards = Object.entries(NIHONGO_LEVELS).map(([levelId, level]) => `
+        <button class="level-card level-card-${levelId}" type="button" onclick="selectNihongoLevel('${levelId}')">
+            <span class="level-card-icon">${level.icon}</span>
+            <span class="level-card-label">${level.label}</span>
+            <span class="level-card-note">${level.note}</span>
         </button>`).join('');
     root.innerHTML = `
-        <section class="age-select-screen nihongo-select-screen">
+        <section class="level-select-screen nihongo-select-screen">
             <div class="nihongo-splash-mark">日本語</div>
             <h1 class="app-title smart-title">Học tiếng Nhật</h1>
             <p class="smart-subtitle">Chọn cấp độ trước. Lần sau app sẽ vào thẳng menu cấp đã chọn.</p>
-            <div class="age-card-grid level-card-grid">${cards}</div>
-            <div class="parent-gear-zone">${renderParentGearButton()}</div>
+            <div class="level-card-grid">${cards}</div>
+            <div class="admin-gear-zone">${renderAdminGearButton()}</div>
         </section>`;
 }
-function renderMainGameMenu(root, age) {
-    const ageInfo = AGE_GROUPS[age];
-    const groups = getAvailableGroups(age);
-    const currentGroup = getCurrentGroup(age);
-    const games = getAgeGames(age).filter(game => game.group === currentGroup);
-    const ageOptions = Object.entries(AGE_GROUPS).map(([ageId, item]) => `<option value="${ageId}" ${ageId === age ? 'selected' : ''}>${item.icon} ${item.label}</option>`).join('');
+function renderMainGameMenu(root, level) {
+    const levelInfo = NIHONGO_LEVELS[level];
+    const groups = getAvailableGroups(level);
+    const currentGroup = getCurrentGroup(level);
+    const games = getLevelGames(level).filter(game => game.group === currentGroup);
+    const levelOptions = Object.entries(NIHONGO_LEVELS).map(([levelId, item]) => `<option value="${levelId}" ${levelId === level ? 'selected' : ''}>${item.icon} ${item.label}</option>`).join('');
     const groupTabs = groups.map(group => `
         <button class="menu-group-tab ${group.id === currentGroup ? 'active' : ''}" type="button" onclick="setGameMenuGroup('${group.id}')">
             <span>${group.icon}</span><span>${group.label}</span>
@@ -643,24 +633,24 @@ function renderMainGameMenu(root, age) {
                 <div>
                     <div class="nihongo-mini-title">Nihongo Quest</div>
                     <h1 class="smart-menu-title">Chọn bài học</h1>
-                    <div class="smart-age-line"><span>Cấp độ:</span><select class="smart-age-select" onchange="selectKidAge(this.value)">${ageOptions}</select></div>
-                    <div class="nihongo-level-note">${ageInfo.note}</div>
+                    <div class="smart-level-line"><span>Cấp độ:</span><select class="smart-level-select" onchange="selectNihongoLevel(this.value)">${levelOptions}</select></div>
+                    <div class="nihongo-level-note">${levelInfo.note}</div>
                 </div>
-                <div class="smart-age-badge" title="${ageInfo.note}"><span>${ageInfo.icon}</span></div>
+                <div class="smart-level-badge" title="${levelInfo.note}"><span>${levelInfo.icon}</span></div>
             </div>
             <div class="menu-group-tabs">${groupTabs}</div>
             <div class="smart-game-grid">${games.map(renderMenuGameButton).join('')}</div>
-            <div class="smart-menu-footer">${renderParentGearButton()}</div>
+            <div class="smart-menu-footer">${renderAdminGearButton()}</div>
         </section>`;
 }
 function renderMenuGameButton(game) {
     const badge = game.badge ? `<span class="${game.badge === 'New' ? 'menu-new-app' : 'menu-version'}">${game.badge}</span>` : '';
     return `<button class="menu-btn smart-game-btn btn-${game.id}" type="button" onclick="startGameFromSmartMenu('${game.id}')" style="background: ${game.color};">${badge}<div class="menu-icon">${game.icon}</div><div class="menu-label">${game.label}</div></button>`;
 }
-function selectKidAge(ageId) {
-    if (!AGE_GROUPS[ageId]) return;
-    safeSetStorage(MENU_STORAGE_KEY_AGE, ageId);
-    const groups = getAvailableGroups(ageId);
+function selectNihongoLevel(levelId) {
+    if (!NIHONGO_LEVELS[levelId]) return;
+    safeSetStorage(MENU_STORAGE_KEY_LEVEL, levelId);
+    const groups = getAvailableGroups(levelId);
     if (groups.length) safeSetStorage(MENU_STORAGE_KEY_GROUP, groups[0].id);
     renderGameMenu();
 }
@@ -669,29 +659,29 @@ function startGameFromSmartMenu(gameId) {
     if (typeof startGame !== 'function') { console.warn('startGame chưa sẵn sàng:', gameId); return; }
     startGame(gameId);
 }
-function openParentTestMenu() {
+function openAdminTestMenu() {
     const root = document.getElementById('smart-menu-root');
     if (!root) return;
-    const old = document.getElementById('parent-test-overlay');
+    const old = document.getElementById('admin-test-overlay');
     if (old) old.remove();
     const overlay = document.createElement('div');
-    overlay.id = 'parent-test-overlay';
-    overlay.className = 'parent-test-overlay';
-    overlay.innerHTML = `<div class="parent-test-box"><div class="parent-test-head"><div><div class="parent-test-title">⚙ Phụ huynh / Test</div><div class="parent-test-note">Hiện toàn bộ bài học để test nhanh khi sửa code.</div></div><button class="parent-test-close" type="button" onclick="closeParentTestMenu()">✕</button></div><div class="parent-test-grid">${GAME_MENU_DATA.slice().map(renderMenuGameButton).join('')}</div></div>`;
+    overlay.id = 'admin-test-overlay';
+    overlay.className = 'admin-test-overlay';
+    overlay.innerHTML = `<div class="admin-test-box"><div class="admin-test-head"><div><div class="admin-test-title">⚙ Quản trị / Test</div><div class="admin-test-note">Hiện toàn bộ bài học để test nhanh khi sửa code.</div></div><button class="admin-test-close" type="button" onclick="closeAdminTestMenu()">✕</button></div><div class="admin-test-grid">${GAME_MENU_DATA.slice().map(renderMenuGameButton).join('')}</div></div>`;
     root.appendChild(overlay);
 }
-function closeParentTestMenu() { const overlay = document.getElementById('parent-test-overlay'); if (overlay) overlay.remove(); }
+function closeAdminTestMenu() { const overlay = document.getElementById('admin-test-overlay'); if (overlay) overlay.remove(); }
 
 window.renderGameMenu = renderGameMenu;
-window.selectKidAge = selectKidAge;
+window.selectNihongoLevel = selectNihongoLevel;
 window.setGameMenuGroup = setGameMenuGroup;
 window.startGameFromSmartMenu = startGameFromSmartMenu;
-window.openParentTestMenu = openParentTestMenu;
-window.closeParentTestMenu = closeParentTestMenu;
-window.renderParentGearButton = renderParentGearButton;
-window.startParentGearHold = startParentGearHold;
-window.endParentGearHold = endParentGearHold;
-window.cancelParentGearHold = cancelParentGearHold;
-window.handleParentGearClick = handleParentGearClick;
-window.resetKidMenuFromGear = resetKidMenuFromGear;
+window.openAdminTestMenu = openAdminTestMenu;
+window.closeAdminTestMenu = closeAdminTestMenu;
+window.renderAdminGearButton = renderAdminGearButton;
+window.startAdminGearHold = startAdminGearHold;
+window.endAdminGearHold = endAdminGearHold;
+window.cancelAdminGearHold = cancelAdminGearHold;
+window.handleAdminGearClick = handleAdminGearClick;
+window.resetNihongoMenuFromGear = resetNihongoMenuFromGear;
 window.addEventListener('DOMContentLoaded', renderGameMenu);

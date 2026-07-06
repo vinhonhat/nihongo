@@ -36,7 +36,7 @@ function addScore(amount = 1) {
 // - answer-panel: khu đáp án + nút loa ở giữa phía trên
 // =====================================================
 
-function renderGameShell(title = 'Bé Vui Học', config = {}) {
+function renderGameShell(title = 'Nihongo Quest', config = {}) {
     const gameScreen = document.getElementById('game-screen');
     if (!gameScreen) return;
 
@@ -157,7 +157,7 @@ function fireGameConfetti() {
 // =====================================================
 
 function fireFanConfettiFromSide(side = 'left') {
-    const colors = [
+    const confettiPalette = [
         '#ff4081',
         '#ffeb3b',
         '#00e5ff',
@@ -199,7 +199,7 @@ function fireFanConfettiFromSide(side = 'left') {
         piece.style.height = longPiece ? size * 1.7 + 'px' : size + 'px';
 
         piece.style.background =
-            colors[Math.floor(Math.random() * colors.length)];
+            confettiPalette[Math.floor(Math.random() * confettiPalette.length)];
 
         piece.style.borderRadius = longPiece ? '3px' : '50%';
         piece.style.zIndex = '99999';
@@ -286,7 +286,7 @@ function fireFanConfettiFromSide(side = 'left') {
         }, duration + delay + 120);
     }
 
-    createFanSpark(originX, originY, colors, isLeft);
+    createFanSpark(originX, originY, confettiPalette, isLeft);
 }
 
 
@@ -335,7 +335,7 @@ function createConfettiCannon(x, y, isLeft) {
 // PHẦN 9 — TIA SÁNG LÚC BẮN
 // =====================================================
 
-function createFanSpark(x, y, colors, isLeft) {
+function createFanSpark(x, y, confettiPalette, isLeft) {
     for (let i = 0; i < 18; i++) {
         const spark = document.createElement('div');
 
@@ -346,7 +346,7 @@ function createFanSpark(x, y, colors, isLeft) {
         spark.style.height = '7px';
         spark.style.borderRadius = '50%';
         spark.style.background =
-            colors[Math.floor(Math.random() * colors.length)];
+            confettiPalette[Math.floor(Math.random() * confettiPalette.length)];
         spark.style.zIndex = '99999';
         spark.style.pointerEvents = 'none';
 

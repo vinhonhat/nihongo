@@ -6,8 +6,8 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '3.2.9-nihongo';
-const APP_VERSION_KEY = 'behoc_app_version';
+const APP_VERSION = '3.2.10-nihongo-clean';
+const APP_VERSION_KEY = 'nihongo_app_version';
 
 
 const loadedCss = new Set();
@@ -348,14 +348,6 @@ const GAME_CONFIG = {
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n1_mock_test",
         "type": "registered"
-    },
-    "frame_test": {
-        "title": "Test Khung",
-        "folder": "frame-test",
-        "css": "games/frame-test/frame-test.css",
-        "js": "games/frame-test/frame-test.js",
-        "moduleId": "frame_test",
-        "type": "registered"
     }
 };
 
@@ -454,8 +446,8 @@ function backToMenu() {
     activeGameId = null;
     currentQuestionData = null;
 
-    const alphabetScreen = document.getElementById('alphabet-screen');
-    if (alphabetScreen) alphabetScreen.remove();
+    const oldScreen = document.getElementById('kana-screen');
+    if (oldScreen) oldScreen.remove();
 
     showMenuOnly();
 }
@@ -490,7 +482,7 @@ async function startGame(gameId) {
     await loadCssOnce(config.css);
     await loadJsOnce(config.js);
 
-    // Game custom như Alphabet
+    // Bài học dạng custom
     if (config.type === 'custom') {
         const fn = window[config.startFn];
 
@@ -543,7 +535,7 @@ function showMaintenancePopup(title = 'Game') {
             🚧 Game này đang bảo trì hoặc chưa hoàn thiện.<br>                      
             </div>
             <button class="maintenance-close" type="button" onclick="closeMaintenancePopup()">
-                Bé chọn game khác nhé
+                Chọn bài khác nhé
             </button>
         </div>
     `;
@@ -747,7 +739,7 @@ function stopAutoReplay() {
 }
 
 // =====================================================
-// TƯƠNG TÁC CỦA BÉ
+// TƯƠNG TÁC CỦA NGƯỜI HỌC
 // Có bấm đáp án hoặc bấm loa thì tính là có tương tác.
 // Sau 3 câu liên tiếp không tương tác thì tạm dừng game.
 // =====================================================
@@ -917,7 +909,7 @@ function handleQuestionTimeUp() {
 
 
 // =====================================================
-// TẠM DỪNG KHI BÉ KHÔNG TƯƠNG TÁC
+// TẠM DỪNG KHI NGƯỜI HỌC KHÔNG TƯƠNG TÁC
 // Sau 3 câu liên tiếp hết giờ không bấm gì.
 // =====================================================
 
@@ -946,11 +938,11 @@ function pauseGameForNoInteraction() {
             <div class="game-pause-icon">⏸️</div>
 
             <div class="game-pause-title">
-                Tạm dừng rồi bé ơi
+                Đã tạm dừng
             </div>
 
             <div class="game-pause-text">
-                Bé chưa chọn đáp án trong 3 câu liên tiếp.
+                Bạn chưa chọn đáp án trong 3 câu liên tiếp.
             </div>
 
             <div class="game-pause-actions">
@@ -958,7 +950,7 @@ function pauseGameForNoInteraction() {
                     class="game-pause-resume"
                     type="button"
                     onclick="resumeGameAfterPause()">
-                    Chơi tiếp
+                    Học tiếp
                 </button>
 
                 <button
@@ -989,7 +981,7 @@ function resumeGameAfterPause() {
 
     resetTopTimerBar();
 
-    // Chơi tiếp bằng một câu mới
+    // Học tiếp bằng một câu mới
     nextQuestion({
         playAudioNow: false,
         startTimerNow: false
@@ -1209,7 +1201,7 @@ function installMobileZoomBlock() {
 
 installMobileZoomBlock();
 
-// PWA: dùng đường dẫn tương đối để chạy được trong thư mục /behocv3.2/ hoặc khi test local.
+// PWA: dùng đường dẫn tương đối để chạy được trong thư mục /nihongo/ hoặc khi test local.
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('sw.js').catch(err => {
@@ -1272,7 +1264,7 @@ function showInstallInvitePopup() {
     if (!deferredPrompt) return;
     if (document.getElementById('install-invite-popup')) return;
 
-    // Chỉ hiện 1 lần trong mỗi tab, tránh làm phiền bé/phụ huynh
+    // Chỉ hiện 1 lần trong mỗi tab, tránh làm phiền người học
     if (sessionStorage.getItem('installInviteClosed') === '1') return;
 
     const popup = document.createElement('div');
@@ -1282,9 +1274,9 @@ function showInstallInvitePopup() {
     popup.innerHTML = `
         <div class="install-invite-box">
             <div class="install-invite-icon">📲</div>
-            <div class="install-invite-title">Cài App Cho Bé?</div>
+            <div class="install-invite-title">Cài Nihongo Quest?</div>
             <div class="install-invite-text">
-                Cài ra màn hình chính để mở game nhanh hơn.
+                Cài ra màn hình chính để mở bài học nhanh hơn.
             </div>
 
             <div class="install-invite-actions">
