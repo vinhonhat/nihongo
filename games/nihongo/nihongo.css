@@ -312,3 +312,223 @@
         font-size: clamp(.82rem, 2.8vw, 1.05rem) !important;
     }
 }
+
+
+/* =====================================================
+   NIHONGO COMPACT PATCH 3.2.12
+   - Chỉ dùng 1 nút loa trên thẻ câu hỏi
+   - Giảm chữ Kanji/Kana và đáp án
+   - Card nằm gọn trong khung trắng, không tràn iPhone/iPad
+===================================================== */
+.game-view[class*='game-nihongo'] {
+    --question-ratio: .86fr;
+    --answer-ratio: .94fr;
+    --game-body-gap: 8px;
+    --question-padding: 8px;
+    --answer-top-padding: 0px;
+    --answer-gap: 8px;
+    font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif) !important;
+}
+
+.game-view[class*='game-nihongo'] .replay-btn {
+    display: none !important;
+}
+
+.game-view[class*='game-nihongo'] .display-area {
+    padding: 8px;
+    border-radius: 18px;
+}
+
+.nihongo-card {
+    min-height: 0;
+    max-height: 100%;
+    padding: clamp(10px, 2.8vw, 20px);
+    border-radius: 24px;
+    border-width: 2px;
+    background: linear-gradient(135deg, rgba(255,255,255,.98), rgba(255,247,249,.96));
+    box-shadow: 0 10px 22px rgba(147, 65, 92, .12);
+}
+
+.nihongo-card::after {
+    right: 10px;
+    bottom: 8px;
+    font-size: clamp(30px, 8.5vw, 64px);
+    letter-spacing: -3px;
+    color: rgba(232, 93, 117, .055);
+}
+
+.nihongo-card-top {
+    margin-bottom: 5px;
+}
+
+.nihongo-chip {
+    min-height: 28px;
+    padding: 4px 10px;
+    font-size: clamp(.72rem, 2.2vw, .9rem);
+}
+
+.nihongo-speak-btn {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+    font-size: 1rem;
+    box-shadow: 0 6px 14px rgba(232, 93, 117, .20);
+}
+
+.nihongo-prompt {
+    margin-top: 0;
+    color: #176d82;
+    font-size: clamp(.82rem, 2.55vw, 1rem);
+    line-height: 1.25;
+}
+
+.nihongo-jp {
+    margin-top: 7px;
+    font-family: var(--font-jp, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', 'Meiryo', sans-serif) !important;
+    font-size: clamp(2.05rem, 10vw, 4.8rem);
+    line-height: 1.02;
+    text-shadow: 0 2px 0 rgba(255,255,255,.58);
+}
+
+.nihongo-kind-kanji .nihongo-jp {
+    font-size: clamp(2.65rem, 11.5vw, 5.6rem);
+}
+
+.nihongo-reading {
+    min-height: 26px;
+    margin-top: 7px;
+    padding: 5px 10px;
+    border-radius: 14px;
+    font-size: clamp(.72rem, 2.4vw, .92rem);
+    line-height: 1.22;
+}
+
+.nihongo-options-grid {
+    height: auto !important;
+    max-height: 100% !important;
+    align-content: start !important;
+    grid-auto-rows: minmax(68px, auto) !important;
+}
+
+.nihongo-option-btn {
+    height: auto !important;
+    min-height: 68px !important;
+    padding: 7px 8px !important;
+    border-radius: 18px !important;
+    border-width: 2px !important;
+    font-family: var(--font-main, -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif) !important;
+    font-size: clamp(.78rem, 2.55vw, 1.04rem) !important;
+    line-height: 1.2 !important;
+    box-shadow: 0 5px 0 rgba(232, 93, 117, .13), 0 7px 14px rgba(0,0,0,.055) !important;
+}
+
+@media (max-width: 767px) {
+    .game-view[class*='game-nihongo'] {
+        padding: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(6px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+        --question-ratio: .8fr;
+        --answer-ratio: .92fr;
+        --game-body-gap: 7px;
+        --question-padding: 6px;
+        --answer-gap: 7px;
+    }
+
+    .game-view[class*='game-nihongo'] .top-bar {
+        margin-bottom: 6px;
+    }
+
+    .game-view[class*='game-nihongo'] .display-area {
+        padding: 6px;
+        border-radius: 16px;
+    }
+
+    .nihongo-card {
+        padding: 10px;
+        border-radius: 20px;
+    }
+
+    .nihongo-speak-btn {
+        width: 34px;
+        height: 34px;
+        flex-basis: 34px;
+    }
+
+    .nihongo-jp {
+        font-size: clamp(1.85rem, 9.2vw, 4.1rem);
+    }
+
+    .nihongo-kind-kanji .nihongo-jp {
+        font-size: clamp(2.35rem, 10.5vw, 4.6rem);
+    }
+
+    .nihongo-options-grid {
+        grid-auto-rows: minmax(62px, auto) !important;
+    }
+
+    .nihongo-option-btn {
+        min-height: 62px !important;
+        font-size: clamp(.74rem, 2.45vw, .95rem) !important;
+    }
+}
+
+@media (max-width: 360px), (max-height: 700px) {
+    .game-view[class*='game-nihongo'] {
+        --question-ratio: .72fr;
+        --answer-ratio: .95fr;
+        --game-body-gap: 5px;
+        --answer-gap: 6px;
+    }
+
+    .nihongo-card {
+        padding: 8px;
+        border-radius: 18px;
+    }
+
+    .nihongo-card::after {
+        font-size: clamp(24px, 7.5vw, 44px);
+        right: 8px;
+        bottom: 6px;
+    }
+
+    .nihongo-chip {
+        min-height: 24px;
+        padding: 3px 8px;
+        font-size: .68rem;
+    }
+
+    .nihongo-speak-btn {
+        width: 30px;
+        height: 30px;
+        flex-basis: 30px;
+        font-size: .86rem;
+    }
+
+    .nihongo-prompt {
+        font-size: .74rem;
+    }
+
+    .nihongo-jp {
+        margin-top: 5px;
+        font-size: clamp(1.55rem, 8.4vw, 3.2rem);
+    }
+
+    .nihongo-kind-kanji .nihongo-jp {
+        font-size: clamp(2rem, 9.6vw, 3.8rem);
+    }
+
+    .nihongo-reading {
+        min-height: 22px;
+        margin-top: 5px;
+        padding: 4px 8px;
+        font-size: .68rem;
+    }
+
+    .nihongo-options-grid {
+        grid-auto-rows: minmax(54px, auto) !important;
+    }
+
+    .nihongo-option-btn {
+        min-height: 54px !important;
+        font-size: .72rem !important;
+        border-radius: 15px !important;
+    }
+}

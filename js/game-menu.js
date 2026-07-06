@@ -42,24 +42,9 @@ const NIHONGO_LEVELS = {
 };
 const GAME_GROUPS = [
     {
-        "id": "kana",
-        "label": "Bảng chữ",
-        "icon": "あ"
-    },
-    {
         "id": "vocab",
         "label": "Từ vựng",
         "icon": "📚"
-    },
-    {
-        "id": "listen",
-        "label": "Luyện nghe",
-        "icon": "👂"
-    },
-    {
-        "id": "kanji",
-        "label": "Kanji",
-        "icon": "漢"
     },
     {
         "id": "grammar",
@@ -67,17 +52,17 @@ const GAME_GROUPS = [
         "icon": "🧩"
     },
     {
-        "id": "test",
-        "label": "Thi thử",
-        "icon": "📝"
+        "id": "practice",
+        "label": "Luyện",
+        "icon": "🎯"
     }
 ];
 const GAME_MENU_DATA = [
     {
         "id": "nihongo_intro_kana",
-        "label": "Bảng Hiragana",
+        "label": "Hiragana",
         "icon": "あ",
-        "group": "kana",
+        "group": "vocab",
         "levels": [
             "intro"
         ],
@@ -86,9 +71,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_intro_katakana",
-        "label": "Bảng Katakana",
+        "label": "Katakana",
         "icon": "ア",
-        "group": "kana",
+        "group": "vocab",
         "levels": [
             "intro"
         ],
@@ -108,9 +93,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_intro_listen",
-        "label": "Nghe âm Kana",
+        "label": "Nghe Kana",
         "icon": "👂あ",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "intro"
         ],
@@ -119,9 +104,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_intro_quiz",
-        "label": "Kiểm tra nhập môn",
+        "label": "Kiểm tra",
         "icon": "🌸",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "intro"
         ],
@@ -130,7 +115,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n5_vocab_learn",
-        "label": "Học từ vựng N5",
+        "label": "Từ vựng N5",
         "icon": "📖",
         "group": "vocab",
         "levels": [
@@ -141,9 +126,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n5_vocab_practice",
-        "label": "Luyện từ vựng N5",
+        "label": "Luyện từ N5",
         "icon": "🎯",
-        "group": "vocab",
+        "group": "practice",
         "levels": [
             "n5"
         ],
@@ -152,9 +137,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n5_listening",
-        "label": "Luyện nghe N5",
+        "label": "Nghe N5",
         "icon": "👂",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "n5"
         ],
@@ -165,7 +150,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n5_kanji",
         "label": "Kanji N5",
         "icon": "漢",
-        "group": "kanji",
+        "group": "vocab",
         "levels": [
             "n5"
         ],
@@ -198,7 +183,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n5_mock_test",
         "label": "Thi thử N5",
         "icon": "📝",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "n5"
         ],
@@ -207,7 +192,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n4_vocab_learn",
-        "label": "Học từ vựng N4",
+        "label": "Từ vựng N4",
         "icon": "📖",
         "group": "vocab",
         "levels": [
@@ -218,9 +203,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n4_vocab_practice",
-        "label": "Luyện từ vựng N4",
+        "label": "Luyện từ N4",
         "icon": "🎯",
-        "group": "vocab",
+        "group": "practice",
         "levels": [
             "n4"
         ],
@@ -229,9 +214,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n4_listening",
-        "label": "Luyện nghe N4",
+        "label": "Nghe N4",
         "icon": "👂",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "n4"
         ],
@@ -242,7 +227,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n4_kanji",
         "label": "Kanji N4",
         "icon": "漢",
-        "group": "kanji",
+        "group": "vocab",
         "levels": [
             "n4"
         ],
@@ -275,7 +260,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n4_mock_test",
         "label": "Thi thử N4",
         "icon": "📝",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "n4"
         ],
@@ -284,7 +269,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n3_vocab_learn",
-        "label": "Học từ vựng N3",
+        "label": "Từ vựng N3",
         "icon": "📖",
         "group": "vocab",
         "levels": [
@@ -295,9 +280,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n3_vocab_practice",
-        "label": "Luyện từ vựng N3",
+        "label": "Luyện từ N3",
         "icon": "🎯",
-        "group": "vocab",
+        "group": "practice",
         "levels": [
             "n3"
         ],
@@ -306,9 +291,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n3_listening",
-        "label": "Luyện nghe N3",
+        "label": "Nghe N3",
         "icon": "👂",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "n3"
         ],
@@ -319,7 +304,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n3_kanji",
         "label": "Kanji N3",
         "icon": "漢",
-        "group": "kanji",
+        "group": "vocab",
         "levels": [
             "n3"
         ],
@@ -352,7 +337,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n3_mock_test",
         "label": "Thi thử N3",
         "icon": "📝",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "n3"
         ],
@@ -361,7 +346,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n2_vocab_learn",
-        "label": "Học từ vựng N2",
+        "label": "Từ vựng N2",
         "icon": "📖",
         "group": "vocab",
         "levels": [
@@ -372,9 +357,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n2_vocab_practice",
-        "label": "Luyện từ vựng N2",
+        "label": "Luyện từ N2",
         "icon": "🎯",
-        "group": "vocab",
+        "group": "practice",
         "levels": [
             "n2"
         ],
@@ -383,9 +368,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n2_listening",
-        "label": "Luyện nghe N2",
+        "label": "Nghe N2",
         "icon": "👂",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "n2"
         ],
@@ -396,7 +381,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n2_kanji",
         "label": "Kanji N2",
         "icon": "漢",
-        "group": "kanji",
+        "group": "vocab",
         "levels": [
             "n2"
         ],
@@ -429,7 +414,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n2_mock_test",
         "label": "Thi thử N2",
         "icon": "📝",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "n2"
         ],
@@ -438,7 +423,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n1_vocab_learn",
-        "label": "Học từ vựng N1",
+        "label": "Từ vựng N1",
         "icon": "📖",
         "group": "vocab",
         "levels": [
@@ -449,9 +434,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n1_vocab_practice",
-        "label": "Luyện từ vựng N1",
+        "label": "Luyện từ N1",
         "icon": "🎯",
-        "group": "vocab",
+        "group": "practice",
         "levels": [
             "n1"
         ],
@@ -460,9 +445,9 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n1_listening",
-        "label": "Luyện nghe N1",
+        "label": "Nghe N1",
         "icon": "👂",
-        "group": "listen",
+        "group": "practice",
         "levels": [
             "n1"
         ],
@@ -473,7 +458,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n1_kanji",
         "label": "Kanji N1",
         "icon": "漢",
-        "group": "kanji",
+        "group": "vocab",
         "levels": [
             "n1"
         ],
@@ -506,7 +491,7 @@ const GAME_MENU_DATA = [
         "id": "nihongo_n1_mock_test",
         "label": "Thi thử N1",
         "icon": "📝",
-        "group": "test",
+        "group": "practice",
         "levels": [
             "n1"
         ],
