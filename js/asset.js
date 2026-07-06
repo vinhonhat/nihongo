@@ -1,6 +1,6 @@
 // js/asset.js
 // =====================================================
-// QUY ƯỚC TÀI NGUYÊN NIHONGO QUEST V3.2
+// QUY ƯỚC TÀI NGUYÊN NIHONGO QUEST V1.1
 // =====================================================
 //
 // Ảnh:            img/logo.png

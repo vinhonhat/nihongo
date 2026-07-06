@@ -197,3 +197,203 @@ const NIHONGO_GAME_IDS = [
 
 NIHONGO_GAME_IDS.forEach(id => registerGame(id, makeNihongoGame(id)));
 window.speakNihongo = speakNihongo;
+
+/* =====================================================
+   NIHONGO SETTINGS UI V1.1.2
+   Chỉnh cỡ chữ, chia khung câu hỏi/đáp án, độ mờ nền.
+   Có MutationObserver để áp dụng lại sau khi game-screen được render lại.
+===================================================== */
+(function () {
+    const STORAGE_KEY = 'nihongo_ui_settings_v1_1_2';
+    const OLD_STORAGE_KEY = 'nihongo_ui_settings_v1';
+
+    const DEFAULT_SETTINGS = {
+        promptSize: 0.95,
+        jpScale: 1,
+        answerSize: 0.78,
+        questionRatio: 70,
+        bgOpacity: 0.14
+    };
+
+    function getGameScreen() {
+        return document.getElementById('game-screen');
+    }
+
+    function isNihongoScreen(screen) {
+        return !!(screen && screen.className && String(screen.className).indexOf('game-nihongo') >= 0);
+    }
+
+    function normalizeSettings(settings = {}) {
+        return {
+            promptSize: Number(settings.promptSize ?? DEFAULT_SETTINGS.promptSize),
+            jpScale: Number(settings.jpScale ?? DEFAULT_SETTINGS.jpScale),
+            answerSize: Number(settings.answerSize ?? DEFAULT_SETTINGS.answerSize),
+            questionRatio: Number(settings.questionRatio ?? DEFAULT_SETTINGS.questionRatio),
+            bgOpacity: Number(settings.bgOpacity ?? DEFAULT_SETTINGS.bgOpacity)
+        };
+    }
+
+    function applyNihongoSettings(settings) {
+        const screen = getGameScreen();
+        if (!isNihongoScreen(screen)) return;
+
+        const finalSettings = normalizeSettings(settings);
+        const questionRatio = Math.max(55, Math.min(85, finalSettings.questionRatio));
+        const answerRatio = 100 - questionRatio;
+        const jpScale = Math.max(0.65, Math.min(1.5, finalSettings.jpScale));
+
+        screen.style.setProperty('--NQ-question-row', `${questionRatio}fr`);
+        screen.style.setProperty('--NQ-answer-row', `${answerRatio}fr`);
+        screen.style.setProperty('--NQ-prompt-size', `${finalSettings.promptSize}rem`);
+        screen.style.setProperty('--NQ-answer-font', `${finalSettings.answerSize}rem`);
+        screen.style.setProperty('--NQ-bg-opacity', `${finalSettings.bgOpacity}`);
+        screen.style.setProperty('--NQ-jp-size', `clamp(${(1.7 * jpScale).toFixed(2)}rem, ${(8.5 * jpScale).toFixed(2)}vw, ${(3.3 * jpScale).toFixed(2)}rem)`);
+        screen.style.setProperty('--NQ-kanji-size', `clamp(${(1.95 * jpScale).toFixed(2)}rem, ${(9.2 * jpScale).toFixed(2)}vw, ${(3.7 * jpScale).toFixed(2)}rem)`);
+    }
+
+    function loadSettings() {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY) || localStorage.getItem(OLD_STORAGE_KEY);
+            return normalizeSettings(saved ? JSON.parse(saved) : DEFAULT_SETTINGS);
+        } catch (e) {
+            return normalizeSettings(DEFAULT_SETTINGS);
+        }
+    }
+
+    function saveSettings(settings) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeSettings(settings)));
+    }
+
+    function updateLabels(settings) {
+        const finalSettings = normalizeSettings(settings);
+        const promptValue = document.getElementById('set-prompt-value');
+        const jpValue = document.getElementById('set-jp-value');
+        const answerValue = document.getElementById('set-answer-value');
+        const ratioValue = document.getElementById('set-question-ratio-value');
+        const opacityValue = document.getElementById('set-bg-opacity-value');
+
+        if (promptValue) promptValue.textContent = `${finalSettings.promptSize.toFixed(2)}rem`;
+        if (jpValue) jpValue.textContent = `${Math.round(finalSettings.jpScale * 100)}%`;
+        if (answerValue) answerValue.textContent = `${finalSettings.answerSize.toFixed(2)}rem`;
+        if (ratioValue) ratioValue.textContent = `${finalSettings.questionRatio}% / ${100 - finalSettings.questionRatio}%`;
+        if (opacityValue) opacityValue.textContent = finalSettings.bgOpacity.toFixed(2);
+    }
+
+    function readPanelValues() {
+        return normalizeSettings({
+            promptSize: document.getElementById('set-prompt-size')?.value,
+            jpScale: document.getElementById('set-jp-scale')?.value,
+            answerSize: document.getElementById('set-answer-size')?.value,
+            questionRatio: document.getElementById('set-question-ratio')?.value,
+            bgOpacity: document.getElementById('set-bg-opacity')?.value
+        });
+    }
+
+    function setPanelValues(settings) {
+        const finalSettings = normalizeSettings(settings);
+        const prompt = document.getElementById('set-prompt-size');
+        const jp = document.getElementById('set-jp-scale');
+        const answer = document.getElementById('set-answer-size');
+        const ratio = document.getElementById('set-question-ratio');
+        const opacity = document.getElementById('set-bg-opacity');
+
+        if (prompt) prompt.value = finalSettings.promptSize;
+        if (jp) jp.value = finalSettings.jpScale;
+        if (answer) answer.value = finalSettings.answerSize;
+        if (ratio) ratio.value = finalSettings.questionRatio;
+        if (opacity) opacity.value = finalSettings.bgOpacity;
+
+        updateLabels(finalSettings);
+        applyNihongoSettings(finalSettings);
+    }
+
+    window.applySavedNihongoSettings = function () {
+        applyNihongoSettings(loadSettings());
+    };
+
+    window.openNihongoSettings = function () {
+        const modal = document.getElementById('nihongo-settings-modal');
+        if (!modal) return;
+        setPanelValues(loadSettings());
+        modal.classList.remove('hidden');
+    };
+
+    window.closeNihongoSettings = function () {
+        document.getElementById('nihongo-settings-modal')?.classList.add('hidden');
+    };
+
+    function resetNihongoAppFromSettings() {
+        const ok = confirm('Xoá lựa chọn cấp học và quay lại màn chọn cấp từ đầu?\n\nCài đặt giao diện đã lưu cũng sẽ được xoá.');
+        if (!ok) return;
+        try {
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch (err) {
+            console.warn('Không xoá được storage:', err);
+        }
+        window.closeNihongoSettings?.();
+        if (typeof closeAdminTestMenu === 'function') closeAdminTestMenu();
+        if (typeof renderGameMenu === 'function') renderGameMenu();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('nihongo-settings-modal');
+        const closeBtn = document.getElementById('nihongo-settings-close');
+        const saveBtn = document.getElementById('settings-save-btn');
+        const resetBtn = document.getElementById('settings-reset-btn');
+        const resetAppBtn = document.getElementById('settings-reset-app-btn');
+
+        const inputs = [
+            'set-prompt-size',
+            'set-jp-scale',
+            'set-answer-size',
+            'set-question-ratio',
+            'set-bg-opacity'
+        ];
+
+        inputs.forEach(id => {
+            const input = document.getElementById(id);
+            if (!input) return;
+            input.addEventListener('input', function () {
+                const settings = readPanelValues();
+                updateLabels(settings);
+                applyNihongoSettings(settings);
+            });
+        });
+
+        closeBtn?.addEventListener('click', window.closeNihongoSettings);
+
+        modal?.addEventListener('click', function (e) {
+            if (e.target === modal) window.closeNihongoSettings();
+        });
+
+        saveBtn?.addEventListener('click', function () {
+            const settings = readPanelValues();
+            saveSettings(settings);
+            applyNihongoSettings(settings);
+            window.closeNihongoSettings();
+        });
+
+        resetBtn?.addEventListener('click', function () {
+            try {
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.removeItem(OLD_STORAGE_KEY);
+            } catch (e) {}
+            setPanelValues(DEFAULT_SETTINGS);
+            applyNihongoSettings(DEFAULT_SETTINGS);
+        });
+
+        resetAppBtn?.addEventListener('click', resetNihongoAppFromSettings);
+
+        const screen = getGameScreen();
+        if (screen && 'MutationObserver' in window) {
+            const observer = new MutationObserver(function () {
+                window.applySavedNihongoSettings?.();
+            });
+            observer.observe(screen, { attributes: true, childList: true, subtree: false });
+        }
+
+        setPanelValues(loadSettings());
+        setTimeout(() => window.applySavedNihongoSettings?.(), 250);
+    });
+})();

@@ -29,7 +29,6 @@ window.NIHONGO_KANA = [
     "vi": "o",
     "type": "Hiragana"
   },
-  
   {
     "jp": "か",
     "romaji": "ka",

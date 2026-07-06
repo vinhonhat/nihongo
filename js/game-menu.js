@@ -561,42 +561,77 @@ const ADMIN_GEAR_RESET_CLICK_COUNT = 10;
 
 function renderAdminGearButton() {
     return `
-        <button class="admin-gear-btn" type="button" aria-label="Quản trị / Test"
-            title="Giữ 1 giây để mở Test. Nhấp ${ADMIN_GEAR_RESET_CLICK_COUNT} lần liên tiếp để xoá cài đặt và chọn lại cấp học."
-            onpointerdown="startAdminGearHold(event)" onpointerup="endAdminGearHold(event)"
-            onpointercancel="cancelAdminGearHold()" onpointerleave="cancelAdminGearHold()"
-            onclick="handleAdminGearClick(event)">⚙</button>`;
+        <button class="admin-gear-btn" type="button" aria-label="Cài đặt"
+            title="Nhấn thả: mở Cài đặt. Giữ 1 giây: mở Test. Nhấn nhanh 10 lần: xoá cài đặt."
+            onpointerdown="startAdminGearHold(event)"
+            onpointerup="endAdminGearHold(event)"
+            onpointercancel="cancelAdminGearHold(event)"
+            onpointerleave="cancelAdminGearHold(event)">⚙</button>`;
 }
+
 function startAdminGearHold(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
     cancelAdminGearHold();
     adminGearActionDone = false;
+    const btn = event && event.currentTarget ? event.currentTarget : null;
+    if (btn) btn.classList.add('admin-gear-holding');
     adminGearTestTimer = setTimeout(() => {
         adminGearTestTimer = null;
         adminGearActionDone = true;
+        if (btn) btn.classList.remove('admin-gear-holding');
         openAdminTestMenu();
     }, 1000);
 }
+
 function endAdminGearHold(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
+    const btn = event && event.currentTarget ? event.currentTarget : null;
+    if (btn) btn.classList.remove('admin-gear-holding');
+
+    // Nếu đã giữ đủ 1 giây và mở Test thì thả tay không mở Cài đặt nữa.
+    if (adminGearActionDone) {
+        adminGearActionDone = false;
+        cancelAdminGearHold();
+        return;
+    }
+
     cancelAdminGearHold();
+    handleAdminGearClick(event);
 }
-function cancelAdminGearHold() {
+
+function cancelAdminGearHold(event) {
     if (adminGearTestTimer) { clearTimeout(adminGearTestTimer); adminGearTestTimer = null; }
+    const btn = event && event.currentTarget ? event.currentTarget : null;
+    if (btn) btn.classList.remove('admin-gear-holding');
 }
+
 function handleAdminGearClick(event) {
     if (event) { event.preventDefault(); event.stopPropagation(); }
-    if (adminGearActionDone) { adminGearActionDone = false; return; }
+
     adminGearClickCount += 1;
     if (adminGearClickResetTimer) clearTimeout(adminGearClickResetTimer);
-    adminGearClickResetTimer = setTimeout(() => { adminGearClickCount = 0; adminGearClickResetTimer = null; }, 3000);
+
+    // Nhấn nhanh 10 lần trong 3 giây vẫn giữ chức năng reset cũ.
     if (adminGearClickCount >= ADMIN_GEAR_RESET_CLICK_COUNT) {
         adminGearClickCount = 0;
-        if (adminGearClickResetTimer) { clearTimeout(adminGearClickResetTimer); adminGearClickResetTimer = null; }
+        adminGearClickResetTimer = null;
         closeAdminTestMenu();
         resetNihongoMenuFromGear();
+        return;
     }
+
+    // Chờ rất ngắn để phân biệt 1 nhấn mở Cài đặt và 10 nhấn reset.
+    adminGearClickResetTimer = setTimeout(() => {
+        adminGearClickCount = 0;
+        adminGearClickResetTimer = null;
+        if (typeof openNihongoSettings === 'function') {
+            openNihongoSettings();
+        } else {
+            console.warn('openNihongoSettings chưa sẵn sàng');
+        }
+    }, 260);
 }
+
 function resetNihongoMenuFromGear() {
     cancelAdminGearHold();
     const ok = confirm('Xoá cài đặt hiện tại và quay lại chọn cấp học từ đầu?\n\nThao tác này sẽ xoá lựa chọn cấp học, nhóm học và dữ liệu tạm trong app.');

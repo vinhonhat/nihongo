@@ -1468,3 +1468,161 @@ body {
 .level-card-n0 {
     background: linear-gradient(135deg, #ffe4ec, #e6f7ff) !important;
 }
+
+/* =====================================================
+   NIHONGO SETTINGS MODAL
+===================================================== */
+
+.nihongo-settings-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(25, 20, 30, .45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.nihongo-settings-modal.hidden {
+    display: none;
+}
+
+.nihongo-settings-box {
+    width: min(94vw, 460px);
+    max-height: 88vh;
+    overflow-y: auto;
+    background: #fffdf9;
+    border-radius: 24px;
+    padding: 18px;
+    box-shadow: 0 18px 50px rgba(0,0,0,.25);
+    border: 2px solid rgba(255, 160, 180, .35);
+}
+
+.nihongo-settings-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.settings-mini-title {
+    font-size: .78rem;
+    font-weight: 900;
+    color: #f05d7f;
+    letter-spacing: .04em;
+}
+
+.nihongo-settings-head h2 {
+    margin: 2px 0 0;
+    font-size: 1.25rem;
+    color: #2d2130;
+}
+
+.settings-close-btn {
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 999px;
+    background: #ffe6ec;
+    color: #e84d76;
+    font-size: 1.6rem;
+    font-weight: 900;
+}
+
+.setting-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 7px;
+    margin: 14px 0;
+}
+
+.setting-row label {
+    font-size: .88rem;
+    font-weight: 900;
+    color: #3a2835;
+}
+
+.setting-row input[type="range"] {
+    width: 100%;
+}
+
+.setting-row span {
+    font-size: .78rem;
+    font-weight: 800;
+    color: #0b6b82;
+}
+
+.settings-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.settings-actions button {
+    flex: 1;
+    min-height: 42px;
+    border: 0;
+    border-radius: 14px;
+    font-weight: 900;
+}
+
+#settings-reset-btn {
+    background: #f1edf0;
+    color: #51404b;
+}
+
+#settings-save-btn {
+    background: linear-gradient(135deg, #ff6f8f, #ff9d73);
+    color: white;
+}
+
+.settings-about {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff4f6;
+    color: #4d3c46;
+    font-size: .82rem;
+    line-height: 1.55;
+}
+
+/* =====================================================
+   NIHONGO SETTINGS BUTTON PATCH V1.1.2
+   - Nút bánh răng nhấn thả: mở Cài đặt.
+   - Giữ 1 giây: Quản trị/Test.
+   - Nút reset cấp học đặt trong bảng Cài đặt.
+===================================================== */
+.admin-gear-btn {
+    touch-action: none !important;
+}
+
+.admin-gear-btn.admin-gear-holding {
+    transform: scale(.94) rotate(20deg);
+    opacity: 1;
+}
+
+.settings-actions-main {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+}
+
+.settings-actions-danger {
+    margin-top: 10px !important;
+}
+
+#settings-reset-app-btn {
+    width: 100%;
+    min-height: 42px;
+    border: 0;
+    border-radius: 14px;
+    background: #fff0f3;
+    color: #be3457;
+    font-weight: 900;
+    box-shadow: inset 0 0 0 2px rgba(232, 93, 117, .16);
+}
+
+#settings-reset-app-btn:active {
+    transform: translateY(2px);
+}

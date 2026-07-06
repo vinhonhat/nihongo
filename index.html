@@ -29,7 +29,7 @@
         <button id="pwa-install-btn" class="install-btn" type="button" style="display:none;">
             📲 Cài App Học Nhật
         </button>
-        <div class="splash-version">V1.1.1 Nihongo</div>
+        <div class="splash-version">V1.1.2 Nihongo</div>
         <div id="ios-guide" class="install-guide" style="display:none;">
             <p class="install-guide-title">Để cài trên iPhone:</p>
             <p class="install-guide-text">
@@ -56,6 +56,69 @@
 
         <div class="game-view" id="game-screen" style="display:none;"></div>
     </div>
+    <!-- =====================================================
+        NIHONGO SETTINGS PANEL
+        Nhấn bánh răng để mở bảng chỉnh giao diện
+    ===================================================== -->
+    <div id="nihongo-settings-modal" class="nihongo-settings-modal hidden">
+        <div class="nihongo-settings-box">
+            <div class="nihongo-settings-head">
+                <div>
+                    <div class="settings-mini-title">Nihongo Quest</div>
+                    <h2>Cài đặt hiển thị</h2>
+                </div>
+                <button id="nihongo-settings-close" class="settings-close-btn">×</button>
+            </div>
+
+            <div class="setting-row">
+                <label>Cỡ chữ câu hỏi</label>
+                <input id="set-prompt-size" type="range" min="0.7" max="1.4" step="0.05" value="1">
+                <span id="set-prompt-value">1rem</span>
+            </div>
+
+            <div class="setting-row">
+                <label>Cỡ chữ Nhật / Kanji</label>
+                <input id="set-jp-scale" type="range" min="0.75" max="1.35" step="0.05" value="1">
+                <span id="set-jp-value">100%</span>
+            </div>
+
+            <div class="setting-row">
+                <label>Cỡ chữ đáp án</label>
+                <input id="set-answer-size" type="range" min="0.65" max="1.1" step="0.05" value="0.78">
+                <span id="set-answer-value">0.78rem</span>
+            </div>
+
+            <div class="setting-row">
+                <label>Tỷ lệ khung câu hỏi</label>
+                <input id="set-question-ratio" type="range" min="60" max="85" step="1" value="72">
+                <span id="set-question-ratio-value">72%</span>
+            </div>
+
+            <div class="setting-row">
+                <label>Độ mờ ảnh nền</label>
+                <input id="set-bg-opacity" type="range" min="0" max="0.6" step="0.02" value="0.16">
+                <span id="set-bg-opacity-value">0.16</span>
+            </div>
+
+            <div class="settings-actions settings-actions-main">
+                <button id="settings-reset-btn" type="button">Về mặc định giao diện</button>
+                <button id="settings-save-btn" type="button">Lưu</button>
+            </div>
+
+            <div class="settings-actions settings-actions-danger">
+                <button id="settings-reset-app-btn" type="button">Xoá chọn cấp / về màn đầu</button>
+            </div>
+
+            <div class="settings-about">
+                <b>Thông tin</b><br>
+                Ứng dụng học tiếng Nhật Nihongo Quest V1.1.2<br>
+                Tác giả: Vinh ở Nhật<br>
+                Liên hệ: thêm email / Zalo / Facebook của bạn tại đây.
+            </div>
+        </div>
+    </div>
+
+
     <script src="games/nihongo/data/n0/kana.js"></script>
     <script src="games/nihongo/data/n0/vocab.js"></script>
     <script src="games/nihongo/data/n0/kanji.js"></script>
