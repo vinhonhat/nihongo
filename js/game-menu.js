@@ -64,7 +64,7 @@ const GAME_MENU_DATA = [
             "n0"
         ],
         "color": "linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%)",
-        "badge": "N0"
+        "badge": "Nhập môn"
     },
     {
         "id": "nihongo_n0_katakana",
@@ -75,7 +75,7 @@ const GAME_MENU_DATA = [
             "n0"
         ],
         "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        "badge": "N0"
+        "badge": "Nhập môn"
     },
     {
         "id": "nihongo_n0_vocab",
@@ -86,7 +86,7 @@ const GAME_MENU_DATA = [
             "n0"
         ],
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
-        "badge": "N0"
+        "badge": "Nhập môn"
     },
     {
         "id": "nihongo_n0_kanji",
@@ -97,7 +97,7 @@ const GAME_MENU_DATA = [
             "n0"
         ],
         "color": "linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)",
-        "badge": "N0"
+        "badge": "Nhập môn"
     },
     {
         "id": "nihongo_n0_grammar",
@@ -108,7 +108,7 @@ const GAME_MENU_DATA = [
             "n0"
         ],
         "color": "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
-        "badge": "N0"
+        "badge": "Nhập môn"
     },
     {
         "id": "nihongo_n0_listen",
