@@ -34,17 +34,58 @@ body {
     font-family: var(--font-main);
     background-image: var(--bg-gradient);
 
-    width: 100vw;
+    width: 100%;
+    max-width: 100%;
     min-height: 100vh;
     min-height: 100dvh;
 
     height: 100vh;
+    height: 100svh;
     height: 100dvh;
     overflow: hidden;
     user-select: none;
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+
+/* =====================================================
+   FIX TRÀN NGANG IPHONE / IPAD
+   Không dùng 100vw cho nội dung nằm trong khung có padding.
+===================================================== */
+html,
+body {
+    max-width: 100%;
+    overscroll-behavior: none;
+}
+
+.app-container,
+.menu-view,
+.smart-menu-root,
+.level-select-screen,
+.smart-menu-screen,
+.smart-menu-header,
+.menu-group-tabs,
+.smart-game-grid,
+.level-card-grid,
+.admin-test-grid {
+    min-width: 0;
+    max-width: 100%;
+}
+
+.menu-view,
+.smart-menu-root,
+.level-select-screen,
+.smart-menu-screen {
+    overflow-x: hidden;
+}
+
+.smart-menu-header > *,
+.level-card,
+.menu-btn,
+.smart-game-btn {
+    min-width: 0;
 }
 
 /* --- KHUNG CHỨA ỨNG DỤNG --- */
@@ -57,6 +98,8 @@ body {
 
     align-items: center;
     position: relative; overflow: hidden; transition: all 0.3s ease;
+    min-width: 0;
+    max-width: 100%;
 }
 
 

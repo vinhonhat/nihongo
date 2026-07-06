@@ -6,7 +6,7 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '3.2.10-nihongo-clean';
+const APP_VERSION = '3.2.11-nihongo-fit';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
