@@ -557,6 +557,7 @@ let adminGearTestTimer = null;
 let adminGearActionDone = false;
 let adminGearClickCount = 0;
 let adminGearClickResetTimer = null;
+let adminGearSuppressNextClick = false;
 const ADMIN_GEAR_RESET_CLICK_COUNT = 10;
 
 function renderAdminGearButton() {
@@ -566,43 +567,70 @@ function renderAdminGearButton() {
             onpointerdown="startAdminGearHold(event)"
             onpointerup="endAdminGearHold(event)"
             onpointercancel="cancelAdminGearHold(event)"
-            onpointerleave="cancelAdminGearHold(event)">⚙</button>`;
+            onpointerleave="cancelAdminGearHold(event)"
+            onclick="handleAdminGearTap(event)">⚙</button>`;
 }
 
 function startAdminGearHold(event) {
-    if (event) { event.preventDefault(); event.stopPropagation(); }
-    cancelAdminGearHold();
+    // Không preventDefault ở pointerdown để iPhone/Safari vẫn phát sinh click sau khi thả tay.
+    if (event) event.stopPropagation();
+    cancelAdminGearHold(event);
     adminGearActionDone = false;
+    adminGearSuppressNextClick = false;
+
     const btn = event && event.currentTarget ? event.currentTarget : null;
     if (btn) btn.classList.add('admin-gear-holding');
+
     adminGearTestTimer = setTimeout(() => {
         adminGearTestTimer = null;
         adminGearActionDone = true;
+        adminGearSuppressNextClick = true;
         if (btn) btn.classList.remove('admin-gear-holding');
         openAdminTestMenu();
+
+        // Nếu trình duyệt không bắn click sau long-press thì vẫn tự mở khoá lại.
+        setTimeout(() => {
+            adminGearActionDone = false;
+            adminGearSuppressNextClick = false;
+        }, 700);
     }, 1000);
 }
 
 function endAdminGearHold(event) {
-    if (event) { event.preventDefault(); event.stopPropagation(); }
+    // Thả tay chỉ huỷ timer giữ. Nhấn-thả nhanh sẽ xử lý bằng onclick để ổn định trên iPhone.
+    if (event) event.stopPropagation();
     const btn = event && event.currentTarget ? event.currentTarget : null;
     if (btn) btn.classList.remove('admin-gear-holding');
 
-    // Nếu đã giữ đủ 1 giây và mở Test thì thả tay không mở Cài đặt nữa.
-    if (adminGearActionDone) {
-        adminGearActionDone = false;
-        cancelAdminGearHold();
-        return;
+    if (adminGearTestTimer) {
+        clearTimeout(adminGearTestTimer);
+        adminGearTestTimer = null;
     }
-
-    cancelAdminGearHold();
-    handleAdminGearClick(event);
 }
 
 function cancelAdminGearHold(event) {
-    if (adminGearTestTimer) { clearTimeout(adminGearTestTimer); adminGearTestTimer = null; }
+    if (adminGearTestTimer) {
+        clearTimeout(adminGearTestTimer);
+        adminGearTestTimer = null;
+    }
     const btn = event && event.currentTarget ? event.currentTarget : null;
     if (btn) btn.classList.remove('admin-gear-holding');
+}
+
+function handleAdminGearTap(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
+    // Sau khi giữ 1 giây mở Test, Safari vẫn có thể bắn thêm click. Bỏ click đó.
+    if (adminGearSuppressNextClick || adminGearActionDone) {
+        adminGearSuppressNextClick = false;
+        adminGearActionDone = false;
+        return;
+    }
+
+    handleAdminGearClick(event);
 }
 
 function handleAdminGearClick(event) {
@@ -628,8 +656,9 @@ function handleAdminGearClick(event) {
             openNihongoSettings();
         } else {
             console.warn('openNihongoSettings chưa sẵn sàng');
+            alert('Cài đặt chưa sẵn sàng. Hãy tải lại trang một lần.');
         }
-    }, 260);
+    }, 220);
 }
 
 function resetNihongoMenuFromGear() {

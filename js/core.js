@@ -6,7 +6,7 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.1.2-nihongo-settings-layout';
+const APP_VERSION = '1.1.3-nihongo-settings-fix';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
@@ -531,6 +531,12 @@ async function startGame(gameId) {
     }
 
     startRegisteredGame(gameId, config.title, module);
+
+    // Áp dụng cài đặt Nihongo sau khi khung câu hỏi/đáp án đã được render.
+    // Dùng setTimeout ngắn để tránh chạy trước khi module dựng xong DOM.
+    if (typeof window.applySavedNihongoSettings === 'function') {
+        setTimeout(() => window.applySavedNihongoSettings(), 50);
+    }
 }
 
 function showMaintenance(title = 'Game') {
