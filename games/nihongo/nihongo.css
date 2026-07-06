@@ -1956,3 +1956,77 @@
         font-size: .76rem;
     }
 }
+
+/* =====================================================
+   NIHONGO REVEAL / ANSWER EXPLANATION SETTINGS V1.1.6
+   Mục tiêu:
+   - Bảng Cài đặt chỉnh riêng được cỡ chữ khung đáp án đúng.
+   - Bảng Cài đặt chỉnh riêng được kích thước khung đáp án đúng.
+   - Không đụng tới cỡ chữ câu hỏi / đáp án thường.
+
+   Chỉnh tay nhanh nếu không dùng bảng Cài đặt:
+   --NQ-reveal-label-size   : chữ "Đáp án / Đúng rồi"
+   --NQ-reveal-jp-size      : chữ Nhật/Kanji khi hiện đáp án đúng
+   --NQ-reveal-reading-size : chữ cách đọc Hiragana
+   --NQ-reveal-meaning-size : chữ nghĩa Việt / English / ghi nhớ
+   --NQ-reveal-box-width    : độ rộng tối đa của khung
+   --NQ-reveal-padding-y    : đệm trên/dưới của khung
+   --NQ-reveal-padding-x    : đệm trái/phải của khung
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] {
+    --NQ-reveal-label-size: .98rem;
+    --NQ-reveal-jp-size: clamp(1.7rem, 6.2vw, 2.85rem);
+    --NQ-reveal-reading-size: clamp(1.08rem, 3.4vw, 1.38rem);
+    --NQ-reveal-meaning-size: clamp(1.02rem, 3.15vw, 1.32rem);
+    --NQ-reveal-box-width: 640px;
+    --NQ-reveal-padding-y: 12px;
+    --NQ-reveal-padding-x: 16px;
+    --NQ-reveal-radius: 18px;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-answer-reveal {
+    width: min(100%, var(--NQ-reveal-box-width)) !important;
+    max-width: min(100%, var(--NQ-reveal-box-width)) !important;
+    padding: var(--NQ-reveal-padding-y) var(--NQ-reveal-padding-x) !important;
+    border-radius: var(--NQ-reveal-radius) !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .reveal-label {
+    font-size: var(--NQ-reveal-label-size) !important;
+    line-height: 1.16 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .reveal-jp {
+    font-size: var(--NQ-reveal-jp-size) !important;
+    line-height: 1.08 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .reveal-reading {
+    font-size: var(--NQ-reveal-reading-size) !important;
+    line-height: 1.18 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .reveal-vi,
+#game-screen.game-view[class*='game-nihongo'] .reveal-en,
+#game-screen.game-view[class*='game-nihongo'] .reveal-line {
+    font-size: var(--NQ-reveal-meaning-size) !important;
+    line-height: 1.26 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-reveal-next {
+    font-size: var(--NQ-reveal-label-size) !important;
+    min-height: 40px !important;
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        --NQ-reveal-label-size: .88rem;
+        --NQ-reveal-jp-size: clamp(1.45rem, 8vw, 2.45rem);
+        --NQ-reveal-reading-size: clamp(.98rem, 4.8vw, 1.25rem);
+        --NQ-reveal-meaning-size: clamp(.92rem, 4.3vw, 1.16rem);
+        --NQ-reveal-box-width: 100%;
+        --NQ-reveal-padding-y: 10px;
+        --NQ-reveal-padding-x: 12px;
+        --NQ-reveal-radius: 16px;
+    }
+}

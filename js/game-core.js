@@ -180,7 +180,7 @@ function fireFanConfettiFromSide(side = 'left') {
     const originY = window.innerHeight + 8;
 
     // Số mảnh giấy mỗi bên
-    const pieces = 100;
+    const pieces = 50;
 
     // Tạo ống pháo nhỏ ở dưới
     createConfettiCannon(originX, originY, isLeft);
@@ -300,8 +300,8 @@ function createConfettiCannon(x, y, isLeft) {
     cannon.style.position = 'fixed';
     cannon.style.left = x + 'px';
     cannon.style.top = y - 26 + 'px';
-    cannon.style.width = '24px';
-    cannon.style.height = '42px';
+    cannon.style.width = '42px';
+    cannon.style.height = '24px';
     cannon.style.background = 'linear-gradient(135deg,#ff9800,#ff4081)';
     cannon.style.borderRadius = '8px';
     cannon.style.zIndex = '99998';

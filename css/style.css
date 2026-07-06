@@ -1626,3 +1626,72 @@ body {
 #settings-reset-app-btn:active {
     transform: translateY(2px);
 }
+
+/* =====================================================
+   NIHONGO SYSTEM FONT SCALE V1.1.6
+   Các biến này được điều khiển từ bảng Cài đặt.
+   - --NQ-menu-title-size: tiêu đề menu
+   - --NQ-menu-subtitle-size: mô tả menu / ghi chú cấp
+   - --NQ-menu-tab-size: tab Từ vựng / Ngữ pháp / Luyện
+   - --NQ-menu-label-size: chữ trong nút menu
+   - --NQ-menu-icon-size: icon trong nút menu
+   - --NQ-settings-label-size: chữ nhãn trong bảng cài đặt
+   - --NQ-settings-text-size: chữ mô tả / thông tin
+===================================================== */
+:root {
+    --NQ-system-scale: 1;
+    --NQ-menu-title-size: clamp(1.35rem, 4.8vw, 2.1rem);
+    --NQ-menu-subtitle-size: .82rem;
+    --NQ-menu-tab-size: .82rem;
+    --NQ-menu-label-size: .86rem;
+    --NQ-menu-icon-size: 2rem;
+    --NQ-settings-label-size: .88rem;
+    --NQ-settings-text-size: .82rem;
+    --NQ-gear-font-size: 18px;
+}
+
+.smart-menu-title,
+.smart-title {
+    font-size: var(--NQ-menu-title-size) !important;
+}
+
+.smart-menu-subtitle,
+.nihongo-level-note,
+.level-card-note,
+.menu-note {
+    font-size: var(--NQ-menu-subtitle-size) !important;
+}
+
+.menu-group-tab {
+    font-size: var(--NQ-menu-tab-size) !important;
+}
+
+.smart-game-btn .menu-label,
+.menu-btn .menu-label,
+.menu-label,
+.level-card-label {
+    font-size: var(--NQ-menu-label-size) !important;
+}
+
+.smart-game-btn .menu-icon,
+.menu-btn .menu-icon,
+.menu-icon,
+.level-card-icon {
+    font-size: var(--NQ-menu-icon-size) !important;
+}
+
+.admin-gear-btn {
+    font-size: var(--NQ-gear-font-size) !important;
+}
+
+.setting-row label,
+.nihongo-settings-head h2 {
+    font-size: var(--NQ-settings-label-size) !important;
+}
+
+.setting-row span,
+.settings-about,
+.settings-actions button,
+.settings-mini-title {
+    font-size: var(--NQ-settings-text-size) !important;
+}

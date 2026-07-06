@@ -6,7 +6,7 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.1.5-nihongo-english-timer';
+const APP_VERSION = '1.1.6-nihongo-reveal-system-settings';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
