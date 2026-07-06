@@ -6,7 +6,7 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.1.3-nihongo-settings-fix';
+const APP_VERSION = '1.1.4-nihongo-question-structure';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
@@ -115,6 +115,15 @@ const GAME_CONFIG = {
         "css": "games/nihongo/nihongo.css",
         "js": "games/nihongo/nihongo.js",
         "moduleId": "nihongo_n5_sentence",
+        "type": "registered"
+    },
+
+    "nihongo_n5_sentence_build": {
+        "title": "Ghép câu N5",
+        "folder": "nihongo",
+        "css": "games/nihongo/nihongo.css",
+        "js": "games/nihongo/nihongo.js",
+        "moduleId": "nihongo_n5_sentence_build",
         "type": "registered"
     },
     "nihongo_n5_vocab_practice": {
@@ -713,6 +722,10 @@ function handleCheckAnswer(selected, btn) {
         btn.classList.add('correct');
         addScore(1);
 
+        if (typeof activeGame.onCorrect === 'function') {
+            activeGame.onCorrect(currentQuestionData, selected, btn);
+        }
+
         let queue = [];
         if (typeof activeGame.getAnswerAudio === 'function') {
             queue = activeGame.getAnswerAudio(selected) || [];
@@ -721,7 +734,8 @@ function handleCheckAnswer(selected, btn) {
         playSequence(queue);
 
         fireGameConfetti();
-        setTimeout(() => nextQuestion(), 2000);
+        const nextDelay = Number(activeGame.correctDelayMs || 2000);
+        setTimeout(() => nextQuestion(), Number.isFinite(nextDelay) ? nextDelay : 2000);
     } else {
         btn.classList.add('wrong');
 

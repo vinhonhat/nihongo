@@ -198,6 +198,18 @@ const GAME_MENU_DATA = [
         "color": "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
         "badge": "Nghe"
     },
+
+    {
+        "id": "nihongo_n5_sentence_build",
+        "label": "Ghép câu N5",
+        "icon": "🧱",
+        "group": "practice",
+        "levels": [
+            "n5"
+        ],
+        "color": "linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%)",
+        "badge": "Ghép"
+    },
     {
         "id": "nihongo_n5_mock_test",
         "label": "Thi thử N5",
