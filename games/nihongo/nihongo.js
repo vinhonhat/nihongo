@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.1.4
+// Nihongo Quest V1.1.5
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -38,7 +38,7 @@ function nihongoOptionKey(value) {
 }
 
 function nihongoItemKey(item) {
-    return [item.jp, item.reading, item.vi, item.romaji, item.type, item.hint, item.example]
+    return [item.jp, item.reading, item.vi, item.en, item.romaji, item.type, item.hint, item.example]
         .filter(Boolean)
         .join('|');
 }
@@ -80,7 +80,7 @@ function makeMeaningOption(item) {
     return {
         key: String(item.vi || ''),
         primary: item.vi || '',
-        secondary: '',
+        secondary: item.en || '',
         speak: item.jp || item.reading || '',
         raw: item
     };
@@ -158,7 +158,7 @@ function buildKanaQuestion(gameId) {
         speakText: item.jp,
         correctKey: String(item.romaji),
         options: buildWrongOptions(item.romaji, pool, 'romaji'),
-        reveal: { reading: item.romaji, vi: 'Cách đọc: ' + item.romaji }
+        reveal: { reading: item.romaji, vi: 'Cách đọc: ' + item.romaji, en: item.en || '' }
     };
 }
 
@@ -183,10 +183,11 @@ function buildVocabQuestion(level, mode) {
             jp: item.jp,
             reading: item.reading || '',
             vi: item.vi,
+            en: item.en || '',
             speakText: item.jp,
             correctKey: makeJapaneseOption(item).key,
             options,
-            reveal: { jp: item.jp, reading: item.reading, vi: item.vi }
+            reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
         };
     }
 
@@ -199,10 +200,11 @@ function buildVocabQuestion(level, mode) {
         jp: item.jp,
         reading: '',
         vi: item.vi,
+        en: item.en || '',
         speakText: item.jp,
         correctKey: makeMeaningOption(item).key,
         options,
-        reveal: { jp: item.jp, reading: item.reading, vi: item.vi }
+        reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -218,10 +220,11 @@ function buildListeningQuestion(level) {
         jp: '？？？',
         reading: '',
         vi: item.vi,
+        en: item.en || '',
         speakText: item.jp,
         correctKey: makeMeaningOption(item).key,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['vocab']),
-        reveal: { jp: item.jp, reading: item.reading, vi: item.vi }
+        reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -239,7 +242,7 @@ function buildKanjiQuestion(level) {
         speakText: item.reading || item.jp,
         correctKey: makeMeaningOption(item).key,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['kanji']),
-        reveal: { jp: item.jp, reading: item.reading, vi: item.vi }
+        reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -278,13 +281,14 @@ function buildGrammarQuestion(level, mode) {
         jp: item.pattern || item.jp,
         reading: item.hint || '',
         vi: item.vi,
+        en: item.en || '',
         example: item.example || item.sentence || item.jp,
         exampleHtml: renderGrammarExample(item),
         hint: item.hint || '',
         speakText: item.example || item.jp,
         correctKey: makeMeaningOption(item).key,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['grammar']),
-        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint, vi: item.vi }
+        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint, vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -318,11 +322,12 @@ function buildSentenceBuildQuestion(level) {
         jp: item.example || item.sentence || item.jp,
         reading: item.hint || '',
         vi: item.sentenceVi || item.vi,
+        en: item.sentenceEn || item.en || '',
         parts: nihongoShuffle(parts),
         speakText: item.example || item.sentence || item.jp,
         correctKey: makeSentenceOption(item).key,
         options,
-        reveal: { jp: item.example || item.sentence || item.jp, hint: item.hint, vi: item.sentenceVi || item.vi }
+        reveal: { jp: item.example || item.sentence || item.jp, hint: item.hint, vi: item.sentenceVi || item.vi, en: item.sentenceEn || item.en || '' }
     };
 }
 
@@ -391,12 +396,14 @@ function renderNihongoDisplay(data) {
         mainHtml = `
             <div id="nihongo-question-text" class="nihongo-prompt">${nihongoEscape(data.prompt)}</div>
             <div id="nihongo-vietnamese-target" class="nihongo-vi-target">${nihongoEscape(data.vi)}</div>
+            ${data.en ? `<div id="nihongo-english-target" class="nihongo-en-target">${nihongoEscape(data.en)}</div>` : ''}
             <div id="nihongo-sentence-parts" class="nihongo-sentence-parts">${partHtml}</div>
         `;
     } else if (isViTarget) {
         mainHtml = `
             <div id="nihongo-question-text" class="nihongo-prompt">${nihongoEscape(data.prompt)}</div>
             <div id="nihongo-vietnamese-target" class="nihongo-vi-target">${nihongoEscape(data.vi)}</div>
+            ${data.en ? `<div id="nihongo-english-target" class="nihongo-en-target">${nihongoEscape(data.en)}</div>` : ''}
         `;
     } else {
         const hint = isListen ? 'Nghe trước, xem đáp án sau' : (data.reading || '');
@@ -443,7 +450,7 @@ function renderNihongoOption(btn, option) {
     btn.setAttribute('aria-label', 'Đáp án ' + (opt.primary || opt.key));
 }
 
-function revealNihongoAnswer(data) {
+function revealNihongoAnswer(data, options = {}) {
     const box = document.getElementById('nihongo-answer-reveal');
     if (!box || !data) return;
 
@@ -453,37 +460,65 @@ function revealNihongoAnswer(data) {
     const vi = reveal.vi || '';
     const pattern = reveal.pattern || '';
     const hint = reveal.hint || '';
+    const en = reveal.en || data.en || '';
+    const labelText = options.timeUp ? 'Hết giờ - xem đáp án' : (options.label || 'Đáp án');
 
     if (data.displayType === 'grammar') {
         box.innerHTML = `
-            <div class="reveal-label">Đúng rồi</div>
+            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : 'Đúng rồi'}</div>
             ${pattern ? `<div class="reveal-line"><b>Mẫu:</b> ${nihongoEscape(pattern)}</div>` : ''}
             ${vi ? `<div class="reveal-line"><b>Nghĩa:</b> ${nihongoEscape(vi)}</div>` : ''}
+            ${en ? `<div class="reveal-line reveal-en"><b>English:</b> ${nihongoEscape(en)}</div>` : ''}
             ${hint ? `<div class="reveal-line"><b>Ghi nhớ:</b> ${nihongoEscape(hint)}</div>` : ''}
         `;
     } else if (data.displayType === 'sentence-build') {
         box.innerHTML = `
-            <div class="reveal-label">Câu đúng</div>
+            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : 'Câu đúng'}</div>
             ${jp ? `<div class="reveal-jp">${nihongoEscape(jp)}</div>` : ''}
             ${hint ? `<div class="reveal-reading">${nihongoEscape(hint)}</div>` : ''}
             ${vi ? `<div class="reveal-vi">${nihongoEscape(vi)}</div>` : ''}
+            ${en ? `<div class="reveal-en">${nihongoEscape(en)}</div>` : ''}
         `;
     } else {
         box.innerHTML = `
-            <div class="reveal-label">Đáp án</div>
+            <div class="reveal-label">${labelText}</div>
             ${jp ? `<div class="reveal-jp">${nihongoEscape(jp)}</div>` : ''}
             ${reading ? `<div class="reveal-reading">${nihongoEscape(reading)}</div>` : ''}
             ${vi ? `<div class="reveal-vi">${nihongoEscape(vi)}</div>` : ''}
+            ${en ? `<div class="reveal-en">${nihongoEscape(en)}</div>` : ''}
         `;
+    }
+
+    if (options.timeUp) {
+        box.insertAdjacentHTML('beforeend', `
+            <button class="nihongo-reveal-next" type="button" onclick="nextQuestion()">
+                Câu tiếp theo
+            </button>
+        `);
     }
 
     box.classList.add('show');
 }
 
+function isNihongoLearnGame(gameId) {
+    return /_vocab_learn$/.test(gameId) || /_kana$/.test(gameId) || /_katakana$/.test(gameId) || /_n0_vocab$/.test(gameId);
+}
+
+function markNihongoCorrectButton(data) {
+    const key = String(data && data.correctKey || '');
+    document.querySelectorAll('#options-grid .nihongo-option-btn').forEach(btn => {
+        if (btn.dataset.answerKey === key) btn.classList.add('correct');
+        btn.disabled = true;
+    });
+}
+
 function makeNihongoGame(gameId) {
+    const isLearn = isNihongoLearnGame(gameId);
+    const isMock = gameId.indexOf('mock_test') >= 0;
+
     return {
-        questionTimeSec: gameId.indexOf('mock_test') >= 0 ? 22 : 18,
-        correctDelayMs: 2900,
+        questionTimeSec: isMock ? 30 : (isLearn ? 30 : 24),
+        correctDelayMs: 3000,
         gridClass: 'nihongo-options-grid',
         generateData() { return buildNihongoQuestion(gameId); },
         renderDisplay(data) {
@@ -499,6 +534,12 @@ function makeNihongoGame(gameId) {
         onCorrect(data) {
             revealNihongoAnswer(data);
             if (data && data.speakText) setTimeout(() => speakNihongo(data.speakText), 120);
+        },
+        onTimeUp(data) {
+            if (!isLearn) return false;
+            markNihongoCorrectButton(data);
+            revealNihongoAnswer(data, { timeUp: true });
+            return true;
         }
     };
 }

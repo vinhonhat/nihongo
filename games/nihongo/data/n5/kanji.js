@@ -4,122 +4,146 @@ window.NIHONGO_DATA.n5.kanji = [
   {
     "jp": "山",
     "reading": "やま",
-    "vi": "Núi"
+    "vi": "Núi",
+    "en": "Mountain"
   },
   {
     "jp": "川",
     "reading": "かわ",
-    "vi": "Sông"
+    "vi": "Sông",
+    "en": "River"
   },
   {
     "jp": "田",
     "reading": "た",
-    "vi": "Ruộng"
+    "vi": "Ruộng",
+    "en": "Rice field"
   },
   {
     "jp": "一",
     "reading": "いち",
-    "vi": "Một"
+    "vi": "Một",
+    "en": "One"
   },
   {
     "jp": "二",
     "reading": "に",
-    "vi": "Hai"
+    "vi": "Hai",
+    "en": "Two"
   },
   {
     "jp": "三",
     "reading": "さん",
-    "vi": "Ba"
+    "vi": "Ba",
+    "en": "Three"
   },
   {
     "jp": "月",
     "reading": "つき / げつ",
-    "vi": "Tháng, mặt trăng"
+    "vi": "Tháng, mặt trăng",
+    "en": "Month / moon"
   },
   {
     "jp": "火",
     "reading": "ひ / か",
-    "vi": "Lửa"
+    "vi": "Lửa",
+    "en": "Fire"
   },
   {
     "jp": "水",
     "reading": "みず / すい",
-    "vi": "Nước"
+    "vi": "Nước",
+    "en": "Water"
   },
   {
     "jp": "木",
     "reading": "き / もく",
-    "vi": "Cây"
+    "vi": "Cây",
+    "en": "Tree"
   },
   {
     "jp": "四",
     "reading": "よん / し",
-    "vi": "Bốn"
+    "vi": "Bốn",
+    "en": "Four"
   },
   {
     "jp": "五",
     "reading": "ご",
-    "vi": "Năm"
+    "vi": "Năm",
+    "en": "Five"
   },
   {
     "jp": "六",
     "reading": "ろく",
-    "vi": "Sáu"
+    "vi": "Sáu",
+    "en": "Six"
   },
   {
     "jp": "七",
     "reading": "なな / しち",
-    "vi": "Bảy"
+    "vi": "Bảy",
+    "en": "Seven"
   },
   {
     "jp": "八",
     "reading": "はち",
-    "vi": "Tám"
+    "vi": "Tám",
+    "en": "Eight"
   },
   {
     "jp": "九",
     "reading": "きゅう / く",
-    "vi": "Chín"
+    "vi": "Chín",
+    "en": "Nine"
   },
   {
     "jp": "十",
     "reading": "じゅう",
-    "vi": "Mười"
+    "vi": "Mười",
+    "en": "Ten"
   },
   {
     "jp": "円",
     "reading": "えん",
-    "vi": "Yên / hình tròn"
+    "vi": "Yên / hình tròn",
+    "en": "Yen / circle"
   },
   {
     "jp": "年",
     "reading": "ねん / とし",
-    "vi": "Năm"
+    "vi": "Năm",
+    "en": "Year"
   },
   {
     "jp": "上",
     "reading": "うえ",
-    "vi": "Trên"
+    "vi": "Trên",
+    "en": "Up / above"
   },
   {
     "jp": "下",
     "reading": "した",
-    "vi": "Dưới"
+    "vi": "Dưới",
+    "en": "Down / below"
   },
   {
     "jp": "左",
     "reading": "ひだり",
-    "vi": "Trái"
+    "vi": "Trái",
+    "en": "Left"
   },
   {
     "jp": "右",
     "reading": "みぎ",
-    "vi": "Phải"
+    "vi": "Phải",
+    "en": "Right"
   },
   {
     "jp": "子",
     "reading": "こ",
-    "vi": "Đứa trẻ"
+    "vi": "Đứa trẻ",
+    "en": "Child"
   },
   {
     "jp": "女",

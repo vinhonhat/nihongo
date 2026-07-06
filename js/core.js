@@ -6,7 +6,7 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.1.4-nihongo-question-structure';
+const APP_VERSION = '1.1.5-nihongo-english-timer';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 
@@ -927,6 +927,17 @@ function handleQuestionTimeUp() {
     stopAutoReplay();
     setTopTimerPercent(0, true);
 
+    // Một số bài học Nihongo không phải dạng game chạy điểm.
+    // Khi hết giờ, module có thể tự hiện đáp án và giữ nguyên màn hình
+    // để người học xem lại thay vì tự nhảy câu tiếp theo.
+    if (typeof activeGame.onTimeUp === 'function') {
+        const handled = activeGame.onTimeUp(currentQuestionData);
+        if (handled === true) {
+            noInteractionCount = 0;
+            return;
+        }
+    }
+
     noInteractionCount += 1;
 
     if (noInteractionCount >= 3) {
@@ -940,7 +951,7 @@ function handleQuestionTimeUp() {
         if (activeGame && !gamePausedByNoInteraction) {
             nextQuestion();
         }
-    }, 900);
+    }, 1200);
 }
 
 

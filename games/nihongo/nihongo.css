@@ -1654,7 +1654,7 @@
 }
 
 /* =====================================================
-   NIHONGO QUESTION STRUCTURE V1.1.4
+   NIHONGO QUESTION STRUCTURE V1.1.5
    Mục tiêu:
    - Từ vựng/Kanji không hiện cách đọc ở câu hỏi trước khi trả lời.
    - Đáp án tiếng Nhật có 2 dòng: chữ Nhật + cách đọc.
@@ -1895,5 +1895,64 @@
         margin-top: 7px;
         padding: 7px 10px;
         border-radius: 14px;
+    }
+}
+
+
+/* =====================================================
+   NIHONGO ENGLISH + TIMER PATCH V1.1.5
+   - Hiện thêm nghĩa tiếng Anh nếu dữ liệu có field en.
+   - Khi hết giờ ở phần học: hiện đáp án và đứng lại.
+===================================================== */
+
+.nihongo-en-target {
+    margin-top: 4px;
+    max-width: 100%;
+    color: #6d4c5a;
+    font-size: clamp(.82rem, 2.7vw, 1.05rem);
+    line-height: 1.18;
+    font-weight: 850;
+    opacity: .92;
+    text-wrap: balance;
+}
+
+.reveal-en {
+    margin-top: 3px;
+    color: #6a4f5c;
+    font-size: clamp(.76rem, 2.25vw, .92rem);
+    line-height: 1.22;
+    font-weight: 820;
+}
+
+.nihongo-reveal-next {
+    margin-top: 8px;
+    min-height: 34px;
+    padding: 6px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #10a37f, #0b7fa3);
+    color: #fff;
+    font-size: .82rem;
+    font-weight: 950;
+    box-shadow: 0 6px 14px rgba(0,0,0,.12);
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn:disabled {
+    cursor: default;
+    opacity: .96;
+}
+
+@media (max-width: 767px) {
+    .nihongo-en-target {
+        font-size: clamp(.74rem, 2.9vw, .95rem);
+    }
+
+    .reveal-en {
+        font-size: clamp(.7rem, 2.45vw, .86rem);
+    }
+
+    .nihongo-reveal-next {
+        min-height: 32px;
+        font-size: .76rem;
     }
 }
