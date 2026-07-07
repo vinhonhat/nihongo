@@ -1,8 +1,8 @@
-// Nihongo Quest service worker V1.2.7
+// Nihongo Quest service worker V1.2.8
 // - Cache app/data để PWA học offline.
 // - version.json luôn network/no-store để kiểm tra bản mới.
-const CACHE_NAME = 'nihongo-quest-v1-2-7';
-const OFFLINE_CACHE_NAME = 'nihongo-offline-v1-2-7';
+const CACHE_NAME = 'nihongo-quest-shell';
+const OFFLINE_CACHE_NAME = 'nihongo-offline-runtime';
 const VERSION_FILE = 'version.json';
 
 self.addEventListener('install', event => {
@@ -14,7 +14,7 @@ self.addEventListener('activate', event => {
         const names = await caches.keys();
         await Promise.all(
             names
-                .filter(name => name.startsWith('nihongo-quest-') && name !== CACHE_NAME)
+                .filter(name => (name.startsWith('nihongo-quest-') || name.startsWith('nihongo-offline-v')) && name !== CACHE_NAME && name !== OFFLINE_CACHE_NAME)
                 .map(name => caches.delete(name))
         );
         await self.clients.claim();

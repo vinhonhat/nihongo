@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.2.7
+// Nihongo Quest V1.2.8
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -40,9 +40,32 @@ function nihongoOptionKey(value) {
 }
 
 function nihongoItemKey(item) {
-    return [item.jp, item.reading, item.vi, item.en, item.romaji, item.type, item.hint, item.example]
-        .filter(Boolean)
-        .join('|');
+    return [
+        item._kind, item._level, item._lessonId,
+        item.jp, item.kanji, item.reading, item.vi, item.en, item.romaji,
+        item.pattern, item.example, item.sentence, item.exampleVi, item.sentenceVi,
+        item.type, item.hint
+    ].filter(Boolean).join('|');
+}
+
+function nihongoStudyDedupeKey(item) {
+    const kind = item._kind || '';
+    const level = item._level || '';
+    const lesson = item._lessonId || '';
+    const main = item.pattern || item.jp || item.kanji || item.example || item.sentence || '';
+    const reading = item.reading || item.exampleReading || item.sentenceReading || '';
+    const meaning = item.vi || item.exampleVi || item.sentenceVi || item.en || '';
+    return [kind, level, lesson, main, reading, meaning].map(v => String(v || '').trim()).join('::');
+}
+
+function dedupeNihongoStudyItems(items) {
+    const map = new Map();
+    (items || []).forEach(item => {
+        const key = nihongoStudyDedupeKey(item);
+        if (!key.replace(/:/g, '')) return;
+        if (!map.has(key)) map.set(key, item);
+    });
+    return Array.from(map.values());
 }
 
 function queueNihongoWrongReview(memoryKey, item, wait = 10) {
@@ -266,7 +289,8 @@ function makeSentenceOption(item) {
     return {
         key: sentence,
         primary: sentence,
-        secondary: item.sentenceVi || item.hint || item.vi || '',
+        // Ghép câu: đáp án chỉ hiện câu tiếng Nhật, không lộ nghĩa Việt/English.
+        secondary: '',
         speak: sentence,
         raw: item
     };
@@ -517,13 +541,13 @@ function buildGrammarQuestion(level, mode) {
         en: item.en || '',
         example: item.example || item.sentence || item.jp,
         exampleHtml: renderGrammarExample(item),
-        hint: item.hint || '',
+        hint: item.hint || item.exampleReading || item.sentenceReading || item.reading || '',
         speakText: item.example || item.jp,
         correctKey: makeMeaningOption(item).key,
         memoryKey,
         rawItem: item,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['grammar']),
-        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint, vi: item.vi, en: item.en || '' }
+        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint || item.exampleReading || item.sentenceReading || item.reading || '', vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -837,9 +861,10 @@ function collectNihongoStudyItems(config) {
 
     levels.forEach(level => {
         if (kind === 'all') {
-            ['vocab', 'kanji', 'grammar', 'sentence'].forEach(k => {
-                const sourceKind = k === 'sentence' ? 'grammar' : k;
-                collectNihongoLessonItems(level, sourceKind, 'all').forEach(item => {
+            // Tra cứu toàn bộ chỉ gom 3 nhóm chính. Không gom 'sentence' từ grammar lần nữa
+            // để tránh lặp một mẫu ngữ pháp thành 2 kết quả giống nhau.
+            ['vocab', 'kanji', 'grammar'].forEach(k => {
+                collectNihongoLessonItems(level, k, 'all').forEach(item => {
                     items.push({ ...item, _kind: k });
                 });
             });
@@ -848,7 +873,7 @@ function collectNihongoStudyItems(config) {
         }
     });
 
-    return items;
+    return dedupeNihongoStudyItems(items);
 }
 
 function getNihongoStudyKindFromMode(mode) {
@@ -954,7 +979,7 @@ function renderNihongoGrammarStudyCard(item, index) {
                 ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
                 ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
                 ${renderNihongoHighlightedExample(item)}
-                ${item.reading ? `<div class="nihongo-study-reading">${nihongoEscape(item.reading)}</div>` : ''}
+                ${(() => { const gr = item.exampleReading || item.sentenceReading || item.reading || item.kana || item.yomi || ''; return gr ? `<div class="nihongo-study-reading">${nihongoEscape(gr)}</div>` : ''; })()}
                 ${item.exampleVi || item.sentenceVi ? `<div class="nihongo-study-example-vi">${nihongoEscape(item.exampleVi || item.sentenceVi)}</div>` : ''}
                 ${item.hint ? `<div class="nihongo-study-hint">${nihongoEscape(item.hint)}</div>` : ''}
                 ${renderNihongoStudyMeta(item)}

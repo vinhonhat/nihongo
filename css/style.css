@@ -1833,3 +1833,48 @@ body {
         overflow: visible !important;
     }
 }
+
+/* =====================================================
+   NIHONGO V1.2.8 - PC MENU FULL WIDTH
+   Trên PC, các khối trong menu dùng ngang bằng khung app.
+   iPad/mobile giữ layout cũ.
+===================================================== */
+@media (min-width: 1181px) {
+    .nihongo-menu-screen,
+    .smart-menu-screen {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .nihongo-menu-screen .smart-menu-header,
+    .nihongo-menu-screen .nihongo-menu-search,
+    .nihongo-menu-screen .menu-group-tabs,
+    .nihongo-menu-screen .smart-game-grid,
+    .nihongo-menu-screen .smart-menu-footer,
+    .smart-menu-screen .smart-menu-header,
+    .smart-menu-screen .nihongo-menu-search,
+    .smart-menu-screen .menu-group-tabs,
+    .smart-menu-screen .smart-game-grid,
+    .smart-menu-screen .smart-menu-footer {
+        width: 100% !important;
+        max-width: 100% !important;
+        align-self: stretch !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .nihongo-menu-search {
+        box-sizing: border-box !important;
+    }
+
+    .menu-group-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .smart-game-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 12px !important;
+    }
+}

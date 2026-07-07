@@ -2613,3 +2613,51 @@
         font-size: .88rem !important;
     }
 }
+
+/* =====================================================
+   NIHONGO V1.2.8 - OPTION FONT / NEXT BUTTON FIX
+   - Cỡ chữ đáp án mặc định tăng lên 1rem.
+   - Giữ nút Sang câu nổi phía trên đáp án để không bị che.
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] {
+    --NQ-answer-font: 1rem;
+}
+
+@media (min-width: 1181px) {
+    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: 1rem; }
+}
+
+@media (min-width: 768px) and (max-width: 1180px) {
+    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: .96rem; }
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: 1rem; }
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
+    font-size: var(--NQ-answer-font) !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-main {
+    font-size: 1em !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-sub {
+    font-size: .82em !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .display-area {
+    padding-bottom: 54px !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] #nihongo-floating-next.nihongo-floating-next {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 14px !important;
+    transform: translateX(-50%) !important;
+    z-index: 30 !important;
+    min-height: 38px !important;
+    padding: 8px 20px !important;
+    white-space: nowrap !important;
+}

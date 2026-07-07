@@ -2,25 +2,61 @@
 // Điều khiển app V1.1: mở khóa audio, hiện menu, load CSS/JS game khi bấm.
 // =====================================================
 // PHIÊN BẢN APP
-// Khi cập nhật web/app, cập nhật APP_VERSION + displayVersion ở đây.
-// version.json là file báo cập nhật online cho PWA, không tự ghi ngược vào core.
+// Từ V1.2.8 trở đi: thông tin hiển thị ưu tiên đọc từ version.json.
+// CORE_APP_VERSION chỉ là bản dự phòng để so sánh/cảnh báo khi đang chạy cache cũ.
 // =====================================================
 
-const APP_VERSION = '1.2.7-pc-layout-next-button';
+const CORE_APP_VERSION = '1.2.8-study-search-fix';
+const APP_VERSION = CORE_APP_VERSION;
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.7 Nihongo',
+    displayVersion: 'V1.2.8 Nihongo',
     get versionText() { return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + this.displayVersion.replace(' Nihongo', ''); },
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
 };
 window.NIHONGO_APP_META = NIHONGO_APP_META;
 
+let NIHONGO_REMOTE_VERSION_INFO = null;
+
+function buildNihongoVersionText(displayVersion) {
+    return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + String(displayVersion || '').replace(' Nihongo', '');
+}
+
+function applyNihongoVersionInfo(info) {
+    if (!info || typeof info !== 'object') return;
+    NIHONGO_REMOTE_VERSION_INFO = info;
+    const meta = window.NIHONGO_APP_META || NIHONGO_APP_META;
+    if (info.name) meta.name = String(info.name);
+    if (info.displayVersion) meta.displayVersion = String(info.displayVersion);
+    if (info.author) meta.author = String(info.author);
+    if (info.contact) meta.contact = String(info.contact);
+    if (info.versionText) {
+        Object.defineProperty(meta, 'versionText', {
+            configurable: true,
+            enumerable: true,
+            get() { return String(info.versionText); }
+        });
+    } else if (info.displayVersion) {
+        Object.defineProperty(meta, 'versionText', {
+            configurable: true,
+            enumerable: true,
+            get() { return buildNihongoVersionText(meta.displayVersion); }
+        });
+    }
+    window.NIHONGO_APP_META = meta;
+    if (document.readyState !== 'loading') applyNihongoAppMeta();
+}
+
+function getNihongoRuntimeVersion() {
+    return String((NIHONGO_REMOTE_VERSION_INFO && NIHONGO_REMOTE_VERSION_INFO.version) || APP_VERSION);
+}
+
 
 const NIHONGO_REMOTE_VERSION_URL = 'version.json';
-const NIHONGO_OFFLINE_CACHE_NAME = 'nihongo-offline-v1-2-7';
+const NIHONGO_OFFLINE_CACHE_NAME = 'nihongo-offline-runtime';
 const NIHONGO_OFFLINE_READY_KEY = 'nihongo_offline_ready_version';
 
 function buildNihongoOfflineAssetList() {
@@ -1290,11 +1326,12 @@ async function checkAppVersionForUpdateHint() {
             });
             if (res.ok) {
                 const info = await res.json();
+                if (info) applyNihongoVersionInfo(info);
                 if (info && info.version) remoteVersion = String(info.version);
                 if (info && info.displayVersion) remoteLabel = String(info.displayVersion);
             }
         } catch (err) {
-            console.warn('Không đọc được version.json, dùng version trong core:', err);
+            console.warn('Không đọc được version.json, dùng version trong core/version dự phòng:', err);
         }
     }
 
@@ -1355,7 +1392,8 @@ async function cacheNihongoOfflineAssets(options = {}) {
     if (!navigator.onLine) return;
 
     const force = options.force === true;
-    const alreadyReady = localStorage.getItem(NIHONGO_OFFLINE_READY_KEY) === APP_VERSION;
+    const runtimeVersion = getNihongoRuntimeVersion();
+    const alreadyReady = localStorage.getItem(NIHONGO_OFFLINE_READY_KEY) === runtimeVersion;
     if (!force && alreadyReady) return;
 
     const assets = buildNihongoOfflineAssetList();
@@ -1368,7 +1406,7 @@ async function cacheNihongoOfflineAssets(options = {}) {
         done += 1;
         try {
             // Không cache version.json. Các file khác được cache để PWA học offline.
-            const requestUrl = asset + (asset.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(APP_VERSION);
+            const requestUrl = asset + (asset.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(runtimeVersion);
             const response = await fetch(requestUrl, { cache: 'reload', credentials: 'same-origin' });
             if (response && response.ok) {
                 await cache.put(asset, response.clone());
@@ -1383,7 +1421,7 @@ async function cacheNihongoOfflineAssets(options = {}) {
         }
     }
 
-    localStorage.setItem(NIHONGO_OFFLINE_READY_KEY, APP_VERSION);
+    localStorage.setItem(NIHONGO_OFFLINE_READY_KEY, runtimeVersion);
     showNihongoOfflineProgress(assets.length, assets.length, 'Đã tải xong dữ liệu offline. Đang mở app...');
     await new Promise(resolve => setTimeout(resolve, 260));
     hideNihongoOfflineProgress();
