@@ -98,11 +98,13 @@ window.registerNihongoLesson && window.registerNihongoLesson('n4', {
             "vi": "Được quyết định",
             "en": "be decided"
         },
+       
         {
             "jp": "決める",
             "reading": "きめる",
             "vi": "Quyết định",
-            "en": "decide"
+            "en": "decide",
+            source: "MinanoNihongo"
         }
     ],
     "kanji": [

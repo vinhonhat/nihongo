@@ -1,8 +1,6 @@
 // games/nihongo/data/n5/index.js
-// N5 lesson loader V1.2.9
-// Cấu trúc chuẩn giống N4/N3: mỗi bài 1 file lesson01.js ... lesson25.js
-// Mỗi lesson có thể chứa: vocab, kanji, grammar, listening, sentence.
-// N5 grammar/sentence đã chuẩn hóa vào từng lesson giống N4. File chung chỉ giữ tương thích.
+// N5 lesson loader V1.2.9.2
+// Mỗi bài 1 file: lesson01.js ... lesson25.js
 
 window.NIHONGO_DATA = window.NIHONGO_DATA || {};
 window.NIHONGO_DATA.n5 = window.NIHONGO_DATA.n5 || {};
@@ -26,21 +24,11 @@ window.NIHONGO_DATA.n5.lessonsMeta = window.NIHONGO_DATA.n5.lessonsMeta || [];
             }));
         });
 
-        const lessonVocab = merge('vocab');
-        const lessonKanji = merge('kanji');
-        const lessonGrammar = merge('grammar');
-        const lessonListening = merge('listening');
-        const lessonSentence = merge('sentence');
-
-        // Vocab N5 đã tách theo bài nên ghi trực tiếp.
-        levelData.vocab = lessonVocab;
-
-        // Các mảng phụ chỉ ghi khi lesson có dữ liệu.
-        // Nếu chưa có, giữ dữ liệu file chung kanji.js / grammar.js / listening.js để tránh màn học bị trống.
-        if (lessonKanji.length) levelData.kanji = lessonKanji;
-        if (lessonGrammar.length) levelData.grammar = lessonGrammar;
-        if (lessonListening.length) levelData.listening = lessonListening;
-        if (lessonSentence.length) levelData.sentence = lessonSentence;
+        levelData.vocab = merge('vocab');
+        levelData.kanji = merge('kanji');
+        levelData.grammar = merge('grammar');
+        levelData.listening = merge('listening');
+        levelData.sentence = merge('sentence');
 
         levelData.lessonsMeta = ids.map(id => {
             const lesson = lessons[id] || {};
