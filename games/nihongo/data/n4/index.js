@@ -1,8 +1,8 @@
 // games/nihongo/data/n4/index.js
-// N4 lesson loader V1.1.8
-// Cấu trúc chuẩn để sau này mở rộng lên N4/N3/N2/N1.
-// Mỗi bài chỉ cần sửa 1 file: lesson01.js ... lesson25.js
+// N4 lesson loader V1.1.9
+// Cấu trúc chuẩn: mỗi bài 1 file lesson01.js ... lesson25.js
 // Mỗi lesson có thể chứa: vocab, kanji, grammar, listening, sentence.
+// Đây là bộ dữ liệu N4 tổng hợp tự biên soạn cho app, không phải danh sách chính thức của JLPT.
 
 window.NIHONGO_DATA = window.NIHONGO_DATA || {};
 window.NIHONGO_DATA.n4 = window.NIHONGO_DATA.n4 || {};
@@ -26,7 +26,6 @@ window.NIHONGO_DATA.n4.lessonsMeta = window.NIHONGO_DATA.n4.lessonsMeta || [];
             }));
         });
 
-        // Dữ liệu tổng hợp dùng cho chế độ "Toàn bộ N4".
         levelData.vocab = merge('vocab');
         levelData.kanji = merge('kanji');
         levelData.grammar = merge('grammar');
@@ -71,7 +70,6 @@ window.NIHONGO_DATA.n4.lessonsMeta = window.NIHONGO_DATA.n4.lessonsMeta || [];
         window.rebuildNihongoLevelFromLessons(levelName);
     };
 
-    // Tự nạp 25 file bài của N4. Nhờ vậy index.html chỉ cần gọi index.js, không cần 25 thẻ script.
     for (let i = 1; i <= 25; i += 1) {
         const num = String(i).padStart(2, '0');
         document.write('<script src="games/nihongo/data/n4/lesson' + num + '.js"><\/script>');
