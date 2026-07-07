@@ -2493,3 +2493,104 @@
     font-size: max(.92rem, calc(var(--NQ-answer-font, 1.1rem) * .86)) !important;
     line-height: 1.18 !important;
 }
+
+/* =====================================================
+   GRAMMAR MULTI EXAMPLE VIEW
+   - Mặc định mỗi mẫu ngữ pháp hiện 1 ví dụ.
+   - Bấm "Ví dụ thêm" để bung nhiều ví dụ trong grammar.examples
+     hoặc các câu sentence cùng bài.
+===================================================== */
+.nihongo-study-grammar-card {
+    align-items: start;
+}
+
+.nihongo-grammar-more-btn {
+    min-width: 86px;
+    min-height: 32px;
+    border: 0;
+    border-radius: 999px;
+    background: #fff0d7;
+    color: #a05d00;
+    font-size: calc(.72rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 950;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    white-space: nowrap;
+}
+
+.nihongo-grammar-more-box {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 14px;
+    background: #f8fbff;
+    border: 1px solid rgba(72, 133, 170, .18);
+}
+
+.nihongo-grammar-more-box.hidden {
+    display: none;
+}
+
+.nihongo-grammar-more-example {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(60, 93, 115, .2);
+}
+
+.nihongo-grammar-more-example:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.nihongo-grammar-more-example.is-preview {
+    margin-top: 8px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.nihongo-grammar-example-no,
+.nihongo-grammar-related-title {
+    color: #0b6078;
+    font-size: calc(.76rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 950;
+    margin: 0 0 5px;
+}
+
+.nihongo-grammar-related-title {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(60, 93, 115, .18);
+    color: #7a4ca5;
+}
+
+.nihongo-grammar-more-empty {
+    color: #735d66;
+    font-size: calc(.84rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 850;
+    line-height: 1.45;
+}
+
+.nihongo-grammar-more-empty code {
+    padding: 1px 5px;
+    border-radius: 6px;
+    background: #fff0d7;
+    color: #9a5500;
+}
+
+@media (max-width: 767px) {
+    .nihongo-study-grammar-card {
+        grid-template-columns: 32px minmax(0, 1fr);
+    }
+
+    .nihongo-study-grammar-card .nihongo-study-actions {
+        grid-column: 2;
+        flex-direction: row;
+        justify-content: flex-start;
+        margin-top: 4px;
+    }
+
+    .nihongo-grammar-more-btn {
+        min-height: 34px;
+        font-size: calc(.74rem * var(--NIHONGO-system-scale, 1));
+    }
+}

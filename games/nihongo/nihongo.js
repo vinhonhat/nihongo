@@ -701,6 +701,139 @@ function renderNihongoHighlightedExample(item) {
     return `<div class="nihongo-study-example">${html}</div>`;
 }
 
+
+// =====================================================
+// GRAMMAR MULTI EXAMPLE HELPERS
+// - Màn Ngữ pháp mặc định hiện 1 ví dụ ngắn.
+// - Bấm "Ví dụ thêm" sẽ bung nhiều ví dụ cho đúng mẫu đó.
+// - Ưu tiên grammar.examples trong từng item.
+// - Nếu chưa nhập examples, app lấy thêm sentence cùng bài làm ví dụ tham khảo.
+// =====================================================
+function nihongoSafeDomId(value) {
+    return String(value || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9_-]+/g, '-')
+        .replace(/^-+|-+$/g, '') || 'item';
+}
+
+function normalizeNihongoGrammarExample(example, baseItem = {}) {
+    if (!example) return null;
+    if (typeof example === 'string') {
+        return {
+            jp: example,
+            reading: '',
+            vi: '',
+            en: '',
+            highlight: baseItem.highlight || baseItem.focus || baseItem.pattern || ''
+        };
+    }
+    return {
+        jp: example.jp || example.example || example.sentence || '',
+        reading: example.reading || example.kana || '',
+        vi: example.vi || example.exampleVi || example.sentenceVi || '',
+        en: example.en || example.exampleEn || example.sentenceEn || '',
+        highlight: example.highlight || example.focus || baseItem.highlight || baseItem.focus || baseItem.pattern || '',
+        note: example.note || example.hint || ''
+    };
+}
+
+function getNihongoGrammarExampleList(item) {
+    const list = [];
+    const add = (example) => {
+        const normalized = normalizeNihongoGrammarExample(example, item);
+        if (!normalized || !normalized.jp) return;
+        const key = [normalized.jp, normalized.reading, normalized.vi].join('|');
+        if (list.some(old => [old.jp, old.reading, old.vi].join('|') === key)) return;
+        list.push(normalized);
+    };
+
+    add({
+        jp: item.example || item.sentence || item.jp,
+        reading: item.reading || '',
+        vi: item.exampleVi || item.sentenceVi || '',
+        en: item.exampleEn || item.sentenceEn || '',
+        highlight: item.highlight || item.focus || item.pattern || '',
+        note: item.hint || ''
+    });
+
+    ['examples', 'moreExamples', 'exampleList'].forEach(key => {
+        if (Array.isArray(item[key])) item[key].forEach(add);
+    });
+
+    return list;
+}
+
+function getNihongoRelatedLessonSentences(item, limit = 4) {
+    const level = item._level || item.level || '';
+    const lessonId = item._lessonId || item.lessonId || '';
+    if (!level || !lessonId || lessonId === 'all') return [];
+
+    const lesson = window.NIHONGO_DATA?.[level]?.lessons?.[lessonId];
+    const sentences = Array.isArray(lesson?.sentence) ? lesson.sentence : [];
+    const ownKeys = new Set(getNihongoGrammarExampleList(item).map(ex => [ex.jp, ex.reading, ex.vi].join('|')));
+    const result = [];
+
+    sentences.forEach(sentence => {
+        if (result.length >= limit) return;
+        const normalized = normalizeNihongoGrammarExample(sentence, item);
+        if (!normalized || !normalized.jp) return;
+        const key = [normalized.jp, normalized.reading, normalized.vi].join('|');
+        if (ownKeys.has(key) || result.some(old => [old.jp, old.reading, old.vi].join('|') === key)) return;
+        result.push(normalized);
+    });
+
+    return result;
+}
+
+function renderNihongoGrammarExampleLine(example, index, className = '') {
+    const html = renderGrammarExample({
+        example: example.jp,
+        focus: example.highlight || ''
+    });
+    return `
+        <div class="nihongo-grammar-more-example ${className}">
+            <div class="nihongo-grammar-example-no">Ví dụ ${index + 1}</div>
+            <div class="nihongo-study-example">${html}</div>
+            ${example.reading ? `<div class="nihongo-study-reading">${nihongoEscape(example.reading)}</div>` : ''}
+            ${example.vi ? `<div class="nihongo-study-example-vi">${nihongoEscape(example.vi)}</div>` : ''}
+            ${example.en ? `<div class="nihongo-study-en">${nihongoEscape(example.en)}</div>` : ''}
+            ${example.note ? `<div class="nihongo-study-hint">${nihongoEscape(example.note)}</div>` : ''}
+        </div>`;
+}
+
+function renderNihongoGrammarPreviewExample(item) {
+    const examples = getNihongoGrammarExampleList(item);
+    if (examples.length) return renderNihongoGrammarExampleLine(examples[0], 0, 'is-preview');
+    return '';
+}
+
+function renderNihongoGrammarMoreExamples(item) {
+    const ownExamples = getNihongoGrammarExampleList(item);
+    // Ví dụ đầu tiên đã hiện ngoài card, nên trong phần bung ra chỉ hiện ví dụ 2 trở đi.
+    const extraOwnExamples = ownExamples.slice(1);
+    const relatedExamples = getNihongoRelatedLessonSentences(item, 4);
+    const all = [...extraOwnExamples, ...relatedExamples];
+
+    if (!all.length) {
+        return `<div class="nihongo-grammar-more-empty">Chưa có ví dụ chi tiết. Bạn có thể thêm trường <code>examples</code> trong file lesson tương ứng.</div>`;
+    }
+
+    const mainHtml = extraOwnExamples.map((ex, idx) => renderNihongoGrammarExampleLine(ex, idx + 1)).join('');
+    const relatedHtml = relatedExamples.length
+        ? `<div class="nihongo-grammar-related-title">Ví dụ thêm trong bài</div>` + relatedExamples.map((ex, idx) => renderNihongoGrammarExampleLine(ex, idx + 1 + extraOwnExamples.length, 'is-related')).join('')
+        : '';
+
+    return mainHtml + relatedHtml;
+}
+
+function toggleNihongoGrammarExamples(id) {
+    const box = document.getElementById(id);
+    if (!box) return;
+    const isHidden = box.classList.toggle('hidden');
+    const btn = document.querySelector(`[data-grammar-toggle="${id}"]`);
+    if (btn) btn.textContent = isHidden ? 'Ví dụ thêm ▼' : 'Ẩn ví dụ ▲';
+}
+
 function renderNihongoStudyCard(item, index) {
     if (item._kind === 'kanji') return renderNihongoKanjiStudyCard(item, index);
     if (item._kind === 'grammar' || item._kind === 'sentence') return renderNihongoGrammarStudyCard(item, index);
@@ -752,6 +885,7 @@ function renderNihongoKanjiStudyCard(item, index) {
 function renderNihongoGrammarStudyCard(item, index) {
     const pattern = item.pattern || item.jp || '';
     const speak = item.example || item.sentence || pattern;
+    const detailsId = 'grammar-more-' + nihongoSafeDomId(item._level || '') + '-' + nihongoSafeDomId(item._lessonId || 'all') + '-' + index;
     return `
         <article class="nihongo-study-card nihongo-study-grammar-card">
             <div class="nihongo-study-index">${index + 1}.</div>
@@ -759,14 +893,15 @@ function renderNihongoGrammarStudyCard(item, index) {
                 <div class="nihongo-study-pattern">${nihongoEscape(pattern)}</div>
                 ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
                 ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
-                ${renderNihongoHighlightedExample(item)}
-                ${item.reading ? `<div class="nihongo-study-reading">${nihongoEscape(item.reading)}</div>` : ''}
-                ${item.exampleVi || item.sentenceVi ? `<div class="nihongo-study-example-vi">${nihongoEscape(item.exampleVi || item.sentenceVi)}</div>` : ''}
-                ${item.hint ? `<div class="nihongo-study-hint">${nihongoEscape(item.hint)}</div>` : ''}
+                ${renderNihongoGrammarPreviewExample(item)}
                 ${renderNihongoStudyMeta(item)}
+                <div id="${detailsId}" class="nihongo-grammar-more-box hidden">
+                    ${renderNihongoGrammarMoreExamples(item)}
+                </div>
             </div>
             <div class="nihongo-study-actions">
                 <button class="nihongo-study-speak" type="button" onclick="speakNihongo(decodeURIComponent('${escapeForClick(speak)}'))">🔊</button>
+                <button class="nihongo-grammar-more-btn" type="button" data-grammar-toggle="${detailsId}" onclick="toggleNihongoGrammarExamples('${detailsId}')">Ví dụ thêm ▼</button>
             </div>
         </article>`;
 }
