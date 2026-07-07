@@ -2030,3 +2030,310 @@
         --NQ-reveal-radius: 16px;
     }
 }
+
+/* =====================================================
+   NIHONGO STUDY LIST / DICTIONARY V1.2.2
+   Màn Từ vựng / Kanji / Ngữ pháp dạng danh sách kéo học.
+===================================================== */
+.game-view[class*='game-nihongo'] .nihongo-study-screen {
+    width: 100%;
+    height: auto;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 8px;
+    overflow: hidden;
+    background: #f2f2f2;
+}
+
+.nihongo-study-toolbar {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
+    gap: 7px;
+    align-items: center;
+    padding: 8px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, .92);
+    border: 1px solid rgba(200, 200, 200, .65);
+    box-shadow: 0 3px 12px rgba(0,0,0,.06);
+}
+
+.nihongo-study-search-wrap {
+    min-width: 0;
+}
+
+.nihongo-study-search-input,
+.nihongo-study-select {
+    width: 100%;
+    min-height: 36px;
+    border: 1px solid rgba(145, 145, 145, .35);
+    border-radius: 12px;
+    background: #fff;
+    padding: 0 10px;
+    font-weight: 800;
+    color: #26313a;
+    font-size: calc(.82rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-study-select {
+    width: auto;
+    max-width: 160px;
+    background: #f9fbff;
+}
+
+.nihongo-study-count {
+    white-space: nowrap;
+    color: #0a607a;
+    font-weight: 900;
+    font-size: calc(.76rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-study-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 2px 90px;
+}
+
+.nihongo-study-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 10px;
+    align-items: start;
+    margin: 0 0 8px;
+    padding: 12px 10px;
+    background: #fff;
+    border: 1px solid rgba(210, 210, 210, .75);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+}
+
+.nihongo-study-index {
+    color: #0b6078;
+    font-weight: 950;
+    font-size: calc(1.05rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.25;
+    text-align: right;
+}
+
+.nihongo-study-main {
+    min-width: 0;
+}
+
+.nihongo-study-jp,
+.nihongo-study-pattern {
+    color: #075f78;
+    font-weight: 950;
+    font-size: calc(1.28rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.28;
+    word-break: break-word;
+}
+
+.nihongo-study-reading,
+.nihongo-study-romaji,
+.nihongo-study-line {
+    color: #777;
+    font-weight: 850;
+    font-size: calc(.94rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.38;
+    word-break: break-word;
+}
+
+.nihongo-study-vi {
+    margin-top: 3px;
+    color: #f09a16;
+    font-weight: 950;
+    font-size: calc(1.05rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.35;
+    word-break: break-word;
+}
+
+.nihongo-study-en {
+    margin-top: 2px;
+    color: #717171;
+    font-weight: 800;
+    font-size: calc(.88rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.32;
+    word-break: break-word;
+}
+
+.nihongo-study-meta {
+    margin-top: 7px;
+    display: inline-flex;
+    max-width: 100%;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: #f1f7fb;
+    color: #497081;
+    font-size: calc(.68rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 900;
+}
+
+.nihongo-study-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+}
+
+.nihongo-study-speak {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 50%;
+    background: #eef3f5;
+    color: #0a607a;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    font-size: 1rem;
+}
+
+.nihongo-study-kanji-card {
+    grid-template-columns: 36px 92px minmax(0, 1fr);
+}
+
+.nihongo-kanji-side {
+    min-height: 120px;
+    border-right: 1px solid #dedede;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding-right: 10px;
+}
+
+.nihongo-kanji-big {
+    color: #f04b25;
+    font-weight: 950;
+    font-size: calc(2.8rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1;
+}
+
+.nihongo-kanji-main-reading {
+    color: #252525;
+    font-weight: 950;
+    font-size: calc(.95rem * var(--NIHONGO-system-scale, 1));
+}
+
+.study-blue { color: #0391d2; }
+.study-purple { color: #8756b9; }
+
+.nihongo-study-hint {
+    margin-top: 6px;
+    color: #333;
+    font-weight: 850;
+    line-height: 1.35;
+    font-size: calc(.88rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-study-example {
+    margin-top: 8px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    background: #fff8e7;
+    color: #222;
+    font-weight: 850;
+    line-height: 1.45;
+    font-size: calc(.95rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-study-example strong {
+    background: #ffe08a;
+    color: #111;
+    border-radius: 5px;
+    padding: 1px 4px;
+}
+
+.nihongo-study-example-vi {
+    margin-top: 5px;
+    color: #f09a16;
+    font-weight: 900;
+    line-height: 1.35;
+    font-size: calc(.9rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-study-empty {
+    margin: 18px auto;
+    width: min(520px, 92%);
+    padding: 18px;
+    border-radius: 16px;
+    background: #fff;
+    color: #66525b;
+    font-weight: 850;
+    text-align: center;
+    box-shadow: 0 4px 18px rgba(0,0,0,.08);
+}
+
+@media (max-width: 767px) {
+    .game-view[class*='game-nihongo'] .nihongo-study-screen {
+        padding: 6px;
+        gap: 6px;
+    }
+
+    .nihongo-study-toolbar {
+        grid-template-columns: minmax(0, 1fr) 104px;
+        gap: 6px;
+        padding: 6px;
+    }
+
+    .nihongo-study-toolbar #nihongo-study-lesson-box,
+    .nihongo-study-count {
+        grid-column: 1 / -1;
+    }
+
+    .nihongo-study-select {
+        width: 100%;
+        max-width: none;
+        min-height: 34px;
+        font-size: calc(.72rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-search-input {
+        min-height: 34px;
+        font-size: calc(.74rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-card {
+        grid-template-columns: 30px minmax(0, 1fr) 34px;
+        gap: 8px;
+        padding: 10px 8px;
+        border-radius: 7px;
+    }
+
+    .nihongo-study-index {
+        font-size: calc(.95rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-jp,
+    .nihongo-study-pattern {
+        font-size: calc(1.18rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-vi {
+        font-size: calc(1rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-kanji-card {
+        grid-template-columns: 24px 74px minmax(0, 1fr);
+    }
+
+    .nihongo-kanji-side {
+        min-height: 104px;
+        padding-right: 7px;
+    }
+
+    .nihongo-kanji-big {
+        font-size: calc(2.35rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-study-speak {
+        width: 30px;
+        height: 30px;
+        font-size: .88rem;
+    }
+}

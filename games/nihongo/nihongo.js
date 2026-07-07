@@ -407,8 +407,8 @@ function buildNihongoQuestion(gameId) {
     if (level === 'n0' && mode === 'quiz') return buildMockQuestion('n0');
     if (mode.indexOf('vocab') >= 0) return buildVocabQuestion(level, mode);
     if (mode === 'listening') return buildListeningQuestion(level);
-    if (mode === 'kanji') return buildKanjiQuestion(level);
-    if (mode === 'grammar' || mode === 'sentence') return buildGrammarQuestion(level, mode);
+    if (mode === 'kanji' || mode === 'kanji_practice') return buildKanjiQuestion(level);
+    if (mode === 'grammar' || mode === 'sentence' || mode === 'grammar_practice') return buildGrammarQuestion(level, mode);
     if (mode === 'sentence_build') return buildSentenceBuildQuestion(level);
     if (mode === 'mock_test') return buildMockQuestion(level);
     return buildVocabQuestion(level, mode);
@@ -553,6 +553,324 @@ function revealNihongoAnswer(data, options = {}) {
     box.classList.add('show');
 }
 
+
+// =====================================================
+// STUDY LIST / TRA CỨU V1.2.2
+// - Từ vựng/Kanji/Ngữ pháp: hiển thị danh sách kéo học, không timer.
+// - Ô tìm trong bài học lọc theo cấp/bài đang chọn.
+// - Search từ menu có thể tìm trong cấp hiện tại hoặc toàn bộ.
+// =====================================================
+
+const NIHONGO_STUDY_LEVELS = ['n0', 'n5', 'n4', 'n3', 'n2', 'n1'];
+let NIHONGO_STUDY_STATE = null;
+
+function isNihongoStudyListGame(gameId) {
+    return /_(vocab_learn|kanji|grammar|sentence|search)$/.test(String(gameId || ''));
+}
+
+function getNihongoLevelLabel(level) {
+    return NIHONGO_LEVEL_NAME[level] || (level ? level.toUpperCase() : '');
+}
+
+function normalText(value) {
+    return String(value ?? '').toLowerCase().trim();
+}
+
+function collectNihongoLessonItems(level, kind, lessonId = 'all') {
+    const bank = nihongoBank();
+    const base = bank[level] || {};
+    const result = [];
+    const pushList = (list, meta = {}) => {
+        if (!Array.isArray(list)) return;
+        list.forEach((item, idx) => {
+            if (!item) return;
+            result.push({
+                ...item,
+                _kind: kind,
+                _level: level,
+                _levelLabel: getNihongoLevelLabel(level),
+                _lessonId: item.lessonId || meta.lessonId || lessonId || 'all',
+                _lessonTitle: item.lessonTitle || meta.lessonTitle || '',
+                _order: idx + 1
+            });
+        });
+    };
+
+    if (lessonId && lessonId !== 'all' && base.lessons && base.lessons[lessonId]) {
+        const lesson = base.lessons[lessonId];
+        const title = lesson.title || lesson.label || lessonId;
+        pushList(lesson[kind], { lessonId, lessonTitle: title });
+        return result;
+    }
+
+    if (base.lessons && Object.keys(base.lessons).length) {
+        Object.keys(base.lessons).sort().forEach(id => {
+            const lesson = base.lessons[id] || {};
+            const title = lesson.title || lesson.label || id;
+            pushList(lesson[kind], { lessonId: id, lessonTitle: title });
+        });
+        return result;
+    }
+
+    pushList(base[kind], { lessonId: 'all', lessonTitle: '' });
+    return result;
+}
+
+function collectNihongoStudyItems(config) {
+    const scope = config.scope || 'n5';
+    const kind = config.kind || 'vocab';
+    const lessonId = config.lessonId || 'all';
+    const levels = scope === 'all' ? NIHONGO_STUDY_LEVELS : [scope];
+    const items = [];
+
+    levels.forEach(level => {
+        if (kind === 'all') {
+            ['vocab', 'kanji', 'grammar', 'sentence'].forEach(k => {
+                const sourceKind = k === 'sentence' ? 'grammar' : k;
+                collectNihongoLessonItems(level, sourceKind, 'all').forEach(item => {
+                    items.push({ ...item, _kind: k });
+                });
+            });
+        } else {
+            collectNihongoLessonItems(level, kind, lessonId).forEach(item => items.push(item));
+        }
+    });
+
+    return items;
+}
+
+function getNihongoStudyKindFromMode(mode) {
+    if (mode === 'search') return 'all';
+    if (mode === 'kanji') return 'kanji';
+    if (mode === 'grammar' || mode === 'sentence') return 'grammar';
+    return 'vocab';
+}
+
+function getNihongoStudyTitle(kind, scope, lessonTitle = '') {
+    const levelText = scope === 'all' ? 'Toàn bộ' : getNihongoLevelLabel(scope);
+    const suffix = lessonTitle ? ' · ' + lessonTitle : '';
+    if (kind === 'kanji') return 'Kanji ' + levelText + suffix;
+    if (kind === 'grammar') return 'Ngữ pháp ' + levelText + suffix;
+    if (kind === 'all') return 'Tra cứu ' + levelText;
+    return 'Từ vựng ' + levelText + suffix;
+}
+
+function getNihongoStudySearchText(item) {
+    return [
+        item.jp, item.reading, item.romaji, item.vi, item.en,
+        item.pattern, item.example, item.exampleVi, item.sentence,
+        item.hint, item.onyomi, item.kunyomi, item.on, item.kun,
+        item._levelLabel, item._lessonTitle, item._kind
+    ].filter(Boolean).join(' ').toLowerCase();
+}
+
+function filterNihongoStudyItems(items, query) {
+    const q = normalText(query);
+    if (!q) return items;
+    return items.filter(item => getNihongoStudySearchText(item).includes(q));
+}
+
+function renderNihongoStudyMeta(item) {
+    const kindLabel = item._kind === 'kanji' ? 'Kanji' : (item._kind === 'grammar' || item._kind === 'sentence' ? 'Ngữ pháp' : 'Từ vựng');
+    const lesson = item._lessonTitle || (item._lessonId && item._lessonId !== 'all' ? item._lessonId : 'Toàn bộ');
+    return `<div class="nihongo-study-meta">${nihongoEscape(item._levelLabel || '')} · ${nihongoEscape(lesson)} · ${kindLabel}</div>`;
+}
+
+function renderNihongoHighlightedExample(item) {
+    const example = item.example || item.sentence || item.jp || '';
+    if (!example) return '';
+    const html = renderGrammarExample({ ...item, focus: item.focus || item.highlight || item.pattern });
+    return `<div class="nihongo-study-example">${html}</div>`;
+}
+
+function renderNihongoStudyCard(item, index) {
+    if (item._kind === 'kanji') return renderNihongoKanjiStudyCard(item, index);
+    if (item._kind === 'grammar' || item._kind === 'sentence') return renderNihongoGrammarStudyCard(item, index);
+    return renderNihongoVocabStudyCard(item, index);
+}
+
+function renderNihongoVocabStudyCard(item, index) {
+    const speak = item.jp || item.reading || '';
+    return `
+        <article class="nihongo-study-card nihongo-study-vocab-card">
+            <div class="nihongo-study-index">${index + 1}.</div>
+            <div class="nihongo-study-main">
+                <div class="nihongo-study-jp">${nihongoEscape(item.jp || '')}</div>
+                ${item.reading ? `<div class="nihongo-study-reading">${nihongoEscape(item.reading)}</div>` : ''}
+                ${item.romaji ? `<div class="nihongo-study-romaji">${nihongoEscape(item.romaji)}</div>` : ''}
+                ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
+                ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
+                ${renderNihongoStudyMeta(item)}
+            </div>
+            <div class="nihongo-study-actions">
+                <button class="nihongo-study-speak" type="button" onclick="speakNihongo(decodeURIComponent('${escapeForClick(speak)}'))">🔊</button>
+            </div>
+        </article>`;
+}
+
+function renderNihongoKanjiStudyCard(item, index) {
+    const speak = item.jp || item.reading || item.kunyomi || item.onyomi || '';
+    const on = item.onyomi || item.on || '';
+    const kun = item.kunyomi || item.kun || item.reading || '';
+    return `
+        <article class="nihongo-study-card nihongo-study-kanji-card">
+            <div class="nihongo-study-index">${index + 1}.</div>
+            <div class="nihongo-kanji-side">
+                <div class="nihongo-kanji-big">${nihongoEscape(item.jp || item.kanji || '')}</div>
+                ${item.reading ? `<div class="nihongo-kanji-main-reading">${nihongoEscape(item.reading)}</div>` : ''}
+                <button class="nihongo-study-speak" type="button" onclick="speakNihongo(decodeURIComponent('${escapeForClick(speak)}'))">🔊</button>
+            </div>
+            <div class="nihongo-study-main">
+                ${on ? `<div class="nihongo-study-line"><b>on:</b> <span class="study-blue">${nihongoEscape(on)}</span></div>` : ''}
+                ${kun ? `<div class="nihongo-study-line"><b>kun:</b> <span class="study-purple">${nihongoEscape(kun)}</span></div>` : ''}
+                ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
+                ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
+                ${item.hint || item.mnemonic ? `<div class="nihongo-study-hint">${nihongoEscape(item.hint || item.mnemonic)}</div>` : ''}
+                ${renderNihongoStudyMeta(item)}
+            </div>
+        </article>`;
+}
+
+function renderNihongoGrammarStudyCard(item, index) {
+    const pattern = item.pattern || item.jp || '';
+    const speak = item.example || item.sentence || pattern;
+    return `
+        <article class="nihongo-study-card nihongo-study-grammar-card">
+            <div class="nihongo-study-index">${index + 1}.</div>
+            <div class="nihongo-study-main">
+                <div class="nihongo-study-pattern">${nihongoEscape(pattern)}</div>
+                ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
+                ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
+                ${renderNihongoHighlightedExample(item)}
+                ${item.reading ? `<div class="nihongo-study-reading">${nihongoEscape(item.reading)}</div>` : ''}
+                ${item.exampleVi || item.sentenceVi ? `<div class="nihongo-study-example-vi">${nihongoEscape(item.exampleVi || item.sentenceVi)}</div>` : ''}
+                ${item.hint ? `<div class="nihongo-study-hint">${nihongoEscape(item.hint)}</div>` : ''}
+                ${renderNihongoStudyMeta(item)}
+            </div>
+            <div class="nihongo-study-actions">
+                <button class="nihongo-study-speak" type="button" onclick="speakNihongo(decodeURIComponent('${escapeForClick(speak)}'))">🔊</button>
+            </div>
+        </article>`;
+}
+
+function getStudyLessonOptions(level, currentLesson) {
+    const data = window.NIHONGO_DATA && window.NIHONGO_DATA[level];
+    const meta = data && Array.isArray(data.lessonsMeta) ? data.lessonsMeta : [];
+    if (!meta.length) return '';
+    const opts = [`<option value="all" ${currentLesson === 'all' ? 'selected' : ''}>Toàn bộ ${getNihongoLevelLabel(level)}</option>`]
+        .concat(meta.map(item => `<option value="${nihongoEscape(item.id)}" ${item.id === currentLesson ? 'selected' : ''}>${nihongoEscape(item.label || item.title || item.id)}</option>`));
+    return opts.join('');
+}
+
+function renderNihongoStudyList() {
+    if (!NIHONGO_STUDY_STATE) return;
+    const listEl = document.getElementById('nihongo-study-list');
+    const countEl = document.getElementById('nihongo-study-count');
+    if (!listEl) return;
+
+    const input = document.getElementById('nihongo-study-search-input');
+    const query = input ? input.value : (NIHONGO_STUDY_STATE.query || '');
+    const filtered = filterNihongoStudyItems(NIHONGO_STUDY_STATE.items, query);
+    const visible = filtered.slice(0, NIHONGO_STUDY_STATE.maxVisible || 600);
+
+    if (countEl) {
+        countEl.textContent = `${filtered.length} mục` + (filtered.length > visible.length ? ` · đang hiện ${visible.length}` : '');
+    }
+
+    if (!visible.length) {
+        listEl.innerHTML = `<div class="nihongo-study-empty">Không tìm thấy dữ liệu phù hợp. Hãy thử từ khoá khác hoặc đổi bài/cấp.</div>`;
+        return;
+    }
+
+    listEl.innerHTML = visible.map(renderNihongoStudyCard).join('');
+}
+
+function setNihongoStudyLesson(lessonId) {
+    if (!NIHONGO_STUDY_STATE) return;
+    const state = NIHONGO_STUDY_STATE;
+    if (state.scope === 'all') return;
+    try { localStorage.setItem('nihongo_selected_lesson_' + state.scope, lessonId || 'all'); } catch (e) {}
+    state.lessonId = lessonId || 'all';
+    state.items = collectNihongoStudyItems({ scope: state.scope, kind: state.kind, lessonId: state.lessonId });
+    const titleEl = document.getElementById('nihongo-study-title');
+    if (titleEl) titleEl.textContent = getNihongoStudyTitle(state.kind, state.scope, state.lessonId === 'all' ? '' : (window.NIHONGO_DATA?.[state.scope]?.lessons?.[state.lessonId]?.title || state.lessonId));
+    renderNihongoStudyList();
+}
+
+function setNihongoStudyScope(scope) {
+    if (!NIHONGO_STUDY_STATE) return;
+    const state = NIHONGO_STUDY_STATE;
+    state.scope = scope || state.scope;
+    state.lessonId = 'all';
+    state.items = collectNihongoStudyItems({ scope: state.scope, kind: state.kind, lessonId: 'all' });
+    const lessonBox = document.getElementById('nihongo-study-lesson-box');
+    if (lessonBox) {
+        lessonBox.innerHTML = state.scope === 'all' ? '' : `<select class="nihongo-study-select" onchange="setNihongoStudyLesson(this.value)">${getStudyLessonOptions(state.scope, 'all')}</select>`;
+    }
+    const titleEl = document.getElementById('nihongo-study-title');
+    if (titleEl) titleEl.textContent = getNihongoStudyTitle(state.kind, state.scope);
+    renderNihongoStudyList();
+}
+
+function renderNihongoStudyScreen(gameId, title) {
+    const gameScreen = document.getElementById('game-screen');
+    if (!gameScreen) return;
+
+    const parsed = parseNihongoGameId(gameId);
+    const mode = parsed.mode;
+    const fromMenuSearch = mode === 'search';
+    const storedScope = (() => { try { return sessionStorage.getItem('nihongo_search_scope') || ''; } catch (e) { return ''; } })();
+    const storedQuery = (() => { try { return sessionStorage.getItem('nihongo_search_query') || ''; } catch (e) { return ''; } })();
+    const scope = fromMenuSearch ? (storedScope || parsed.level) : parsed.level;
+    const kind = getNihongoStudyKindFromMode(mode);
+    const lessonId = scope === 'all' ? 'all' : getSelectedNihongoLessonId(scope);
+    const lessonTitle = scope !== 'all' && lessonId !== 'all' ? (window.NIHONGO_DATA?.[scope]?.lessons?.[lessonId]?.title || lessonId) : '';
+    const items = collectNihongoStudyItems({ scope, kind, lessonId });
+    const headerTitle = getNihongoStudyTitle(kind, scope, lessonTitle);
+
+    NIHONGO_STUDY_STATE = { gameId, mode, kind, scope, lessonId, items, query: storedQuery, maxVisible: scope === 'all' && !storedQuery ? 180 : 800 };
+
+    const scopeOptions = [`<option value="all" ${scope === 'all' ? 'selected' : ''}>🌐 Toàn bộ</option>`]
+        .concat(NIHONGO_STUDY_LEVELS.map(level => `<option value="${level}" ${scope === level ? 'selected' : ''}>${getNihongoLevelLabel(level)}</option>`))
+        .join('');
+    const lessonSelect = scope === 'all' ? '' : `<select class="nihongo-study-select" onchange="setNihongoStudyLesson(this.value)">${getStudyLessonOptions(scope, lessonId)}</select>`;
+
+    gameScreen.innerHTML = `
+        ${renderGameHeader({ score: '<span id="nihongo-study-title">' + nihongoEscape(headerTitle) + '</span>', onHome: 'backToMenu()' })}
+        <div class="nihongo-study-screen">
+            <div class="nihongo-study-toolbar">
+                <div class="nihongo-study-search-wrap">
+                    <input id="nihongo-study-search-input" class="nihongo-study-search-input" type="search" autocomplete="off"
+                        placeholder="Tìm tiếng Nhật / cách đọc / nghĩa Việt / English..." value="${nihongoEscape(storedQuery)}"
+                        oninput="renderNihongoStudyList()">
+                </div>
+                <select class="nihongo-study-select" onchange="setNihongoStudyScope(this.value)">${scopeOptions}</select>
+                <span id="nihongo-study-lesson-box">${lessonSelect}</span>
+                <span id="nihongo-study-count" class="nihongo-study-count"></span>
+            </div>
+            <div id="nihongo-study-list" class="nihongo-study-list"></div>
+        </div>
+    `;
+
+    renderNihongoStudyList();
+}
+
+function makeNihongoStudyGame(gameId) {
+    return {
+        start(ctx = {}) {
+            try { activeGame = null; } catch (e) {}
+            try { currentQuestionData = null; } catch (e) {}
+            if (typeof stopQuestionTimer === 'function') stopQuestionTimer(true);
+            if (typeof stopAutoReplay === 'function') stopAutoReplay();
+            renderNihongoStudyScreen(gameId, ctx.title || 'Nihongo Quest');
+        }
+    };
+}
+
+window.renderNihongoStudyList = renderNihongoStudyList;
+window.setNihongoStudyLesson = setNihongoStudyLesson;
+window.setNihongoStudyScope = setNihongoStudyScope;
+
 function isNihongoLearnGame(gameId) {
     return /_vocab_learn$/.test(gameId) || /_kana$/.test(gameId) || /_katakana$/.test(gameId) || /_n0_vocab$/.test(gameId);
 }
@@ -566,6 +884,7 @@ function markNihongoCorrectButton(data) {
 }
 
 function makeNihongoGame(gameId) {
+    if (isNihongoStudyListGame(gameId)) return makeNihongoStudyGame(gameId);
     const isLearn = isNihongoLearnGame(gameId);
     const isMock = gameId.indexOf('mock_test') >= 0;
 
@@ -598,6 +917,8 @@ function makeNihongoGame(gameId) {
 }
 
 const NIHONGO_GAME_IDS = [
+    'nihongo_n0_search', 'nihongo_n5_search', 'nihongo_n4_search', 'nihongo_n3_search', 'nihongo_n2_search', 'nihongo_n1_search',
+    'nihongo_n0_kanji_practice', 'nihongo_n0_grammar_practice', 'nihongo_n5_kanji_practice', 'nihongo_n5_grammar_practice', 'nihongo_n4_kanji_practice', 'nihongo_n4_grammar_practice', 'nihongo_n3_kanji_practice', 'nihongo_n3_grammar_practice', 'nihongo_n2_kanji_practice', 'nihongo_n2_grammar_practice', 'nihongo_n1_kanji_practice', 'nihongo_n1_grammar_practice',
     'nihongo_n0_kana', 'nihongo_n0_katakana', 'nihongo_n0_vocab', 'nihongo_n0_listen', 'nihongo_n0_kanji', 'nihongo_n0_grammar', 'nihongo_n0_quiz',
     'nihongo_n5_vocab_learn', 'nihongo_n5_vocab_practice', 'nihongo_n5_listening', 'nihongo_n5_kanji', 'nihongo_n5_grammar', 'nihongo_n5_sentence', 'nihongo_n5_sentence_build', 'nihongo_n5_mock_test',
     'nihongo_n4_vocab_learn', 'nihongo_n4_vocab_practice', 'nihongo_n4_listening', 'nihongo_n4_kanji', 'nihongo_n4_grammar', 'nihongo_n4_sentence', 'nihongo_n4_sentence_build', 'nihongo_n4_mock_test',

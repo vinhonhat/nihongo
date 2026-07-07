@@ -530,13 +530,46 @@ const GAME_MENU_DATA = [
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     }
-];
+ ];
+
+['n0', 'n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
+    const label = level === 'n0' ? 'nhập môn' : level.toUpperCase();
+    GAME_MENU_DATA.push({
+        id: `nihongo_${level}_kanji_practice`,
+        label: `Luyện Kanji ${label}`,
+        icon: '漢',
+        group: 'practice',
+        levels: [level],
+        color: 'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)',
+        badge: 'Luyện'
+    });
+    GAME_MENU_DATA.push({
+        id: `nihongo_${level}_grammar_practice`,
+        label: `Luyện ngữ pháp ${label}`,
+        icon: '🧩',
+        group: 'practice',
+        levels: [level],
+        color: 'linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)',
+        badge: 'Luyện'
+    });
+});
 
 function safeGetStorage(key, fallback = '') {
     try { return localStorage.getItem(key) || fallback; } catch (e) { return fallback; }
 }
 function safeSetStorage(key, value) {
     try { localStorage.setItem(key, value); } catch (e) {}
+}
+function safeSessionSet(key, value) {
+    try { sessionStorage.setItem(key, value); } catch (e) {}
+}
+function nihongoMenuEscape(value) {
+    return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
 }
 function getCurrentNihongoLevel() {
     let level = safeGetStorage(MENU_STORAGE_KEY_LEVEL, '');
@@ -735,6 +768,46 @@ function renderLevelSelectScreen(root) {
             <div class="admin-gear-zone">${renderAdminGearButton()}</div>
         </section>`;
 }
+function renderNihongoMenuSearchPanel(level) {
+    const levelInfo = NIHONGO_LEVELS[level] || { label: level.toUpperCase(), icon: '🔎' };
+    const levelOptions = Object.entries(NIHONGO_LEVELS)
+        .filter(([levelId]) => levelId !== level)
+        .map(([levelId, item]) => `<option value="${levelId}">${item.icon} Chỉ ${item.label}</option>`)
+        .join('');
+
+    return `
+        <div class="nihongo-menu-search">
+            <div class="nihongo-menu-search-title">🔎 Tra cứu nhanh</div>
+            <div class="nihongo-menu-search-row">
+                <input id="nihongo-menu-search-input" class="nihongo-menu-search-input"
+                    type="search" autocomplete="off"
+                    placeholder="Tìm từ / kanji / ngữ pháp trong ${nihongoMenuEscape(levelInfo.label)}..."
+                    onkeydown="if(event.key==='Enter') startNihongoMenuSearch()">
+                <select id="nihongo-menu-search-scope" class="nihongo-menu-search-scope">
+                    <option value="${level}" selected>${levelInfo.icon} ${nihongoMenuEscape(levelInfo.label)}</option>
+                    <option value="all">🌐 Toàn bộ</option>
+                    ${levelOptions}
+                </select>
+                <button class="nihongo-menu-search-btn" type="button" onclick="startNihongoMenuSearch()">Tìm</button>
+            </div>
+            <div class="nihongo-menu-search-note">Nếu đang ở N4 thì mặc định chỉ tìm trong N4. Chọn “Toàn bộ” để tra tất cả cấp.</div>
+        </div>`;
+}
+
+function startNihongoMenuSearch() {
+    const level = getCurrentNihongoLevel() || 'n5';
+    const input = document.getElementById('nihongo-menu-search-input');
+    const select = document.getElementById('nihongo-menu-search-scope');
+    const query = input ? input.value.trim() : '';
+    const scope = select ? (select.value || level) : level;
+
+    safeSessionSet('nihongo_search_query', query);
+    safeSessionSet('nihongo_search_scope', scope);
+
+    const startLevel = scope === 'all' ? level : scope;
+    startGameFromSmartMenu(`nihongo_${startLevel}_search`);
+}
+
 function renderMainGameMenu(root, level) {
     const levelInfo = NIHONGO_LEVELS[level];
     const groups = getAvailableGroups(level);
@@ -758,6 +831,7 @@ function renderMainGameMenu(root, level) {
                 </div>
                 <div class="smart-level-badge" title="${levelInfo.note}"><span>${levelInfo.icon}</span></div>
             </div>
+            ${renderNihongoMenuSearchPanel(level)}
             <div class="menu-group-tabs">${groupTabs}</div>
             <div class="smart-game-grid">${games.map(renderMenuGameButton).join('')}</div>
             <div class="smart-menu-footer">${renderAdminGearButton()}</div>
@@ -796,6 +870,7 @@ window.renderGameMenu = renderGameMenu;
 window.selectNihongoLevel = selectNihongoLevel;
 window.setGameMenuGroup = setGameMenuGroup;
 window.selectNihongoLesson = selectNihongoLesson;
+window.startNihongoMenuSearch = startNihongoMenuSearch;
 window.startGameFromSmartMenu = startGameFromSmartMenu;
 window.openAdminTestMenu = openAdminTestMenu;
 window.closeAdminTestMenu = closeAdminTestMenu;

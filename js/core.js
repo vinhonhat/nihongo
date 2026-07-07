@@ -6,8 +6,27 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.1.8-nihongo-n4-n1-lessons';
+const APP_VERSION = '1.2.2-study-list-search';
 const APP_VERSION_KEY = 'nihongo_app_version';
+
+const NIHONGO_APP_META = {
+    name: 'Nihongo Quest',
+    displayVersion: 'V1.2.2 Nihongo',
+    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.2',
+    author: 'Quang Vinh - Vinh ở Nhật',
+    contact: 'https://vinhonhat.github.io'
+};
+window.NIHONGO_APP_META = NIHONGO_APP_META;
+
+function applyNihongoAppMeta() {
+    const meta = window.NIHONGO_APP_META || NIHONGO_APP_META;
+    document.querySelectorAll('[data-app-meta]').forEach(el => {
+        const key = el.getAttribute('data-app-meta');
+        if (!key || meta[key] == null) return;
+        el.textContent = String(meta[key]);
+    });
+}
+window.applyNihongoAppMeta = applyNihongoAppMeta;
 
 
 const loadedCss = new Set();
@@ -376,6 +395,39 @@ const GAME_CONFIG = {
     }
 };
 
+// =====================================================
+// TÌM KIẾM / TRA CỨU
+// Mỗi cấp có một module search. Khi chọn "Toàn bộ" ở menu,
+// phạm vi thật được lưu trong sessionStorage và module search tự đọc.
+// =====================================================
+['n0', 'n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
+    const label = level === 'n0' ? 'Nhập môn' : level.toUpperCase();
+    GAME_CONFIG[`nihongo_${level}_search`] = {
+        title: `Tra cứu ${label}`,
+        folder: 'nihongo',
+        css: 'games/nihongo/nihongo.css',
+        js: 'games/nihongo/nihongo.js',
+        moduleId: `nihongo_${level}_search`,
+        type: 'registered'
+    };
+    GAME_CONFIG[`nihongo_${level}_kanji_practice`] = {
+        title: `Luyện Kanji ${label}`,
+        folder: 'nihongo',
+        css: 'games/nihongo/nihongo.css',
+        js: 'games/nihongo/nihongo.js',
+        moduleId: `nihongo_${level}_kanji_practice`,
+        type: 'registered'
+    };
+    GAME_CONFIG[`nihongo_${level}_grammar_practice`] = {
+        title: `Luyện ngữ pháp ${label}`,
+        folder: 'nihongo',
+        css: 'games/nihongo/nihongo.css',
+        js: 'games/nihongo/nihongo.js',
+        moduleId: `nihongo_${level}_grammar_practice`,
+        type: 'registered'
+    };
+});
+
 function registerGame(gameId, gameLogic) {
     gameModules[gameId] = gameLogic;
 }
@@ -586,6 +638,12 @@ function startRegisteredGame(gameId, title, module) {
 
     gamePausedByNoInteraction = false;
     noInteractionCount = 0;
+
+    // Màn học/tra cứu dạng danh sách tự dựng giao diện riêng, không dùng timer/đáp án.
+    if (module && typeof module.start === 'function') {
+        module.start({ gameId, title });
+        return;
+    }
 
     // 1. Dựng khung game trước
     renderGameShell(title);
@@ -1065,6 +1123,7 @@ let startButtonClickTimer = null;
 let hasNewAppVersion = false;
 
 window.addEventListener('DOMContentLoaded', () => {
+    applyNihongoAppMeta();
     setupStartButtonActions();
     checkAppVersionForUpdateHint();
 });

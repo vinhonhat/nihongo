@@ -1716,3 +1716,92 @@ body {
         min-width: 0;
     }
 }
+
+/* =====================================================
+   NIHONGO MENU SEARCH V1.2.2
+   Ô tra cứu nằm ngoài menu bài học.
+===================================================== */
+.nihongo-menu-search {
+    width: 100%;
+    margin: 10px 0 12px;
+    padding: 10px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.72);
+    border: 1px solid rgba(255, 118, 148, 0.20);
+    box-shadow: 0 10px 24px rgba(83, 54, 68, 0.08);
+}
+
+.nihongo-menu-search-title {
+    font-weight: 900;
+    color: #075f78;
+    font-size: calc(0.82rem * var(--NIHONGO-system-scale, 1));
+    margin-bottom: 7px;
+}
+
+.nihongo-menu-search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 7px;
+    align-items: center;
+}
+
+.nihongo-menu-search-input,
+.nihongo-menu-search-scope,
+.nihongo-menu-search-btn {
+    min-height: 38px;
+    border-radius: 14px;
+    border: 1px solid rgba(222, 120, 150, 0.35);
+    font-weight: 800;
+    font-size: calc(0.82rem * var(--NIHONGO-system-scale, 1));
+}
+
+.nihongo-menu-search-input {
+    min-width: 0;
+    padding: 0 12px;
+    background: #fff;
+    color: #302632;
+}
+
+.nihongo-menu-search-scope {
+    max-width: 150px;
+    padding: 0 8px;
+    background: #fff7fa;
+    color: #40323d;
+}
+
+.nihongo-menu-search-btn {
+    padding: 0 14px;
+    border: 0;
+    background: linear-gradient(135deg, #ff708f, #ff9b72);
+    color: #fff;
+}
+
+.nihongo-menu-search-note {
+    margin-top: 6px;
+    color: #7b6570;
+    font-size: calc(0.72rem * var(--NIHONGO-system-scale, 1));
+    line-height: 1.35;
+}
+
+@media (max-width: 767px) {
+    .nihongo-menu-search-row {
+        grid-template-columns: minmax(0, 1fr) 108px 58px;
+        gap: 5px;
+    }
+
+    .nihongo-menu-search-input,
+    .nihongo-menu-search-scope,
+    .nihongo-menu-search-btn {
+        min-height: 34px;
+        border-radius: 12px;
+        font-size: calc(0.72rem * var(--NIHONGO-system-scale, 1));
+    }
+
+    .nihongo-menu-search-scope {
+        max-width: 108px;
+    }
+
+    .nihongo-menu-search-btn {
+        padding: 0 8px;
+    }
+}
