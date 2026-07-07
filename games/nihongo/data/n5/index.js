@@ -1,8 +1,8 @@
 // games/nihongo/data/n5/index.js
-// N5 lesson loader V1.2.4
+// N5 lesson loader V1.2.9
 // Cấu trúc chuẩn giống N4/N3: mỗi bài 1 file lesson01.js ... lesson25.js
 // Mỗi lesson có thể chứa: vocab, kanji, grammar, listening, sentence.
-// Nếu N5 grammar/kanji/listening vẫn nằm ở file chung thì logic app sẽ fallback, không bị trống.
+// N5 grammar/sentence đã chuẩn hóa vào từng lesson giống N4. File chung chỉ giữ tương thích.
 
 window.NIHONGO_DATA = window.NIHONGO_DATA || {};
 window.NIHONGO_DATA.n5 = window.NIHONGO_DATA.n5 || {};

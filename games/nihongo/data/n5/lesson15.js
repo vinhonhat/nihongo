@@ -9,7 +9,37 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "note": "Chưa nhập dữ liệu. Thêm vocab/kanji/grammar/listening vào file này.",
     "vocab": [],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Động từ thể て + います",
+                    "vi": "Đang làm A / trạng thái",
+                    "en": "",
+                    "example": "今、日本語を勉強しています。",
+                    "reading": "いま、にほんごを べんきょうしています。",
+                    "exampleVi": "Bây giờ tôi đang học tiếng Nhật",
+                    "highlight": "ています",
+                    "hint": "Thể て + います",
+                    "parts": [
+                            "今",
+                            "日本語",
+                            "を",
+                            "勉強しています"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "今、日本語を勉強しています。",
+                    "reading": "いま、にほんごを べんきょうしています。",
+                    "vi": "Bây giờ tôi đang học tiếng Nhật",
+                    "en": "",
+                    "parts": [
+                            "今",
+                            "日本語",
+                            "を",
+                            "勉強しています"
+                    ]
+            }
+    ]
 });

@@ -1,9 +1,9 @@
 {
-  "version": "1.2.8-study-search-fix",
-  "displayVersion": "V1.2.8 Nihongo",
-  "versionText": " Phiên bản V1.2.8",
+  "version": "1.2.9.1-light-fix",
+  "displayVersion": "V1.2.9.1 Nihongo",
+  "versionText": " Phiên bản V1.2.9.1",
   "author": "Quang Vinh - Vinh ở Nhật",
   "contact": "https://vinhonhat.github.io",
   "releasedAt": "2026-07-07",
-  "notes": "Sửa lặp kết quả ngữ pháp khi tra cứu, tăng cỡ chữ đáp án, mở rộng menu PC và gom thông tin hiển thị về version.json."
+  "notes": "Sửa nhẹ logic kiểm tra cập nhật để không còn báo cập nhật sau khi app đã chạy đúng bản mới."
 }

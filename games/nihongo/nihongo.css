@@ -2442,7 +2442,7 @@
 
 
 /* =====================================================
-   NIHONGO NEXT BUTTON / LOCKED ANSWERS V1.2.5
+   NIHONGO NEXT BUTTON / LOCKED ANSWERS V1.2.4
    - Sau khi trả lời đúng hiện nút “Sang câu ➜”.
    - Bấm nút sẽ bỏ chờ 3 giây và sang câu ngay.
 ===================================================== */
@@ -2469,195 +2469,27 @@
     transform: translateY(1px) scale(.99) !important;
 }
 
-/* =====================================================
-   NIHONGO PRACTICE REVIEW / NEXT BUTTON V1.2.5
-   - Nút Sang câu nằm nổi trên vùng đáp án, không nằm trong hộp giải thích.
-   - Sai câu: tô đáp án đúng, giữ 5 giây để người học nhìn lại.
-===================================================== */
-#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 8px !important;
-    z-index: 8 !important;
-    transform: translateX(-50%) translateY(8px) scale(.96) !important;
-    min-height: 38px !important;
-    padding: 0 18px !important;
-    border: 0 !important;
-    border-radius: 999px !important;
-    background: linear-gradient(135deg, #ff7a87, #ffad61) !important;
-    color: #fff !important;
-    font-weight: 900 !important;
-    box-shadow: 0 8px 18px rgba(255, 122, 135, .28) !important;
-    opacity: 0 !important;
-    pointer-events: none !important;
-    transition: opacity .16s ease, transform .16s ease !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next.show {
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    transform: translateX(-50%) translateY(0) scale(1) !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next:active {
-    transform: translateX(-50%) translateY(1px) scale(.99) !important;
-}
-
-/* Nút cũ trong hộp giải thích không còn dùng nữa */
-#game-screen.game-view[class*='game-nihongo'] .nihongo-reveal-next {
-    display: none !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
-    margin-top: 8px !important;
-    font-size: clamp(2rem, 8vw, 4.2rem) !important;
-    line-height: 1.05 !important;
-    font-weight: 950 !important;
-    color: #2c2030 !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.correct {
-    border-color: rgba(46, 196, 128, .95) !important;
-    background: linear-gradient(135deg, #dcfff0, #f7fffb) !important;
-    box-shadow: 0 0 0 3px rgba(46, 196, 128, .18), 0 6px 0 rgba(46, 196, 128, .22) !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.wrong {
-    border-color: rgba(255, 94, 115, .95) !important;
-    background: linear-gradient(135deg, #fff0f2, #fff8f8) !important;
-    box-shadow: 0 0 0 3px rgba(255, 94, 115, .18), 0 6px 0 rgba(255, 94, 115, .20) !important;
-}
-
-@media (max-width: 767px) {
-    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-        bottom: 6px !important;
-        min-height: 34px !important;
-        padding: 0 14px !important;
-        font-size: .78rem !important;
-    }
-
-    #game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
-        font-size: clamp(1.75rem, 9vw, 3.4rem) !important;
-    }
-}
 
 /* =====================================================
-   NIHONGO PRACTICE UI V1.2.7
-   - Đáp án luyện Kanji không hiển thị nghĩa/cách đọc phụ để tránh lộ đáp án.
-   - Cỡ chữ đáp án mặc định 1.0rem.
-   - Nút Sang câu nổi giữa khung câu hỏi và đáp án.
+   NIHONGO FONT SETTINGS V1.2.9
+   - Mặc định chữ đáp án >= 1.1rem.
+   - Cài đặt mới cho phép tăng tới 1.8rem.
+   - Dùng !important để đè các patch cũ còn sót phía trên.
 ===================================================== */
 #game-screen.game-view[class*='game-nihongo'] {
-    --NQ-answer-font: 1rem !important;
+    --NQ-answer-font: max(1.1rem, var(--NQ-answer-font, 1.1rem));
 }
 
 #game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
-    font-size: 1rem !important;
+    font-size: var(--NQ-answer-font, 1.1rem) !important;
 }
 
 #game-screen.game-view[class*='game-nihongo'] .nihongo-option-main {
-    font-size: 1em !important;
-    line-height: 1.18 !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-option-sub:empty {
-    display: none !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-    bottom: -17px !important;
-    z-index: 30 !important;
-}
-
-@media (max-width: 767px) {
-    #game-screen.game-view[class*='game-nihongo'] {
-        --NQ-answer-font: 1rem !important;
-    }
-
-    #game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
-        font-size: 1rem !important;
-    }
-
-    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-        bottom: -16px !important;
-        font-size: .86rem !important;
-    }
-}
-
-/* =====================================================
-   NIHONGO V1.2.7 - NEXT BUTTON KHÔNG BỊ CHE
-   - Nút Sang câu nằm trong khung câu hỏi, cao hơn mép đáp án.
-   - Tăng padding đáy cụm câu hỏi để nội dung không đè lên nút.
-===================================================== */
-#game-screen.game-view[class*='game-nihongo'] {
-    --NQ-center-padding: 62px 24px 78px !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-    bottom: 18px !important;
-    z-index: 80 !important;
-    min-height: 38px !important;
-    padding: 0 20px !important;
-    box-shadow: 0 10px 22px rgba(255, 122, 135, .32), 0 0 0 4px rgba(255,255,255,.72) !important;
-}
-
-@media (max-width: 767px) {
-    #game-screen.game-view[class*='game-nihongo'] {
-        --NQ-center-padding: 56px 12px 68px !important;
-    }
-
-    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
-        bottom: 14px !important;
-        min-height: 36px !important;
-        padding: 0 16px !important;
-        font-size: .88rem !important;
-    }
-}
-
-/* =====================================================
-   NIHONGO V1.2.8 - OPTION FONT / NEXT BUTTON FIX
-   - Cỡ chữ đáp án mặc định tăng lên 1rem.
-   - Giữ nút Sang câu nổi phía trên đáp án để không bị che.
-===================================================== */
-#game-screen.game-view[class*='game-nihongo'] {
-    --NQ-answer-font: 1rem;
-}
-
-@media (min-width: 1181px) {
-    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: 1rem; }
-}
-
-@media (min-width: 768px) and (max-width: 1180px) {
-    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: .96rem; }
-}
-
-@media (max-width: 767px) {
-    #game-screen.game-view[class*='game-nihongo'] { --NQ-answer-font: 1rem; }
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
-    font-size: var(--NQ-answer-font) !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .nihongo-option-main {
-    font-size: 1em !important;
+    font-size: var(--NQ-answer-font, 1.1rem) !important;
+    line-height: 1.16 !important;
 }
 
 #game-screen.game-view[class*='game-nihongo'] .nihongo-option-sub {
-    font-size: .82em !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] .display-area {
-    padding-bottom: 54px !important;
-}
-
-#game-screen.game-view[class*='game-nihongo'] #nihongo-floating-next.nihongo-floating-next {
-    position: absolute !important;
-    left: 50% !important;
-    bottom: 14px !important;
-    transform: translateX(-50%) !important;
-    z-index: 30 !important;
-    min-height: 38px !important;
-    padding: 8px 20px !important;
-    white-space: nowrap !important;
+    font-size: max(.92rem, calc(var(--NQ-answer-font, 1.1rem) * .86)) !important;
+    line-height: 1.18 !important;
 }

@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson04",
     "title": "Bài 4",
     "label": "Bài 4",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "起きる",
@@ -328,7 +328,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Đồ vật が あります",
+                    "vi": "Có A",
+                    "en": "There is A",
+                    "example": "部屋に机があります。",
+                    "reading": "へやに つくえが あります。",
+                    "exampleVi": "Trong phòng có cái bàn",
+                    "highlight": "が",
+                    "hint": "Dùng với đồ vật/sự việc",
+                    "parts": [
+                            "部屋",
+                            "に",
+                            "机",
+                            "が",
+                            "あります"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "部屋に机があります。",
+                    "reading": "へやに つくえが あります。",
+                    "vi": "Trong phòng có cái bàn",
+                    "en": "There is a desk in the room.",
+                    "parts": [
+                            "部屋",
+                            "に",
+                            "机",
+                            "が",
+                            "あります"
+                    ]
+            }
+    ]
 });

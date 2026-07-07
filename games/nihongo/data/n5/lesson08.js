@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson08",
     "title": "Bài 8",
     "label": "Bài 8",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "ハンサム",
@@ -322,7 +322,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "A から B まで",
+                    "vi": "Từ A đến B",
+                    "en": "From A to B",
+                    "example": "九時から五時まで働きます。",
+                    "reading": "くじから ごじまで はたらきます。",
+                    "exampleVi": "Tôi làm việc từ 9 giờ đến 5 giờ",
+                    "highlight": "から",
+                    "hint": "Nói khoảng cách/thời gian",
+                    "parts": [
+                            "九時",
+                            "から",
+                            "五時",
+                            "まで",
+                            "働きます"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "九時から五時まで働きます。",
+                    "reading": "くじから ごじまで はたらきます。",
+                    "vi": "Tôi làm việc từ 9 giờ đến 5 giờ",
+                    "en": "I work from 9 to 5.",
+                    "parts": [
+                            "九時",
+                            "から",
+                            "五時",
+                            "まで",
+                            "働きます"
+                    ]
+            }
+    ]
 });

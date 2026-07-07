@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson03",
     "title": "Bài 3",
     "label": "Bài 3",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "ここ",
@@ -268,7 +268,35 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Tân ngữ を Động từ",
+                    "vi": "Ăn A / làm hành động lên A",
+                    "en": "Eat A / do an action to A",
+                    "example": "ごはんを食べます。",
+                    "reading": "ごはんを たべます。",
+                    "exampleVi": "Tôi ăn cơm",
+                    "highlight": "を",
+                    "hint": "を chỉ tân ngữ",
+                    "parts": [
+                            "ごはん",
+                            "を",
+                            "食べます"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "ごはんを食べます。",
+                    "reading": "ごはんを たべます。",
+                    "vi": "Tôi ăn cơm",
+                    "en": "I eat rice/a meal.",
+                    "parts": [
+                            "ごはん",
+                            "を",
+                            "食べます"
+                    ]
+            }
+    ]
 });

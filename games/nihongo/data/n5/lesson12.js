@@ -9,7 +9,37 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "note": "Chưa nhập dữ liệu. Thêm vocab/kanji/grammar/listening vào file này.",
     "vocab": [],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Động từ thể ます bỏ ます + たいです",
+                    "vi": "Muốn làm A",
+                    "en": "Want to A",
+                    "example": "水を飲みたいです。",
+                    "reading": "みずを のみたいです。",
+                    "exampleVi": "Tôi muốn uống nước",
+                    "highlight": "たいです",
+                    "hint": "Diễn tả mong muốn",
+                    "parts": [
+                            "水",
+                            "を",
+                            "飲みたい",
+                            "です"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "水を飲みたいです。",
+                    "reading": "みずを のみたいです。",
+                    "vi": "Tôi muốn uống nước",
+                    "en": "I want to drink water.",
+                    "parts": [
+                            "水",
+                            "を",
+                            "飲みたい",
+                            "です"
+                    ]
+            }
+    ]
 });

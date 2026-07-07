@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson09",
     "title": "Bài 9",
     "label": "Bài 9",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "分かる",
@@ -334,7 +334,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "A と B",
+                    "vi": "A và B / cùng với A",
+                    "en": "A and B / with A",
+                    "example": "母とスーパーへ行きます。",
+                    "reading": "ははと スーパーへ いきます。",
+                    "exampleVi": "Tôi đi siêu thị cùng mẹ",
+                    "highlight": "と",
+                    "hint": "Nối danh từ hoặc người đi cùng",
+                    "parts": [
+                            "母",
+                            "と",
+                            "スーパー",
+                            "へ",
+                            "行きます"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "母とスーパーへ行きます。",
+                    "reading": "ははと スーパーへ いきます。",
+                    "vi": "Tôi đi siêu thị cùng mẹ",
+                    "en": "I go to the supermarket with my mother.",
+                    "parts": [
+                            "母",
+                            "と",
+                            "スーパー",
+                            "へ",
+                            "行きます"
+                    ]
+            }
+    ]
 });

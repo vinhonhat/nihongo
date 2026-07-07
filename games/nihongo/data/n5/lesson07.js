@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson07",
     "title": "Bài 7",
     "label": "Bài 7",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "切る",
@@ -280,7 +280,35 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Nơi chốn へ 行きます",
+                    "vi": "Đi về phía/đến A",
+                    "en": "Go toward/to A",
+                    "example": "日本へ行きます。",
+                    "reading": "にほんへ いきます。",
+                    "exampleVi": "Tôi đi Nhật",
+                    "highlight": "へ",
+                    "hint": "へ nhấn hướng di chuyển",
+                    "parts": [
+                            "日本",
+                            "へ",
+                            "行きます"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "日本へ行きます。",
+                    "reading": "にほんへ いきます。",
+                    "vi": "Tôi đi Nhật",
+                    "en": "I go to Japan.",
+                    "parts": [
+                            "日本",
+                            "へ",
+                            "行きます"
+                    ]
+            }
+    ]
 });

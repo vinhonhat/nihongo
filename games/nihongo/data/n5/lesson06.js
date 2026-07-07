@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson06",
     "title": "Bài 6",
     "label": "Bài 6",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "食べる",
@@ -322,7 +322,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Nơi chốn / phương tiện で Động từ",
+                    "vi": "Làm B ở/bằng A",
+                    "en": "Do B at/by A",
+                    "example": "駅で友だちに会います。",
+                    "reading": "えきで ともだちに あいます。",
+                    "exampleVi": "Tôi gặp bạn ở nhà ga",
+                    "highlight": "で",
+                    "hint": "で chỉ nơi chốn hoặc phương tiện",
+                    "parts": [
+                            "駅",
+                            "で",
+                            "友だち",
+                            "に",
+                            "会います"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "駅で友だちに会います。",
+                    "reading": "えきで ともだちに あいます。",
+                    "vi": "Tôi gặp bạn ở nhà ga",
+                    "en": "I meet my friend at the station.",
+                    "parts": [
+                            "駅",
+                            "で",
+                            "友だち",
+                            "に",
+                            "会います"
+                    ]
+            }
+    ]
 });

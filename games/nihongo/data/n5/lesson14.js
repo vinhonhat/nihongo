@@ -9,7 +9,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "note": "Chưa nhập dữ liệu. Thêm vocab/kanji/grammar/listening vào file này.",
     "vocab": [],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Động từ thể て + はいけません",
+                    "vi": "Không được làm A",
+                    "en": "Must not A",
+                    "example": "ここでたばこを吸ってはいけません。",
+                    "reading": "ここで たばこを すってはいけません。",
+                    "exampleVi": "Không được hút thuốc ở đây",
+                    "highlight": "てはいけません",
+                    "hint": "Cấm đoán",
+                    "parts": [
+                            "ここ",
+                            "で",
+                            "たばこ",
+                            "を",
+                            "吸ってはいけません"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "ここでたばこを吸ってはいけません。",
+                    "reading": "ここで たばこを すってはいけません。",
+                    "vi": "Không được hút thuốc ở đây",
+                    "en": "You must not smoke here.",
+                    "parts": [
+                            "ここ",
+                            "で",
+                            "たばこ",
+                            "を",
+                            "吸ってはいけません"
+                    ]
+            }
+    ]
 });

@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson01",
     "title": "Bài 1",
     "label": "Bài 1",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "私",
@@ -130,7 +130,37 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "A は B です",
+                    "vi": "A là B",
+                    "en": "A is B",
+                    "example": "私は学生です。",
+                    "reading": "わたしは がくせいです。",
+                    "exampleVi": "Tôi là học sinh / sinh viên",
+                    "highlight": "は",
+                    "hint": "Câu danh từ cơ bản",
+                    "parts": [
+                            "私",
+                            "は",
+                            "学生",
+                            "です"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "私は学生です。",
+                    "reading": "わたしは がくせいです。",
+                    "vi": "Tôi là học sinh / sinh viên",
+                    "en": "I am a student.",
+                    "parts": [
+                            "私",
+                            "は",
+                            "学生",
+                            "です"
+                    ]
+            }
+    ]
 });

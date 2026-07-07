@@ -8,8 +8,9 @@
 (function () {
     'use strict';
 
-    const STORAGE_KEY = 'nihongo_ui_settings_v1_1_6';
+    const STORAGE_KEY = 'nihongo_ui_settings_v1_2_9';
     const OLD_STORAGE_KEYS = [
+        'nihongo_ui_settings_v1_1_6',
         'nihongo_ui_settings_v1_1_5',
         'nihongo_ui_settings_v1_1_4',
         'nihongo_ui_settings_v1_1_3',
@@ -20,7 +21,7 @@
     const DEFAULT_SETTINGS = {
         promptSize: 0.95,
         jpScale: 1,
-        answerSize: 0.78,
+        answerSize: 1.1,
         revealScale: 1.2,
         revealBoxScale: 1.15,
         systemScale: 1,
@@ -40,12 +41,12 @@
 
     function normalizeSettings(settings = {}) {
         return {
-            promptSize: clampNumber(settings.promptSize, 0.7, 1.4, DEFAULT_SETTINGS.promptSize),
-            jpScale: clampNumber(settings.jpScale, 0.75, 1.35, DEFAULT_SETTINGS.jpScale),
-            answerSize: clampNumber(settings.answerSize, 0.65, 1.1, DEFAULT_SETTINGS.answerSize),
-            revealScale: clampNumber(settings.revealScale, 0.8, 1.8, DEFAULT_SETTINGS.revealScale),
-            revealBoxScale: clampNumber(settings.revealBoxScale, 0.8, 1.7, DEFAULT_SETTINGS.revealBoxScale),
-            systemScale: clampNumber(settings.systemScale, 0.85, 1.25, DEFAULT_SETTINGS.systemScale),
+            promptSize: clampNumber(settings.promptSize, 0.7, 2.2, DEFAULT_SETTINGS.promptSize),
+            jpScale: clampNumber(settings.jpScale, 0.75, 2.2, DEFAULT_SETTINGS.jpScale),
+            answerSize: clampNumber(settings.answerSize, 1.1, 1.8, DEFAULT_SETTINGS.answerSize),
+            revealScale: clampNumber(settings.revealScale, 0.8, 2.6, DEFAULT_SETTINGS.revealScale),
+            revealBoxScale: clampNumber(settings.revealBoxScale, 0.8, 2.4, DEFAULT_SETTINGS.revealBoxScale),
+            systemScale: clampNumber(settings.systemScale, 0.85, 1.8, DEFAULT_SETTINGS.systemScale),
             questionRatio: Math.round(clampNumber(settings.questionRatio, 60, 85, DEFAULT_SETTINGS.questionRatio)),
             bgOpacity: clampNumber(settings.bgOpacity, 0, 0.6, DEFAULT_SETTINGS.bgOpacity)
         };

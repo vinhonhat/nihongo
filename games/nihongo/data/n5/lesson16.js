@@ -9,7 +9,35 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "note": "Chưa nhập dữ liệu. Thêm vocab/kanji/grammar/listening vào file này.",
     "vocab": [],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Động từ thể た + ほうがいいです",
+                    "vi": "Nên làm A",
+                    "en": "",
+                    "example": "早く寝たほうがいいです。",
+                    "reading": "はやく ねたほうがいいです。",
+                    "exampleVi": "Bạn nên ngủ sớm",
+                    "highlight": "たほうがいいです",
+                    "hint": "Khuyên nhủ",
+                    "parts": [
+                            "早く",
+                            "寝た",
+                            "ほうがいいです"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "早く寝たほうがいいです。",
+                    "reading": "はやく ねたほうがいいです。",
+                    "vi": "Bạn nên ngủ sớm",
+                    "en": "",
+                    "parts": [
+                            "早く",
+                            "寝た",
+                            "ほうがいいです"
+                    ]
+            }
+    ]
 });

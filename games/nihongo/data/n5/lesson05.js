@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson05",
     "title": "Bài 5",
     "label": "Bài 5",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "行く",
@@ -352,7 +352,37 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "A が 好きです",
+                    "vi": "Thích A",
+                    "en": "Like A",
+                    "example": "日本語が好きです。",
+                    "reading": "にほんごが すきです。",
+                    "exampleVi": "Tôi thích tiếng Nhật",
+                    "highlight": "が",
+                    "hint": "が đánh dấu đối tượng thích",
+                    "parts": [
+                            "日本語",
+                            "が",
+                            "好き",
+                            "です"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "日本語が好きです。",
+                    "reading": "にほんごが すきです。",
+                    "vi": "Tôi thích tiếng Nhật",
+                    "en": "I like Japanese.",
+                    "parts": [
+                            "日本語",
+                            "が",
+                            "好き",
+                            "です"
+                    ]
+            }
+    ]
 });

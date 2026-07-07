@@ -9,7 +9,39 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "note": "Chưa nhập dữ liệu. Thêm vocab/kanji/grammar/listening vào file này.",
     "vocab": [],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Động từ thể て + もいいです",
+                    "vi": "Được phép làm A",
+                    "en": "May A / it is okay to A",
+                    "example": "ここで写真を撮ってもいいです。",
+                    "reading": "ここで しゃしんを とってもいいです。",
+                    "exampleVi": "Chụp ảnh ở đây được không?",
+                    "highlight": "てもいいです",
+                    "hint": "Xin phép / cho phép",
+                    "parts": [
+                            "ここ",
+                            "で",
+                            "写真",
+                            "を",
+                            "撮ってもいいです"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "ここで写真を撮ってもいいです。",
+                    "reading": "ここで しゃしんを とってもいいです。",
+                    "vi": "Chụp ảnh ở đây được không?",
+                    "en": "May A / it is okay to A",
+                    "parts": [
+                            "ここ",
+                            "で",
+                            "写真",
+                            "を",
+                            "撮ってもいいです"
+                    ]
+            }
+    ]
 });

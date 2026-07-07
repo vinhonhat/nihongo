@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.2.8
+// Nihongo Quest V1.2.9
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -10,8 +10,6 @@
 
 const NIHONGO_LEVEL_NAME = { n0: 'Nhập môn', n5: 'N5', n4: 'N4', n3: 'N3', n2: 'N2', n1: 'N1' };
 const NIHONGO_REPEAT_MEMORY = {};
-const NIHONGO_PICK_STATE = {};
-const NIHONGO_WRONG_REVIEW = {};
 
 function nihongoBank() {
     return window.NIHONGO_DATA || {};
@@ -40,86 +38,19 @@ function nihongoOptionKey(value) {
 }
 
 function nihongoItemKey(item) {
-    return [
-        item._kind, item._level, item._lessonId,
-        item.jp, item.kanji, item.reading, item.vi, item.en, item.romaji,
-        item.pattern, item.example, item.sentence, item.exampleVi, item.sentenceVi,
-        item.type, item.hint
-    ].filter(Boolean).join('|');
-}
-
-function nihongoStudyDedupeKey(item) {
-    const kind = item._kind || '';
-    const level = item._level || '';
-    const lesson = item._lessonId || '';
-    const main = item.pattern || item.jp || item.kanji || item.example || item.sentence || '';
-    const reading = item.reading || item.exampleReading || item.sentenceReading || '';
-    const meaning = item.vi || item.exampleVi || item.sentenceVi || item.en || '';
-    return [kind, level, lesson, main, reading, meaning].map(v => String(v || '').trim()).join('::');
-}
-
-function dedupeNihongoStudyItems(items) {
-    const map = new Map();
-    (items || []).forEach(item => {
-        const key = nihongoStudyDedupeKey(item);
-        if (!key.replace(/:/g, '')) return;
-        if (!map.has(key)) map.set(key, item);
-    });
-    return Array.from(map.values());
-}
-
-function queueNihongoWrongReview(memoryKey, item, wait = 10) {
-    if (!memoryKey || !item) return;
-    const key = nihongoItemKey(item);
-    if (!key) return;
-    const list = NIHONGO_WRONG_REVIEW[memoryKey] || [];
-    if (!list.some(entry => entry.key === key)) {
-        list.push({ key, item, wait });
-    }
-    NIHONGO_WRONG_REVIEW[memoryKey] = list.slice(-8);
-}
-
-function pullNihongoWrongReview(memoryKey, validKeys) {
-    const list = NIHONGO_WRONG_REVIEW[memoryKey];
-    if (!Array.isArray(list) || !list.length) return null;
-    for (const entry of list) entry.wait = Math.max(0, Number(entry.wait || 0) - 1);
-    const idx = list.findIndex(entry => entry.wait <= 0 && validKeys.has(entry.key));
-    if (idx < 0) return null;
-    const [entry] = list.splice(idx, 1);
-    return entry.item || null;
+    return [item.jp, item.reading, item.vi, item.en, item.romaji, item.type, item.hint, item.example]
+        .filter(Boolean)
+        .join('|');
 }
 
 function nihongoPick(pool, memoryKey, keepCount = 8) {
     if (!Array.isArray(pool) || pool.length === 0) return null;
-
-    // Cách chọn mới: đi hết một vòng dữ liệu rồi mới lặp lại.
-    // Như vậy random vẫn có, nhưng không bị kẹt vài câu lặp liên tục.
-    const normalized = pool.filter(Boolean);
-    const validKeys = new Set(normalized.map(nihongoItemKey));
-    const reviewItem = pullNihongoWrongReview(memoryKey, validKeys);
-    if (reviewItem) return reviewItem;
-
-    const signature = normalized.map(nihongoItemKey).join('::');
-    let state = NIHONGO_PICK_STATE[memoryKey];
-
-    if (!state || state.signature !== signature || !Array.isArray(state.queue) || state.queue.length === 0) {
-        let queue = nihongoShuffle(normalized);
-        const lastKey = state && state.lastKey;
-        if (queue.length > 1 && lastKey && nihongoItemKey(queue[0]) === lastKey) {
-            queue.push(queue.shift());
-        }
-        state = { signature, queue, lastKey: lastKey || '' };
-        NIHONGO_PICK_STATE[memoryKey] = state;
-    }
-
-    const item = state.queue.shift() || nihongoRandom(normalized);
-    state.lastKey = nihongoItemKey(item);
-
-    // Giữ lại lịch sử ngắn để tương thích với code cũ / debug.
     const history = NIHONGO_REPEAT_MEMORY[memoryKey] || [];
-    NIHONGO_REPEAT_MEMORY[memoryKey] = [state.lastKey, ...history.filter(oldKey => oldKey !== state.lastKey)]
-        .slice(0, Math.min(keepCount, Math.max(1, normalized.length - 1)));
-
+    const candidates = pool.filter(item => !history.includes(nihongoItemKey(item)));
+    const usable = candidates.length ? candidates : pool;
+    const item = nihongoRandom(usable);
+    const key = nihongoItemKey(item);
+    NIHONGO_REPEAT_MEMORY[memoryKey] = [key, ...history.filter(oldKey => oldKey !== key)].slice(0, Math.min(keepCount, Math.max(1, pool.length - 1)));
     return item;
 }
 
@@ -210,86 +141,12 @@ function makeJapaneseOption(item) {
     };
 }
 
-function makeReadingOption(item) {
-    const reading = item.reading || item.kunyomi || item.onyomi || item.on || item.kun || '';
-    return {
-        key: String(reading || ''),
-        primary: reading || '',
-        secondary: item.vi || item.en || '',
-        speak: item.jp || reading || '',
-        raw: item
-    };
-}
-
-function makeKanjiOption(item) {
-    return {
-        key: String(item.jp || item.kanji || ''),
-        primary: item.jp || item.kanji || '',
-        secondary: item.vi || item.reading || '',
-        speak: item.jp || item.reading || '',
-        raw: item
-    };
-}
-
-// Dùng riêng cho luyện Kanji để không lộ nghĩa/cách đọc trong đáp án.
-// Ví dụ: câu hỏi "Chọn Kanji của れいぞうこ" thì đáp án chỉ hiện 冷蔵庫.
-function makeBareKanjiOption(item) {
-    return {
-        key: String(item.jp || item.kanji || ''),
-        primary: item.jp || item.kanji || '',
-        secondary: '',
-        speak: item.jp || item.reading || '',
-        raw: item
-    };
-}
-
-// Dùng riêng cho luyện cách đọc để đáp án chỉ hiện しんはつばい, không hiện nghĩa bên dưới.
-function makeBareReadingOption(item) {
-    const reading = item.reading || item.kunyomi || item.onyomi || item.on || item.kun || '';
-    return {
-        key: String(reading || ''),
-        primary: reading || '',
-        secondary: '',
-        speak: item.jp || reading || '',
-        raw: item
-    };
-}
-
-function getSimilarKanjiDistractors(correctItem, list, targetField = 'reading') {
-    const correctKey = targetField === 'jp'
-        ? String(correctItem.jp || correctItem.kanji || '')
-        : String(correctItem.reading || correctItem.kunyomi || correctItem.onyomi || '');
-    const correctReading = String(correctItem.reading || '');
-    const correctJp = String(correctItem.jp || correctItem.kanji || '');
-
-    return [...(list || [])]
-        .filter(item => item && item !== correctItem)
-        .filter(item => {
-            const value = targetField === 'jp'
-                ? String(item.jp || item.kanji || '')
-                : String(item.reading || item.kunyomi || item.onyomi || '');
-            return value && value !== correctKey;
-        })
-        .map(item => {
-            const r = String(item.reading || '');
-            const j = String(item.jp || item.kanji || '');
-            let score = 0;
-            if (correctReading && r && r[0] === correctReading[0]) score += 4;
-            if (correctJp && j && j[0] === correctJp[0]) score += 3;
-            score += Math.max(0, 6 - Math.abs(r.length - correctReading.length));
-            score += Math.max(0, 4 - Math.abs(j.length - correctJp.length));
-            return { item, score: score + Math.random() };
-        })
-        .sort((a, b) => b.score - a.score)
-        .map(entry => entry.item);
-}
-
 function makeSentenceOption(item) {
     const sentence = item.example || item.sentence || item.jp || '';
     return {
         key: sentence,
         primary: sentence,
-        // Ghép câu: đáp án chỉ hiện câu tiếng Nhật, không lộ nghĩa Việt/English.
+        // Ghép câu chỉ hiện câu tiếng Nhật, không hiện tiếng Việt/English ở đáp án.
         secondary: '',
         speak: sentence,
         raw: item
@@ -357,8 +214,7 @@ function buildVocabQuestion(level, mode) {
     const pureVocab = levelPool.vocab || [];
     const mixedPool = mode.indexOf('practice') >= 0 ? getLevelVocabMixed(level) : pureVocab;
     const pool = mixedPool.length ? mixedPool : pureVocab;
-    const memoryKey = level + ':vocab:' + mode;
-    const item = nihongoPick(pool, memoryKey, 14) || { jp: '日本語', reading: 'にほんご', vi: 'Tiếng Nhật' };
+    const item = nihongoPick(pool, level + ':vocab:' + mode, 14) || { jp: '日本語', reading: 'にほんご', vi: 'Tiếng Nhật' };
 
     // Học từ vựng: ưu tiên kiểu nhìn nghĩa tiếng Việt -> chọn từ tiếng Nhật đúng.
     // Luyện từ: random 2 chiều để không học vẹt.
@@ -377,8 +233,6 @@ function buildVocabQuestion(level, mode) {
             en: item.en || '',
             speakText: item.jp,
             correctKey: makeJapaneseOption(item).key,
-            memoryKey,
-            rawItem: item,
             options,
             reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
         };
@@ -396,8 +250,6 @@ function buildVocabQuestion(level, mode) {
         en: item.en || '',
         speakText: item.jp,
         correctKey: makeMeaningOption(item).key,
-        memoryKey,
-        rawItem: item,
         options,
         reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
@@ -407,8 +259,7 @@ function buildListeningQuestion(level) {
     const levelPool = getLevelPool(level);
     const lessonSuffix = getLessonTitleSuffix(levelPool);
     const pool = (levelPool.listening && levelPool.listening.length) ? levelPool.listening : (levelPool.vocab || []);
-    const memoryKey = level + ':listen';
-    const item = nihongoPick(pool, memoryKey, 12) || { jp: '日本語', reading: 'にほんご', vi: 'Tiếng Nhật' };
+    const item = nihongoPick(pool, level + ':listen', 12) || { jp: '日本語', reading: 'にほんご', vi: 'Tiếng Nhật' };
     return {
         kind: 'listen',
         title: 'Luyện nghe' + lessonSuffix,
@@ -420,8 +271,6 @@ function buildListeningQuestion(level) {
         en: item.en || '',
         speakText: item.jp,
         correctKey: makeMeaningOption(item).key,
-        memoryKey,
-        rawItem: item,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['vocab']),
         reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
@@ -430,73 +279,20 @@ function buildListeningQuestion(level) {
 function buildKanjiQuestion(level) {
     const levelPool = getLevelPool(level);
     const lessonSuffix = getLessonTitleSuffix(levelPool);
-    const pool = (levelPool.kanji || []).filter(item => (item.jp || item.kanji) && (item.reading || item.vi));
-    const memoryKey = level + ':kanji';
-    const item = nihongoPick(pool, memoryKey, 16) || { jp: '日', reading: 'にち / ひ', vi: 'Ngày, mặt trời' };
-    const modeSeed = Math.random();
-    const canAskReading = !!item.reading;
-    const canAskKanji = !!(item.jp || item.kanji) && !!item.reading;
-
-    // Luyện Kanji trộn 3 kiểu:
-    // 1) Nhìn Kanji -> chọn cách đọc.
-    // 2) Nhìn cách đọc -> chọn Kanji.
-    // 3) Nhìn Kanji -> chọn nghĩa.
-    if (canAskReading && modeSeed < 0.42) {
-        const distractors = getSimilarKanjiDistractors(item, pool, 'reading');
-        const options = buildOptionsFromItems(item, [item, ...distractors], makeBareReadingOption, ['kanji']);
-        return {
-            kind: 'kanji-reading',
-            title: 'Luyện Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
-            prompt: 'Chọn cách đọc đúng của Kanji này.',
-            displayType: 'jp',
-            jp: item.jp || item.kanji,
-            reading: '',
-            vi: item.vi,
-            en: item.en || '',
-            speakText: item.jp || item.reading,
-            correctKey: makeBareReadingOption(item).key,
-            memoryKey,
-            rawItem: item,
-            options,
-            reveal: { jp: item.jp || item.kanji, reading: item.reading, vi: item.vi, en: item.en || '' }
-        };
-    }
-
-    if (canAskKanji && modeSeed < 0.84) {
-        const distractors = getSimilarKanjiDistractors(item, pool, 'jp');
-        const options = buildOptionsFromItems(item, [item, ...distractors], makeBareKanjiOption, ['kanji']);
-        return {
-            kind: 'kanji-word',
-            title: 'Luyện Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
-            prompt: 'Chọn Kanji đúng cho cách đọc này.',
-            displayType: 'reading-target',
-            jp: item.reading,
-            reading: '',
-            vi: item.vi,
-            en: item.en || '',
-            speakText: item.reading || item.jp,
-            correctKey: makeBareKanjiOption(item).key,
-            memoryKey,
-            rawItem: item,
-            options,
-            reveal: { jp: item.jp || item.kanji, reading: item.reading, vi: item.vi, en: item.en || '' }
-        };
-    }
-
+    const pool = levelPool.kanji || [];
+    const item = nihongoPick(pool, level + ':kanji', 10) || { jp: '日', reading: 'にち / ひ', vi: 'Ngày, mặt trời' };
     return {
-        kind: 'kanji-meaning',
-        title: 'Luyện Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
+        kind: 'kanji',
+        title: 'Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
         prompt: 'Kanji này có nghĩa gì?',
         displayType: 'jp',
-        jp: item.jp || item.kanji,
+        jp: item.jp,
         reading: '',
         vi: item.vi,
         speakText: item.reading || item.jp,
         correctKey: makeMeaningOption(item).key,
-        memoryKey,
-        rawItem: item,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['kanji']),
-        reveal: { jp: item.jp || item.kanji, reading: item.reading, vi: item.vi, en: item.en || '' }
+        reveal: { jp: item.jp, reading: item.reading, vi: item.vi, en: item.en || '' }
     };
 }
 
@@ -520,8 +316,7 @@ function buildGrammarQuestion(level, mode) {
     const levelPool = getLevelPool(level);
     const lessonSuffix = getLessonTitleSuffix(levelPool);
     const pool = levelPool.grammar || [];
-    const memoryKey = level + ':grammar:' + mode;
-    const item = nihongoPick(pool, memoryKey, 10) || {
+    const item = nihongoPick(pool, level + ':grammar:' + mode, 10) || {
         jp: 'A は B です',
         pattern: 'A は B です',
         example: '私は学生です。',
@@ -541,17 +336,16 @@ function buildGrammarQuestion(level, mode) {
         en: item.en || '',
         example: item.example || item.sentence || item.jp,
         exampleHtml: renderGrammarExample(item),
-        hint: item.hint || item.exampleReading || item.sentenceReading || item.reading || '',
+        hint: item.hint || '',
         speakText: item.example || item.jp,
         correctKey: makeMeaningOption(item).key,
-        memoryKey,
-        rawItem: item,
         options: buildOptionsFromItems(item, pool, makeMeaningOption, ['grammar']),
-        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint || item.exampleReading || item.sentenceReading || item.reading || '', vi: item.vi, en: item.en || '' }
+        reveal: { pattern: item.pattern || item.jp, example: item.example || item.sentence, hint: item.hint, vi: item.vi, en: item.en || '' }
     };
 }
 
 function splitSentenceParts(item) {
+    if (Array.isArray(item.parts) && item.parts.length) return item.parts;
     if (Array.isArray(item.sentenceParts) && item.sentenceParts.length) return item.sentenceParts;
     const sentence = String(item.example || item.sentence || item.jp || '').replace(/[。！？!?]$/g, '');
     if (!sentence) return [];
@@ -563,18 +357,19 @@ function splitSentenceParts(item) {
 function buildSentenceBuildQuestion(level) {
     const levelPool = getLevelPool(level);
     const lessonSuffix = getLessonTitleSuffix(levelPool);
-    const pool = (levelPool.grammar || []).filter(item => item.example || item.sentence || item.jp);
-    const memoryKey = level + ':sentence_build';
-    const item = nihongoPick(pool, memoryKey, 10) || {
-        jp: 'A は B です',
-        example: '私は学生です。',
-        sentenceParts: ['私', 'は', '学生', 'です'],
+    const sentencePool = (levelPool.sentence || []).filter(item => item.jp || item.sentence || item.example);
+    const grammarPool = (levelPool.grammar || []).filter(item => item.example || item.sentence || item.jp);
+    const pool = sentencePool.length ? sentencePool : grammarPool;
+    const item = nihongoPick(pool, level + ':sentence_build', 10) || {
+        jp: '私は学生です。',
+        reading: 'わたしは がくせいです。',
+        parts: ['私', 'は', '学生', 'です'],
         vi: 'Tôi là học sinh / sinh viên',
         hint: 'A là B'
     };
 
     const parts = splitSentenceParts(item);
-    const options = buildOptionsFromItems(item, pool, makeSentenceOption, ['grammar']);
+    const options = buildOptionsFromItems(item, pool, makeSentenceOption, sentencePool.length ? ['sentence'] : ['grammar']);
 
     return {
         kind: 'sentence-build',
@@ -588,8 +383,6 @@ function buildSentenceBuildQuestion(level) {
         parts: nihongoShuffle(parts),
         speakText: item.example || item.sentence || item.jp,
         correctKey: makeSentenceOption(item).key,
-        memoryKey,
-        rawItem: item,
         options,
         reveal: { jp: item.example || item.sentence || item.jp, hint: item.hint, vi: item.sentenceVi || item.vi, en: item.sentenceEn || item.en || '' }
     };
@@ -644,7 +437,6 @@ function renderNihongoDisplay(data) {
     const isViTarget = data.displayType === 'vi';
     const isGrammar = data.displayType === 'grammar';
     const isSentenceBuild = data.displayType === 'sentence-build';
-    const isReadingTarget = data.displayType === 'reading-target';
     const jp = isListen ? '？？？' : (data.jp || '');
 
     let mainHtml = '';
@@ -669,12 +461,6 @@ function renderNihongoDisplay(data) {
             <div id="nihongo-question-text" class="nihongo-prompt">${nihongoEscape(data.prompt)}</div>
             <div id="nihongo-vietnamese-target" class="nihongo-vi-target">${nihongoEscape(data.vi)}</div>
             ${data.en ? `<div id="nihongo-english-target" class="nihongo-en-target">${nihongoEscape(data.en)}</div>` : ''}
-        `;
-    } else if (isReadingTarget) {
-        mainHtml = `
-            <div id="nihongo-question-text" class="nihongo-prompt">${nihongoEscape(data.prompt)}</div>
-            <div id="nihongo-question-reading-target" class="nihongo-reading-target">${nihongoEscape(data.jp)}</div>
-            ${data.reading ? `<div id="nihongo-question-reading" class="nihongo-reading">${nihongoEscape(data.reading)}</div>` : ''}
         `;
     } else {
         const hint = isListen ? 'Nghe trước, xem đáp án sau' : (data.reading || '');
@@ -703,11 +489,6 @@ function renderNihongoDisplay(data) {
                 ${mainHtml}
                 <div id="nihongo-answer-reveal" class="nihongo-answer-reveal" aria-live="polite"></div>
             </div>
-
-            <button id="nihongo-floating-next" class="nihongo-floating-next" type="button"
-                onclick="window.goNextQuestionNow ? goNextQuestionNow() : nextQuestion()" aria-label="Sang câu tiếp theo">
-                Sang câu ➜
-            </button>
         </div>
     `;
 }
@@ -737,11 +518,11 @@ function revealNihongoAnswer(data, options = {}) {
     const pattern = reveal.pattern || '';
     const hint = reveal.hint || '';
     const en = reveal.en || data.en || '';
-    const labelText = options.timeUp ? 'Hết giờ - xem đáp án' : (options.wrong ? 'Đáp án đúng' : (options.label || 'Đáp án'));
+    const labelText = options.timeUp ? 'Hết giờ - xem đáp án' : (options.label || 'Đáp án');
 
     if (data.displayType === 'grammar') {
         box.innerHTML = `
-            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : (options.wrong ? 'Đáp án đúng' : 'Đúng rồi')}</div>
+            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : 'Đúng rồi'}</div>
             ${pattern ? `<div class="reveal-line"><b>Mẫu:</b> ${nihongoEscape(pattern)}</div>` : ''}
             ${vi ? `<div class="reveal-line"><b>Nghĩa:</b> ${nihongoEscape(vi)}</div>` : ''}
             ${en ? `<div class="reveal-line reveal-en"><b>English:</b> ${nihongoEscape(en)}</div>` : ''}
@@ -749,7 +530,7 @@ function revealNihongoAnswer(data, options = {}) {
         `;
     } else if (data.displayType === 'sentence-build') {
         box.innerHTML = `
-            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : (options.wrong ? 'Câu đúng' : 'Câu đúng')}</div>
+            <div class="reveal-label">${options.timeUp ? 'Hết giờ - xem đáp án' : 'Câu đúng'}</div>
             ${jp ? `<div class="reveal-jp">${nihongoEscape(jp)}</div>` : ''}
             ${hint ? `<div class="reveal-reading">${nihongoEscape(hint)}</div>` : ''}
             ${vi ? `<div class="reveal-vi">${nihongoEscape(vi)}</div>` : ''}
@@ -765,13 +546,14 @@ function revealNihongoAnswer(data, options = {}) {
         `;
     }
 
-    box.classList.add('show');
+    const nextLabel = options.timeUp ? 'Câu tiếp theo' : 'Sang câu ➜';
+    box.insertAdjacentHTML('beforeend', `
+        <button class="nihongo-reveal-next" type="button" onclick="window.goNextQuestionNow ? goNextQuestionNow() : nextQuestion()" aria-label="${nextLabel}">
+            <span>${nextLabel}</span>
+        </button>
+    `);
 
-    const nextBtn = document.getElementById('nihongo-floating-next');
-    if (nextBtn) {
-        nextBtn.textContent = options.timeUp ? 'Câu tiếp theo ➜' : 'Sang câu ➜';
-        nextBtn.classList.add('show');
-    }
+    box.classList.add('show');
 }
 
 
@@ -861,10 +643,9 @@ function collectNihongoStudyItems(config) {
 
     levels.forEach(level => {
         if (kind === 'all') {
-            // Tra cứu toàn bộ chỉ gom 3 nhóm chính. Không gom 'sentence' từ grammar lần nữa
-            // để tránh lặp một mẫu ngữ pháp thành 2 kết quả giống nhau.
-            ['vocab', 'kanji', 'grammar'].forEach(k => {
-                collectNihongoLessonItems(level, k, 'all').forEach(item => {
+            ['vocab', 'kanji', 'grammar', 'sentence'].forEach(k => {
+                const sourceKind = k === 'sentence' ? 'grammar' : k;
+                collectNihongoLessonItems(level, sourceKind, 'all').forEach(item => {
                     items.push({ ...item, _kind: k });
                 });
             });
@@ -873,7 +654,7 @@ function collectNihongoStudyItems(config) {
         }
     });
 
-    return dedupeNihongoStudyItems(items);
+    return items;
 }
 
 function getNihongoStudyKindFromMode(mode) {
@@ -979,7 +760,7 @@ function renderNihongoGrammarStudyCard(item, index) {
                 ${item.vi ? `<div class="nihongo-study-vi">${nihongoEscape(item.vi)}</div>` : ''}
                 ${item.en ? `<div class="nihongo-study-en">${nihongoEscape(item.en)}</div>` : ''}
                 ${renderNihongoHighlightedExample(item)}
-                ${(() => { const gr = item.exampleReading || item.sentenceReading || item.reading || item.kana || item.yomi || ''; return gr ? `<div class="nihongo-study-reading">${nihongoEscape(gr)}</div>` : ''; })()}
+                ${item.reading ? `<div class="nihongo-study-reading">${nihongoEscape(item.reading)}</div>` : ''}
                 ${item.exampleVi || item.sentenceVi ? `<div class="nihongo-study-example-vi">${nihongoEscape(item.exampleVi || item.sentenceVi)}</div>` : ''}
                 ${item.hint ? `<div class="nihongo-study-hint">${nihongoEscape(item.hint)}</div>` : ''}
                 ${renderNihongoStudyMeta(item)}
@@ -1156,7 +937,7 @@ function renderNihongoMockMenuScreen(gameId) {
             <div class="nihongo-mock-menu-head">
                 <div class="nihongo-mock-menu-kicker">Luyện · Thi thử</div>
                 <h2>Chọn đề ${nihongoEscape(levelLabel)}</h2>
-                <p>Chọn một đề để bắt đầu luyện tổng hợp từ vựng, Kanji, ngữ pháp, nghe và ghép câu.</p>
+                <p>Hiện các đề dùng ngân hàng câu hỏi của cấp đang học. Sau này bạn thêm dữ liệu đề riêng thì vẫn giữ được menu này.</p>
             </div>
             <div class="nihongo-mock-set-grid">${setButtons}</div>
         </div>
@@ -1196,17 +977,7 @@ function markNihongoCorrectButton(data) {
     document.querySelectorAll('#options-grid .nihongo-option-btn').forEach(btn => {
         if (btn.dataset.answerKey === key) btn.classList.add('correct');
         btn.disabled = true;
-        btn.classList.add('locked');
     });
-}
-
-function markNihongoWrongAnswer(data, selectedBtn) {
-    if (selectedBtn) selectedBtn.classList.add('wrong');
-    if (data && data.memoryKey && data.rawItem) {
-        queueNihongoWrongReview(data.memoryKey, data.rawItem, 10);
-    }
-    markNihongoCorrectButton(data);
-    revealNihongoAnswer(data, { wrong: true });
 }
 
 function makeNihongoGame(gameId) {
@@ -1217,8 +988,7 @@ function makeNihongoGame(gameId) {
 
     return {
         questionTimeSec: isMock ? 30 : (isLearn ? 30 : 24),
-        correctDelayMs: 5000,
-        wrongDelayMs: 5000,
+        correctDelayMs: 3000,
         gridClass: 'nihongo-options-grid',
         generateData() { return buildNihongoQuestion(gameId); },
         renderDisplay(data) {
@@ -1234,10 +1004,6 @@ function makeNihongoGame(gameId) {
         onCorrect(data) {
             revealNihongoAnswer(data);
             if (data && data.speakText) setTimeout(() => speakNihongo(data.speakText), 120);
-        },
-        onWrong(data, selected, btn) {
-            markNihongoWrongAnswer(data, btn);
-            return true;
         },
         onTimeUp(data) {
             if (!isLearn) return false;

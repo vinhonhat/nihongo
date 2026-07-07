@@ -6,7 +6,7 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
     "id": "lesson02",
     "title": "Bài 2",
     "label": "Bài 2",
-    "note": "Từ vựng Minna no Nihongo theo dữ liệu hiện có.",
+    "note": "Từ vựng và ngữ pháp N5 theo bài.",
     "vocab": [
         {
             "jp": "これ",
@@ -190,7 +190,35 @@ window.registerNihongoLesson && window.registerNihongoLesson('n5', {
         }
     ],
     "kanji": [],
-    "grammar": [],
+    "grammar": [
+            {
+                    "pattern": "Nơi chốn に 行きます",
+                    "vi": "Đi đến A",
+                    "en": "Go to A",
+                    "example": "学校に行きます。",
+                    "reading": "がっこうに いきます。",
+                    "exampleVi": "Tôi đi đến trường",
+                    "highlight": "に",
+                    "hint": "に chỉ điểm đến",
+                    "parts": [
+                            "学校",
+                            "に",
+                            "行きます"
+                    ]
+            }
+    ],
     "listening": [],
-    "sentence": []
+    "sentence": [
+            {
+                    "jp": "学校に行きます。",
+                    "reading": "がっこうに いきます。",
+                    "vi": "Tôi đi đến trường",
+                    "en": "I go to school.",
+                    "parts": [
+                            "学校",
+                            "に",
+                            "行きます"
+                    ]
+            }
+    ]
 });
