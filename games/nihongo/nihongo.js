@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.2.5
+// Nihongo Quest V1.2.7
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -208,6 +208,30 @@ function makeKanjiOption(item) {
     };
 }
 
+// Dùng riêng cho luyện Kanji để không lộ nghĩa/cách đọc trong đáp án.
+// Ví dụ: câu hỏi "Chọn Kanji của れいぞうこ" thì đáp án chỉ hiện 冷蔵庫.
+function makeBareKanjiOption(item) {
+    return {
+        key: String(item.jp || item.kanji || ''),
+        primary: item.jp || item.kanji || '',
+        secondary: '',
+        speak: item.jp || item.reading || '',
+        raw: item
+    };
+}
+
+// Dùng riêng cho luyện cách đọc để đáp án chỉ hiện しんはつばい, không hiện nghĩa bên dưới.
+function makeBareReadingOption(item) {
+    const reading = item.reading || item.kunyomi || item.onyomi || item.on || item.kun || '';
+    return {
+        key: String(reading || ''),
+        primary: reading || '',
+        secondary: '',
+        speak: item.jp || reading || '',
+        raw: item
+    };
+}
+
 function getSimilarKanjiDistractors(correctItem, list, targetField = 'reading') {
     const correctKey = targetField === 'jp'
         ? String(correctItem.jp || correctItem.kanji || '')
@@ -395,7 +419,7 @@ function buildKanjiQuestion(level) {
     // 3) Nhìn Kanji -> chọn nghĩa.
     if (canAskReading && modeSeed < 0.42) {
         const distractors = getSimilarKanjiDistractors(item, pool, 'reading');
-        const options = buildOptionsFromItems(item, [item, ...distractors], makeReadingOption, ['kanji']);
+        const options = buildOptionsFromItems(item, [item, ...distractors], makeBareReadingOption, ['kanji']);
         return {
             kind: 'kanji-reading',
             title: 'Luyện Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
@@ -406,7 +430,7 @@ function buildKanjiQuestion(level) {
             vi: item.vi,
             en: item.en || '',
             speakText: item.jp || item.reading,
-            correctKey: makeReadingOption(item).key,
+            correctKey: makeBareReadingOption(item).key,
             memoryKey,
             rawItem: item,
             options,
@@ -416,18 +440,18 @@ function buildKanjiQuestion(level) {
 
     if (canAskKanji && modeSeed < 0.84) {
         const distractors = getSimilarKanjiDistractors(item, pool, 'jp');
-        const options = buildOptionsFromItems(item, [item, ...distractors], makeKanjiOption, ['kanji']);
+        const options = buildOptionsFromItems(item, [item, ...distractors], makeBareKanjiOption, ['kanji']);
         return {
             kind: 'kanji-word',
             title: 'Luyện Kanji ' + (NIHONGO_LEVEL_NAME[level] || '').trim() + lessonSuffix,
             prompt: 'Chọn Kanji đúng cho cách đọc này.',
             displayType: 'reading-target',
             jp: item.reading,
-            reading: item.vi || '',
+            reading: '',
             vi: item.vi,
             en: item.en || '',
             speakText: item.reading || item.jp,
-            correctKey: makeKanjiOption(item).key,
+            correctKey: makeBareKanjiOption(item).key,
             memoryKey,
             rawItem: item,
             options,
@@ -1168,7 +1192,7 @@ function makeNihongoGame(gameId) {
 
     return {
         questionTimeSec: isMock ? 30 : (isLearn ? 30 : 24),
-        correctDelayMs: 3000,
+        correctDelayMs: 5000,
         wrongDelayMs: 5000,
         gridClass: 'nihongo-options-grid',
         generateData() { return buildNihongoQuestion(gameId); },

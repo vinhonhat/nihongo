@@ -1805,3 +1805,31 @@ body {
         padding: 0 8px;
     }
 }
+
+/* =====================================================
+   NIHONGO V1.2.7 - PC MENU WIDTH FIX
+   - Trên PC, thanh Tra cứu nhanh không kéo dài quá khung 3 tab/menu.
+   - iPad/mobile giữ nguyên để không phá layout đang ổn.
+===================================================== */
+@media (min-width: 1181px) {
+    .nihongo-menu-screen .smart-menu-header,
+    .nihongo-menu-screen .nihongo-menu-search,
+    .nihongo-menu-screen .menu-group-tabs,
+    .nihongo-menu-screen .smart-game-grid,
+    .nihongo-menu-screen .smart-menu-footer {
+        width: 100% !important;
+        max-width: 920px !important;
+        align-self: center !important;
+    }
+
+    .nihongo-menu-screen .nihongo-menu-search {
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .nihongo-menu-screen .menu-group-tabs {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        overflow: visible !important;
+    }
+}

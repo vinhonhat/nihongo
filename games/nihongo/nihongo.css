@@ -2540,3 +2540,76 @@
         font-size: clamp(1.75rem, 9vw, 3.4rem) !important;
     }
 }
+
+/* =====================================================
+   NIHONGO PRACTICE UI V1.2.7
+   - Đáp án luyện Kanji không hiển thị nghĩa/cách đọc phụ để tránh lộ đáp án.
+   - Cỡ chữ đáp án mặc định 1.0rem.
+   - Nút Sang câu nổi giữa khung câu hỏi và đáp án.
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] {
+    --NQ-answer-font: 1rem !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
+    font-size: 1rem !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-main {
+    font-size: 1em !important;
+    line-height: 1.18 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-sub:empty {
+    display: none !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+    bottom: -17px !important;
+    z-index: 30 !important;
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        --NQ-answer-font: 1rem !important;
+    }
+
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn {
+        font-size: 1rem !important;
+    }
+
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+        bottom: -16px !important;
+        font-size: .86rem !important;
+    }
+}
+
+/* =====================================================
+   NIHONGO V1.2.7 - NEXT BUTTON KHÔNG BỊ CHE
+   - Nút Sang câu nằm trong khung câu hỏi, cao hơn mép đáp án.
+   - Tăng padding đáy cụm câu hỏi để nội dung không đè lên nút.
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] {
+    --NQ-center-padding: 62px 24px 78px !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+    bottom: 18px !important;
+    z-index: 80 !important;
+    min-height: 38px !important;
+    padding: 0 20px !important;
+    box-shadow: 0 10px 22px rgba(255, 122, 135, .32), 0 0 0 4px rgba(255,255,255,.72) !important;
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] {
+        --NQ-center-padding: 56px 12px 68px !important;
+    }
+
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+        bottom: 14px !important;
+        min-height: 36px !important;
+        padding: 0 16px !important;
+        font-size: .88rem !important;
+    }
+}

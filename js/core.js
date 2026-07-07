@@ -2,21 +2,66 @@
 // Điều khiển app V1.1: mở khóa audio, hiện menu, load CSS/JS game khi bấm.
 // =====================================================
 // PHIÊN BẢN APP
-// Khi cập nhật web/app, chỉ cần tăng số này.
-// Ví dụ: 3.2.1 -> 3.2.2
+// Khi cập nhật web/app, cập nhật APP_VERSION + displayVersion ở đây.
+// version.json là file báo cập nhật online cho PWA, không tự ghi ngược vào core.
 // =====================================================
 
-const APP_VERSION = '1.2.5-kanji-practice-wrong-review-ui';
+const APP_VERSION = '1.2.7-pc-layout-next-button';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.5 Nihongo',
-    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.5',
+    displayVersion: 'V1.2.7 Nihongo',
+    get versionText() { return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + this.displayVersion.replace(' Nihongo', ''); },
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
 };
 window.NIHONGO_APP_META = NIHONGO_APP_META;
+
+
+const NIHONGO_REMOTE_VERSION_URL = 'version.json';
+const NIHONGO_OFFLINE_CACHE_NAME = 'nihongo-offline-v1-2-7';
+const NIHONGO_OFFLINE_READY_KEY = 'nihongo_offline_ready_version';
+
+function buildNihongoOfflineAssetList() {
+    const assets = [
+        './',
+        'index.html',
+        'manifest.json',
+        'sw.js',
+        'nihongo.png',
+        'css/style.css',
+        'css/game-core.css',
+        'games/nihongo/nihongo.css',
+        'games/nihongo/nihongo.js',
+        'js/asset.js',
+        'js/audio.js',
+        'js/core.js',
+        'js/game-core.js',
+        'js/game-menu.js',
+        'js/nihongo-settings.js',
+        'games/nihongo/data/n0/kana.js',
+        'games/nihongo/data/n0/vocab.js',
+        'games/nihongo/data/n0/kanji.js',
+        'games/nihongo/data/n0/listening.js',
+        'games/nihongo/data/n0/grammar.js'
+    ];
+
+    ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
+        ['index.js', 'vocab.js', 'kanji.js', 'listening.js', 'grammar.js'].forEach(file => {
+            assets.push(`games/nihongo/data/${level}/${file}`);
+        });
+        for (let i = 1; i <= 25; i += 1) {
+            assets.push(`games/nihongo/data/${level}/lesson${String(i).padStart(2, '0')}.js`);
+        }
+    });
+
+    return assets;
+}
+
+function isNihongoStandalonePwa() {
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
 
 function applyNihongoAppMeta() {
     const meta = window.NIHONGO_APP_META || NIHONGO_APP_META;
@@ -1218,7 +1263,7 @@ function setupStartButtonActions() {
 
         startButtonClickTimer = setTimeout(() => {
             startButtonClickTimer = null;
-            unlockAudio();
+            startNihongoAppFlow();
         }, 260);
     });
 }
@@ -1228,44 +1273,132 @@ function setupStartButtonActions() {
 // thì hiện gợi ý nhấn đúp để cập nhật.
 // =====================================================
 
-function checkAppVersionForUpdateHint() {
+async function checkAppVersionForUpdateHint() {
     const hint = document.getElementById('update-hint');
-
     const savedVersion = localStorage.getItem(APP_VERSION_KEY);
 
-    // Lần đầu mở app: chưa có version cũ
-    // Lưu version hiện tại và không hiện gợi ý.
+    let remoteVersion = APP_VERSION;
+    let remoteLabel = (window.NIHONGO_APP_META && window.NIHONGO_APP_META.displayVersion) || APP_VERSION;
+
+    // version.json luôn đọc network/no-store, không dùng cache PWA.
+    // Nhờ vậy người đã cài PWA vẫn biết có bản mới dù toàn bộ app đang chạy offline từ cache.
+    if (navigator.onLine) {
+        try {
+            const res = await fetch(NIHONGO_REMOTE_VERSION_URL + '?t=' + Date.now(), {
+                cache: 'no-store',
+                credentials: 'same-origin'
+            });
+            if (res.ok) {
+                const info = await res.json();
+                if (info && info.version) remoteVersion = String(info.version);
+                if (info && info.displayVersion) remoteLabel = String(info.displayVersion);
+            }
+        } catch (err) {
+            console.warn('Không đọc được version.json, dùng version trong core:', err);
+        }
+    }
+
     if (!savedVersion) {
         localStorage.setItem(APP_VERSION_KEY, APP_VERSION);
-
-        if (hint) {
-            hint.style.display = 'none';
-        }
-
-        hasNewAppVersion = false;
-        return;
     }
 
-    // Có version cũ và khác version mới
-    if (savedVersion !== APP_VERSION) {
+    if (remoteVersion && remoteVersion !== APP_VERSION) {
         hasNewAppVersion = true;
-
         if (hint) {
             hint.style.display = 'block';
-            hint.textContent =
-                `Có bản cập nhật mới ${savedVersion} → ${APP_VERSION}. ` +
-                `Nhấn đúp “Vào chơi” để cập nhật.`;
+            hint.textContent = `Có bản cập nhật mới ${remoteLabel}. Nhấn đúp “Vào chơi” để xoá cache và tải lại.`;
         }
-
         return;
     }
 
-    // Đang là bản mới nhất
-    hasNewAppVersion = false;
-
+    hasNewAppVersion = !!(savedVersion && savedVersion !== APP_VERSION);
     if (hint) {
-        hint.style.display = 'none';
+        if (hasNewAppVersion) {
+            hint.style.display = 'block';
+            hint.textContent = `Có bản cập nhật mới ${savedVersion} → ${APP_VERSION}. Nhấn đúp “Vào chơi” để cập nhật.`;
+        } else {
+            hint.style.display = 'none';
+        }
     }
+}
+
+function showNihongoOfflineProgress(done, total, message = '') {
+    let overlay = document.getElementById('nihongo-offline-progress');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'nihongo-offline-progress';
+        overlay.style.cssText = 'position:fixed;inset:0;z-index:999999;display:flex;align-items:center;justify-content:center;background:rgba(33,24,31,.55);padding:18px;';
+        overlay.innerHTML = `
+            <div style="width:min(92vw,420px);background:#fffdf9;border-radius:22px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.25);font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;color:#33232e;">
+                <div style="font-weight:950;font-size:1.05rem;margin-bottom:6px;">Đang tải dữ liệu học offline</div>
+                <div id="nihongo-offline-progress-text" style="font-size:.86rem;font-weight:800;color:#705b66;margin-bottom:12px;">Chuẩn bị...</div>
+                <div style="height:10px;background:#f4e9ee;border-radius:999px;overflow:hidden;">
+                    <div id="nihongo-offline-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,#ff7a87,#ffad61);border-radius:999px;"></div>
+                </div>
+                <div style="font-size:.76rem;color:#8a7780;margin-top:10px;line-height:1.45;">Lần đầu khi dùng PWA, app sẽ tải dữ liệu về máy để học cục bộ. File phiên bản vẫn luôn đọc online để biết khi nào cần cập nhật.</div>
+            </div>`;
+        document.body.appendChild(overlay);
+    }
+    const percent = total ? Math.round(done / total * 100) : 0;
+    const text = document.getElementById('nihongo-offline-progress-text');
+    const bar = document.getElementById('nihongo-offline-progress-bar');
+    if (text) text.textContent = message || `Đã tải ${done}/${total} file (${percent}%)`;
+    if (bar) bar.style.width = percent + '%';
+}
+
+function hideNihongoOfflineProgress() {
+    document.getElementById('nihongo-offline-progress')?.remove();
+}
+
+async function cacheNihongoOfflineAssets(options = {}) {
+    if (!('caches' in window)) return;
+    if (!navigator.onLine) return;
+
+    const force = options.force === true;
+    const alreadyReady = localStorage.getItem(NIHONGO_OFFLINE_READY_KEY) === APP_VERSION;
+    if (!force && alreadyReady) return;
+
+    const assets = buildNihongoOfflineAssetList();
+    const cache = await caches.open(NIHONGO_OFFLINE_CACHE_NAME);
+    let done = 0;
+
+    showNihongoOfflineProgress(0, assets.length, 'Đang chuẩn bị tải dữ liệu...');
+
+    for (const asset of assets) {
+        done += 1;
+        try {
+            // Không cache version.json. Các file khác được cache để PWA học offline.
+            const requestUrl = asset + (asset.includes('?') ? '&' : '?') + 'v=' + encodeURIComponent(APP_VERSION);
+            const response = await fetch(requestUrl, { cache: 'reload', credentials: 'same-origin' });
+            if (response && response.ok) {
+                await cache.put(asset, response.clone());
+            }
+        } catch (err) {
+            // Bỏ qua file chưa có, ví dụ N1/N2 chưa đủ dữ liệu. App vẫn chạy các file đang tồn tại.
+            console.warn('Không cache được:', asset, err);
+        }
+        if (done === 1 || done === assets.length || done % 5 === 0) {
+            showNihongoOfflineProgress(done, assets.length);
+            await new Promise(resolve => setTimeout(resolve, 0));
+        }
+    }
+
+    localStorage.setItem(NIHONGO_OFFLINE_READY_KEY, APP_VERSION);
+    showNihongoOfflineProgress(assets.length, assets.length, 'Đã tải xong dữ liệu offline. Đang mở app...');
+    await new Promise(resolve => setTimeout(resolve, 260));
+    hideNihongoOfflineProgress();
+}
+
+async function startNihongoAppFlow() {
+    try {
+        if (isNihongoStandalonePwa() && navigator.onLine) {
+            await cacheNihongoOfflineAssets();
+        }
+    } catch (err) {
+        console.warn('Tải offline không hoàn tất, vẫn mở app:', err);
+        hideNihongoOfflineProgress();
+    }
+    unlockAudio();
 }
 // =====================================================
 // HỎI XOÁ CACHE / CẬP NHẬT
