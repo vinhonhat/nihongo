@@ -213,7 +213,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n5_mock_test",
-        "label": "Thi thử N5",
+        "label": "Thi thử JLPT N5",
         "icon": "📝",
         "group": "practice",
         "levels": [
@@ -290,7 +290,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n4_mock_test",
-        "label": "Thi thử N4",
+        "label": "Thi thử JLPT N4",
         "icon": "📝",
         "group": "practice",
         "levels": [
@@ -367,7 +367,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n3_mock_test",
-        "label": "Thi thử N3",
+        "label": "Thi thử JLPT N3",
         "icon": "📝",
         "group": "practice",
         "levels": [
@@ -444,7 +444,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n2_mock_test",
-        "label": "Thi thử N2",
+        "label": "Thi thử JLPT N2",
         "icon": "📝",
         "group": "practice",
         "levels": [
@@ -521,7 +521,7 @@ const GAME_MENU_DATA = [
     },
     {
         "id": "nihongo_n1_mock_test",
-        "label": "Thi thử N1",
+        "label": "Thi thử JLPT N1",
         "icon": "📝",
         "group": "practice",
         "levels": [
@@ -562,6 +562,13 @@ function safeSetStorage(key, value) {
 }
 function safeSessionSet(key, value) {
     try { sessionStorage.setItem(key, value); } catch (e) {}
+}
+function safeSessionRemove(key) {
+    try { sessionStorage.removeItem(key); } catch (e) {}
+}
+function clearNihongoMenuSearchSession() {
+    safeSessionRemove('nihongo_search_query');
+    safeSessionRemove('nihongo_search_scope');
 }
 function nihongoMenuEscape(value) {
     return String(value ?? '')
@@ -851,6 +858,13 @@ function selectNihongoLevel(levelId) {
 function setGameMenuGroup(groupId) { safeSetStorage(MENU_STORAGE_KEY_GROUP, groupId); renderGameMenu(); }
 function startGameFromSmartMenu(gameId) {
     if (typeof startGame !== 'function') { console.warn('startGame chưa sẵn sàng:', gameId); return; }
+
+    // Từ khoá tra cứu ngoài menu chỉ dùng một lần cho màn Tra cứu.
+    // Khi vào Từ vựng/Kanji/Ngữ pháp/Luyện khác thì không giữ lại từ khoá cũ.
+    if (!/_search$/.test(String(gameId || ''))) {
+        clearNihongoMenuSearchSession();
+    }
+
     startGame(gameId);
 }
 function openAdminTestMenu() {
@@ -871,6 +885,7 @@ window.selectNihongoLevel = selectNihongoLevel;
 window.setGameMenuGroup = setGameMenuGroup;
 window.selectNihongoLesson = selectNihongoLesson;
 window.startNihongoMenuSearch = startNihongoMenuSearch;
+window.clearNihongoMenuSearchSession = clearNihongoMenuSearchSession;
 window.startGameFromSmartMenu = startGameFromSmartMenu;
 window.openAdminTestMenu = openAdminTestMenu;
 window.closeAdminTestMenu = closeAdminTestMenu;

@@ -6,13 +6,13 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.2.2-study-list-search';
+const APP_VERSION = '1.2.4-next-button-n5-grammar-fix';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.2 Nihongo',
-    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.2',
+    displayVersion: 'V1.2.4 Nihongo',
+    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.4',
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
 };
@@ -36,6 +36,7 @@ const gameModules = {};
 let activeGame = null;
 let activeGameId = null;
 let currentQuestionData = null;
+let correctAdvanceTimer = null;
 
 let replayTimer = null;
 let questionTimer = null;
@@ -426,6 +427,20 @@ const GAME_CONFIG = {
         moduleId: `nihongo_${level}_grammar_practice`,
         type: 'registered'
     };
+
+    // Thi thử JLPT theo đề số. Hiện mỗi đề dùng ngân hàng câu hỏi của cấp;
+    // sau này có thể gắn dữ liệu đề riêng theo set01, set02... trong data.
+    for (let i = 1; i <= 20; i += 1) {
+        const setNo = String(i).padStart(2, '0');
+        GAME_CONFIG[`nihongo_${level}_mock_test_${setNo}`] = {
+            title: `Thi thử JLPT ${label} - Đề số ${setNo}`,
+            folder: 'nihongo',
+            css: 'games/nihongo/nihongo.css',
+            js: 'games/nihongo/nihongo.js',
+            moduleId: `nihongo_${level}_mock_test_${setNo}`,
+            type: 'registered'
+        };
+    }
 });
 
 function registerGame(gameId, gameLogic) {
@@ -681,6 +696,11 @@ function startRegisteredGame(gameId, title, module) {
 }
 
 function nextQuestion(config = {}) {
+    if (correctAdvanceTimer) {
+        clearTimeout(correctAdvanceTimer);
+        correctAdvanceTimer = null;
+    }
+
     if (!activeGame) return;
     if (gamePausedByNoInteraction) return;
 
@@ -778,6 +798,10 @@ function handleCheckAnswer(selected, btn) {
         stopAutoReplay();
         stopQuestionTimer(false);
         btn.classList.add('correct');
+        document.querySelectorAll('#options-grid button').forEach(optionBtn => {
+            optionBtn.disabled = true;
+            optionBtn.classList.add('locked');
+        });
         addScore(1);
 
         if (typeof activeGame.onCorrect === 'function') {
@@ -793,7 +817,13 @@ function handleCheckAnswer(selected, btn) {
 
         fireGameConfetti();
         const nextDelay = Number(activeGame.correctDelayMs || 2000);
-        setTimeout(() => nextQuestion(), Number.isFinite(nextDelay) ? nextDelay : 2000);
+        const questionRef = currentQuestionData;
+        correctAdvanceTimer = setTimeout(() => {
+            correctAdvanceTimer = null;
+            if (currentQuestionData !== questionRef) return;
+            if (!activeGame || gamePausedByNoInteraction) return;
+            nextQuestion();
+        }, Number.isFinite(nextDelay) ? nextDelay : 2000);
     } else {
         btn.classList.add('wrong');
 
@@ -807,6 +837,19 @@ function handleCheckAnswer(selected, btn) {
         setTimeout(() => btn.classList.remove('wrong'), 900);
     }
 }
+
+function goNextQuestionNow() {
+    if (correctAdvanceTimer) {
+        clearTimeout(correctAdvanceTimer);
+        correctAdvanceTimer = null;
+    }
+
+    if (!activeGame || gamePausedByNoInteraction) return;
+    if (typeof stopAllAudio === 'function') stopAllAudio();
+    nextQuestion();
+}
+
+window.goNextQuestionNow = goNextQuestionNow;
 
 function startAutoReplay(delayMs = 5000) {
     stopAutoReplay();

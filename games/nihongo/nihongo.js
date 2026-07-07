@@ -1,5 +1,5 @@
 // games/nihongo/nihongo.js
-// Nihongo Quest V1.1.7
+// Nihongo Quest V1.2.4
 // Logic câu hỏi dùng chung. Dữ liệu vẫn tách theo cấp tại games/nihongo/data/n0..n1/.
 // Cấu trúc mới:
 // - Từ vựng/Kanji: không hiện Hiragana dưới câu hỏi trước khi trả lời.
@@ -410,7 +410,7 @@ function buildNihongoQuestion(gameId) {
     if (mode === 'kanji' || mode === 'kanji_practice') return buildKanjiQuestion(level);
     if (mode === 'grammar' || mode === 'sentence' || mode === 'grammar_practice') return buildGrammarQuestion(level, mode);
     if (mode === 'sentence_build') return buildSentenceBuildQuestion(level);
-    if (mode === 'mock_test') return buildMockQuestion(level);
+    if (mode.indexOf('mock_test') === 0) return buildMockQuestion(level);
     return buildVocabQuestion(level, mode);
 }
 
@@ -542,13 +542,12 @@ function revealNihongoAnswer(data, options = {}) {
         `;
     }
 
-    if (options.timeUp) {
-        box.insertAdjacentHTML('beforeend', `
-            <button class="nihongo-reveal-next" type="button" onclick="nextQuestion()">
-                Câu tiếp theo
-            </button>
-        `);
-    }
+    const nextLabel = options.timeUp ? 'Câu tiếp theo' : 'Sang câu ➜';
+    box.insertAdjacentHTML('beforeend', `
+        <button class="nihongo-reveal-next" type="button" onclick="window.goNextQuestionNow ? goNextQuestionNow() : nextQuestion()" aria-label="${nextLabel}">
+            <span>${nextLabel}</span>
+        </button>
+    `);
 
     box.classList.add('show');
 }
@@ -596,10 +595,19 @@ function collectNihongoLessonItems(level, kind, lessonId = 'all') {
         });
     };
 
+    // Nếu bài đang chọn có dữ liệu theo bài thì dùng dữ liệu đó.
+    // Nếu chưa có dữ liệu theo bài, ví dụ N5 grammar cũ đang nằm ở grammar.js chung,
+    // thì fallback về dữ liệu chung của cấp để màn học không bị trống.
     if (lessonId && lessonId !== 'all' && base.lessons && base.lessons[lessonId]) {
         const lesson = base.lessons[lessonId];
         const title = lesson.title || lesson.label || lessonId;
         pushList(lesson[kind], { lessonId, lessonTitle: title });
+        if (result.length) return result;
+
+        pushList(base[kind], {
+            lessonId: 'all',
+            lessonTitle: `${getNihongoLevelLabel(level)} chung`
+        });
         return result;
     }
 
@@ -609,10 +617,16 @@ function collectNihongoLessonItems(level, kind, lessonId = 'all') {
             const title = lesson.title || lesson.label || id;
             pushList(lesson[kind], { lessonId: id, lessonTitle: title });
         });
+        if (result.length) return result;
+
+        pushList(base[kind], {
+            lessonId: 'all',
+            lessonTitle: `${getNihongoLevelLabel(level)} chung`
+        });
         return result;
     }
 
-    pushList(base[kind], { lessonId: 'all', lessonTitle: '' });
+    pushList(base[kind], { lessonId: 'all', lessonTitle: `${getNihongoLevelLabel(level)} chung` });
     return result;
 }
 
@@ -819,8 +833,8 @@ function renderNihongoStudyScreen(gameId, title) {
     const parsed = parseNihongoGameId(gameId);
     const mode = parsed.mode;
     const fromMenuSearch = mode === 'search';
-    const storedScope = (() => { try { return sessionStorage.getItem('nihongo_search_scope') || ''; } catch (e) { return ''; } })();
-    const storedQuery = (() => { try { return sessionStorage.getItem('nihongo_search_query') || ''; } catch (e) { return ''; } })();
+    const storedScope = fromMenuSearch ? (() => { try { return sessionStorage.getItem('nihongo_search_scope') || ''; } catch (e) { return ''; } })() : '';
+    const storedQuery = fromMenuSearch ? (() => { try { return sessionStorage.getItem('nihongo_search_query') || ''; } catch (e) { return ''; } })() : '';
     const scope = fromMenuSearch ? (storedScope || parsed.level) : parsed.level;
     const kind = getNihongoStudyKindFromMode(mode);
     const lessonId = scope === 'all' ? 'all' : getSelectedNihongoLessonId(scope);
@@ -852,6 +866,15 @@ function renderNihongoStudyScreen(gameId, title) {
         </div>
     `;
 
+    // Query từ ô Tra cứu ngoài menu chỉ dùng để mở màn Tra cứu một lần.
+    // Không lưu sang lần mở Từ vựng/Kanji/Ngữ pháp kế tiếp.
+    if (fromMenuSearch) {
+        try {
+            sessionStorage.removeItem('nihongo_search_query');
+            sessionStorage.removeItem('nihongo_search_scope');
+        } catch (e) {}
+    }
+
     renderNihongoStudyList();
 }
 
@@ -867,9 +890,79 @@ function makeNihongoStudyGame(gameId) {
     };
 }
 
+// =====================================================
+// JLPT MOCK TEST MENU V1.2.3
+// - Nút "Thi thử JLPT" trong nhóm Luyện không vào đề ngay.
+// - Mở menu Đề số 01..20 để sau này cập nhật dữ liệu từng đề.
+// - Hiện tại mỗi đề dùng ngân hàng câu hỏi random của cấp đó.
+// =====================================================
+const NIHONGO_JLPT_MOCK_SET_COUNT = 20;
+
+function isNihongoMockMenuGame(gameId) {
+    return /_mock_test$/.test(String(gameId || ''));
+}
+
+function isNihongoMockSetGame(gameId) {
+    return /_mock_test_\d{2}$/.test(String(gameId || ''));
+}
+
+function getNihongoMockSetNo(gameId) {
+    const match = String(gameId || '').match(/_mock_test_(\d{2})$/);
+    return match ? match[1] : '';
+}
+
+function renderNihongoMockMenuScreen(gameId) {
+    const gameScreen = document.getElementById('game-screen');
+    if (!gameScreen) return;
+
+    const parsed = parseNihongoGameId(gameId);
+    const level = parsed.level || 'n5';
+    const levelLabel = getNihongoLevelLabel(level);
+    const setButtons = Array.from({ length: NIHONGO_JLPT_MOCK_SET_COUNT }, (_, idx) => {
+        const setNo = String(idx + 1).padStart(2, '0');
+        return `
+            <button class="nihongo-mock-set-btn" type="button" onclick="startNihongoMockSet('${level}', '${setNo}')">
+                <span class="nihongo-mock-set-no">Đề số ${setNo}</span>
+                <span class="nihongo-mock-set-sub">JLPT ${levelLabel}</span>
+            </button>`;
+    }).join('');
+
+    gameScreen.innerHTML = `
+        ${renderGameHeader({ score: 'Thi thử JLPT ' + nihongoEscape(levelLabel), onHome: 'backToMenu()' })}
+        <div class="nihongo-mock-menu-screen">
+            <div class="nihongo-mock-menu-head">
+                <div class="nihongo-mock-menu-kicker">Luyện · Thi thử</div>
+                <h2>Chọn đề ${nihongoEscape(levelLabel)}</h2>
+                <p>Hiện các đề dùng ngân hàng câu hỏi của cấp đang học. Sau này bạn thêm dữ liệu đề riêng thì vẫn giữ được menu này.</p>
+            </div>
+            <div class="nihongo-mock-set-grid">${setButtons}</div>
+        </div>
+    `;
+}
+
+function startNihongoMockSet(level, setNo) {
+    const safeLevel = /^n[0-5]$/.test(String(level || '')) ? level : 'n5';
+    const safeSet = String(setNo || '01').padStart(2, '0').slice(-2);
+    try { sessionStorage.setItem('nihongo_mock_set_' + safeLevel, safeSet); } catch (e) {}
+    if (typeof startGame === 'function') startGame(`nihongo_${safeLevel}_mock_test_${safeSet}`);
+}
+
+function makeNihongoMockMenuGame(gameId) {
+    return {
+        start(ctx = {}) {
+            try { activeGame = null; } catch (e) {}
+            try { currentQuestionData = null; } catch (e) {}
+            if (typeof stopQuestionTimer === 'function') stopQuestionTimer(true);
+            if (typeof stopAutoReplay === 'function') stopAutoReplay();
+            renderNihongoMockMenuScreen(gameId, ctx.title || 'Thi thử JLPT');
+        }
+    };
+}
+
 window.renderNihongoStudyList = renderNihongoStudyList;
 window.setNihongoStudyLesson = setNihongoStudyLesson;
 window.setNihongoStudyScope = setNihongoStudyScope;
+window.startNihongoMockSet = startNihongoMockSet;
 
 function isNihongoLearnGame(gameId) {
     return /_vocab_learn$/.test(gameId) || /_kana$/.test(gameId) || /_katakana$/.test(gameId) || /_n0_vocab$/.test(gameId);
@@ -885,6 +978,7 @@ function markNihongoCorrectButton(data) {
 
 function makeNihongoGame(gameId) {
     if (isNihongoStudyListGame(gameId)) return makeNihongoStudyGame(gameId);
+    if (isNihongoMockMenuGame(gameId)) return makeNihongoMockMenuGame(gameId);
     const isLearn = isNihongoLearnGame(gameId);
     const isMock = gameId.indexOf('mock_test') >= 0;
 
@@ -926,6 +1020,12 @@ const NIHONGO_GAME_IDS = [
     'nihongo_n2_vocab_learn', 'nihongo_n2_vocab_practice', 'nihongo_n2_listening', 'nihongo_n2_kanji', 'nihongo_n2_grammar', 'nihongo_n2_sentence', 'nihongo_n2_sentence_build', 'nihongo_n2_mock_test',
     'nihongo_n1_vocab_learn', 'nihongo_n1_vocab_practice', 'nihongo_n1_listening', 'nihongo_n1_kanji', 'nihongo_n1_grammar', 'nihongo_n1_sentence', 'nihongo_n1_sentence_build', 'nihongo_n1_mock_test'
 ];
+
+NIHONGO_STUDY_LEVELS.forEach(level => {
+    for (let i = 1; i <= NIHONGO_JLPT_MOCK_SET_COUNT; i += 1) {
+        NIHONGO_GAME_IDS.push(`nihongo_${level}_mock_test_${String(i).padStart(2, '0')}`);
+    }
+});
 
 NIHONGO_GAME_IDS.forEach(id => registerGame(id, makeNihongoGame(id)));
 window.speakNihongo = speakNihongo;
