@@ -2442,7 +2442,7 @@
 
 
 /* =====================================================
-   NIHONGO NEXT BUTTON / LOCKED ANSWERS V1.2.4
+   NIHONGO NEXT BUTTON / LOCKED ANSWERS V1.2.5
    - Sau khi trả lời đúng hiện nút “Sang câu ➜”.
    - Bấm nút sẽ bỏ chờ 3 giây và sang câu ngay.
 ===================================================== */
@@ -2467,4 +2467,76 @@
 
 #game-screen.game-view[class*='game-nihongo'] .nihongo-reveal-next:active {
     transform: translateY(1px) scale(.99) !important;
+}
+
+/* =====================================================
+   NIHONGO PRACTICE REVIEW / NEXT BUTTON V1.2.5
+   - Nút Sang câu nằm nổi trên vùng đáp án, không nằm trong hộp giải thích.
+   - Sai câu: tô đáp án đúng, giữ 5 giây để người học nhìn lại.
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+    position: absolute !important;
+    left: 50% !important;
+    bottom: 8px !important;
+    z-index: 8 !important;
+    transform: translateX(-50%) translateY(8px) scale(.96) !important;
+    min-height: 38px !important;
+    padding: 0 18px !important;
+    border: 0 !important;
+    border-radius: 999px !important;
+    background: linear-gradient(135deg, #ff7a87, #ffad61) !important;
+    color: #fff !important;
+    font-weight: 900 !important;
+    box-shadow: 0 8px 18px rgba(255, 122, 135, .28) !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity .16s ease, transform .16s ease !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next.show {
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    transform: translateX(-50%) translateY(0) scale(1) !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next:active {
+    transform: translateX(-50%) translateY(1px) scale(.99) !important;
+}
+
+/* Nút cũ trong hộp giải thích không còn dùng nữa */
+#game-screen.game-view[class*='game-nihongo'] .nihongo-reveal-next {
+    display: none !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
+    margin-top: 8px !important;
+    font-size: clamp(2rem, 8vw, 4.2rem) !important;
+    line-height: 1.05 !important;
+    font-weight: 950 !important;
+    color: #2c2030 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.correct {
+    border-color: rgba(46, 196, 128, .95) !important;
+    background: linear-gradient(135deg, #dcfff0, #f7fffb) !important;
+    box-shadow: 0 0 0 3px rgba(46, 196, 128, .18), 0 6px 0 rgba(46, 196, 128, .22) !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.wrong {
+    border-color: rgba(255, 94, 115, .95) !important;
+    background: linear-gradient(135deg, #fff0f2, #fff8f8) !important;
+    box-shadow: 0 0 0 3px rgba(255, 94, 115, .18), 0 6px 0 rgba(255, 94, 115, .20) !important;
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-floating-next {
+        bottom: 6px !important;
+        min-height: 34px !important;
+        padding: 0 14px !important;
+        font-size: .78rem !important;
+    }
+
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
+        font-size: clamp(1.75rem, 9vw, 3.4rem) !important;
+    }
 }

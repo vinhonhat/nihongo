@@ -532,6 +532,14 @@ const GAME_MENU_DATA = [
     }
  ];
 
+// V1.2.5: phần học Ngữ pháp và Mẫu câu đang dùng cùng dữ liệu,
+// nên ẩn nút Mẫu câu ở màn học để tránh trùng. Ghép câu vẫn nằm trong mục Luyện.
+GAME_MENU_DATA.forEach(item => {
+    if (/^nihongo_n[1-5]_sentence$/.test(item.id)) {
+        item.testOnly = true;
+    }
+});
+
 ['n0', 'n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
     const label = level === 'n0' ? 'nhập môn' : level.toUpperCase();
     GAME_MENU_DATA.push({

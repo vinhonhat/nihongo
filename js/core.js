@@ -6,13 +6,13 @@
 // Ví dụ: 3.2.1 -> 3.2.2
 // =====================================================
 
-const APP_VERSION = '1.2.4-next-button-n5-grammar-fix';
+const APP_VERSION = '1.2.5-kanji-practice-wrong-review-ui';
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.4 Nihongo',
-    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.4',
+    displayVersion: 'V1.2.5 Nihongo',
+    versionText: 'Ứng dụng web học tiếng Nhật Nihongo Quest V1.2.5',
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
 };
@@ -825,7 +825,14 @@ function handleCheckAnswer(selected, btn) {
             nextQuestion();
         }, Number.isFinite(nextDelay) ? nextDelay : 2000);
     } else {
+        stopAutoReplay();
+        stopQuestionTimer(false);
         btn.classList.add('wrong');
+
+        document.querySelectorAll('#options-grid button').forEach(optionBtn => {
+            optionBtn.disabled = true;
+            optionBtn.classList.add('locked');
+        });
 
         let queue = [];
         if (typeof activeGame.getAnswerAudio === 'function') {
@@ -834,7 +841,31 @@ function handleCheckAnswer(selected, btn) {
         queue.push(wrongAudioPath());
         playSequence(queue);
 
-        setTimeout(() => btn.classList.remove('wrong'), 900);
+        const handledWrong = typeof activeGame.onWrong === 'function'
+            ? activeGame.onWrong(currentQuestionData, selected, btn)
+            : false;
+
+        if (!handledWrong) {
+            setTimeout(() => {
+                btn.classList.remove('wrong');
+                document.querySelectorAll('#options-grid button').forEach(optionBtn => {
+                    optionBtn.disabled = false;
+                    optionBtn.classList.remove('locked');
+                });
+                startQuestionTimer();
+                startAutoReplay();
+            }, 900);
+            return;
+        }
+
+        const nextDelay = Number(activeGame.wrongDelayMs || 5000);
+        const questionRef = currentQuestionData;
+        correctAdvanceTimer = setTimeout(() => {
+            correctAdvanceTimer = null;
+            if (currentQuestionData !== questionRef) return;
+            if (!activeGame || gamePausedByNoInteraction) return;
+            nextQuestion();
+        }, Number.isFinite(nextDelay) ? nextDelay : 5000);
     }
 }
 
