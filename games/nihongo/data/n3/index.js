@@ -1,8 +1,8 @@
 // games/nihongo/data/n3/index.js
-// N3 lesson loader V1.1.8
-// Cấu trúc chuẩn để sau này mở rộng lên N4/N3/N2/N1.
-// Mỗi bài chỉ cần sửa 1 file: lesson01.js ... lesson25.js
+// N3 lesson loader V1.2.0
+// Cấu trúc chuẩn: mỗi bài 1 file lesson01.js ... lesson25.js
 // Mỗi lesson có thể chứa: vocab, kanji, grammar, listening, sentence.
+// Đây là bộ dữ liệu N3 tổng hợp tự biên soạn cho app, không phải danh sách chính thức của JLPT.
 
 window.NIHONGO_DATA = window.NIHONGO_DATA || {};
 window.NIHONGO_DATA.n3 = window.NIHONGO_DATA.n3 || {};
@@ -26,7 +26,6 @@ window.NIHONGO_DATA.n3.lessonsMeta = window.NIHONGO_DATA.n3.lessonsMeta || [];
             }));
         });
 
-        // Dữ liệu tổng hợp dùng cho chế độ "Toàn bộ N3".
         levelData.vocab = merge('vocab');
         levelData.kanji = merge('kanji');
         levelData.grammar = merge('grammar');
@@ -71,7 +70,6 @@ window.NIHONGO_DATA.n3.lessonsMeta = window.NIHONGO_DATA.n3.lessonsMeta || [];
         window.rebuildNihongoLevelFromLessons(levelName);
     };
 
-    // Tự nạp 25 file bài của N3. Nhờ vậy index.html chỉ cần gọi index.js, không cần 25 thẻ script.
     for (let i = 1; i <= 25; i += 1) {
         const num = String(i).padStart(2, '0');
         document.write('<script src="games/nihongo/data/n3/lesson' + num + '.js"><\/script>');
