@@ -2594,3 +2594,35 @@
         font-size: calc(.74rem * var(--NIHONGO-system-scale, 1));
     }
 }
+
+
+/* =====================================================
+   NIHONGO RESTORE FIX V1.2.9.2
+   - Hiện rõ đáp án đúng/sai sau khi chọn sai.
+   - Hỗ trợ câu hỏi Kanji dạng nhìn cách đọc -> chọn Kanji.
+===================================================== */
+#game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
+    margin-top: 8px !important;
+    font-size: clamp(2rem, 8vw, 4.2rem) !important;
+    line-height: 1.05 !important;
+    font-weight: 950 !important;
+    color: #2c2030 !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.correct {
+    border-color: rgba(46, 196, 128, .95) !important;
+    background: linear-gradient(135deg, #dcfff0, #f7fffb) !important;
+    box-shadow: 0 0 0 3px rgba(46, 196, 128, .18), 0 6px 0 rgba(46, 196, 128, .22) !important;
+}
+
+#game-screen.game-view[class*='game-nihongo'] .nihongo-option-btn.wrong {
+    border-color: rgba(255, 94, 115, .95) !important;
+    background: linear-gradient(135deg, #fff0f2, #fff8f8) !important;
+    box-shadow: 0 0 0 3px rgba(255, 94, 115, .18), 0 6px 0 rgba(255, 94, 115, .20) !important;
+}
+
+@media (max-width: 767px) {
+    #game-screen.game-view[class*='game-nihongo'] .nihongo-reading-target {
+        font-size: clamp(1.75rem, 9vw, 3.4rem) !important;
+    }
+}

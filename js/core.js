@@ -6,13 +6,13 @@
 // CORE_APP_VERSION chỉ là bản dự phòng để so sánh/cảnh báo khi đang chạy cache cũ.
 // =====================================================
 
-const CORE_APP_VERSION = '1.2.9.1-light-fix';
+const CORE_APP_VERSION = '1.2.9.2-light-fix';
 const APP_VERSION = CORE_APP_VERSION;
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.9.1 Nihongo',
+    displayVersion: 'V1.2.9.2 Nihongo',
     get versionText() { return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + this.displayVersion.replace(' Nihongo', ''); },
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'

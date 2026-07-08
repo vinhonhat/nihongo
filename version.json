@@ -1,9 +1,9 @@
 {
-  "version": "1.2.9.1-light-fix",
-  "displayVersion": "V1.2.9.1 Nihongo",
-  "versionText": " Phiên bản V1.2.9.1",
+  "version": "1.2.9.2-restore-fix",
+  "displayVersion": "V1.2.9.2 Nihongo",
+  "versionText": " Phiên bản V1.2.9.2",
   "author": "Quang Vinh - Vinh ở Nhật",
   "contact": "https://vinhonhat.github.io",
-  "releasedAt": "2026-07-07",
-  "notes": "Sửa nhẹ logic kiểm tra cập nhật để không còn báo cập nhật sau khi app đã chạy đúng bản mới."
+  "releasedAt": "2026-07-08",
+  "notes": "Khôi phục các chức năng bị thiếu khi gom bản full: sai hiện đáp án đúng, ôn lại câu sai, chống lặp câu hỏi/search, luyện Kanji 3 dạng."
 }
