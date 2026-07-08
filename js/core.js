@@ -87,7 +87,15 @@ function buildNihongoOfflineAssetList() {
         'games/nihongo/data/specialized/office.js',
         'games/nihongo/data/specialized/combini.js',
         'games/nihongo/data/specialized/daily.js',
-        'games/nihongo/data/specialized/medical.js'
+        'games/nihongo/data/specialized/medical.js',
+
+        'games/nihongo/data/specialized/construction.js',
+        'games/nihongo/data/specialized/mechanical.js',
+        'games/nihongo/data/specialized/driving.js',
+        'games/nihongo/data/specialized/hotel.js',
+        'games/nihongo/data/specialized/restaurant.js',
+        'games/nihongo/data/specialized/food_drink.js',
+        'games/nihongo/data/specialized/food.js'
     ];
 
     ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
