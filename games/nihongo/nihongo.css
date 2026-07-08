@@ -2626,3 +2626,64 @@
         font-size: clamp(1.75rem, 9vw, 3.4rem) !important;
     }
 }
+
+
+/* =====================================================
+   SPECIALIZED DICTIONARY V1.3.0
+   Card riêng cho từ vựng chuyên ngành.
+===================================================== */
+.nihongo-specialized-card {
+    border-left: 5px solid #22b789;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fffc 100%);
+}
+
+.nihongo-specialized-meta {
+    background: #eafff7;
+    color: #16775d;
+}
+
+.nihongo-specialized-tags {
+    margin-top: 7px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.nihongo-specialized-tags span {
+    display: inline-flex;
+    align-items: center;
+    min-height: 22px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #f1f7fb;
+    color: #497081;
+    font-size: calc(.68rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 900;
+}
+
+.nihongo-specialized-examples {
+    margin-top: 8px;
+    display: grid;
+    gap: 6px;
+}
+
+.nihongo-specialized-example {
+    padding: 8px 10px;
+    border-radius: 10px;
+    background: #fff8e7;
+    border: 1px solid rgba(245, 179, 80, .28);
+}
+
+.nihongo-specialized-example-no {
+    color: #b26c00;
+    font-size: calc(.68rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 950;
+    margin-bottom: 2px;
+}
+
+.nihongo-specialized-example-jp {
+    color: #24333c;
+    font-size: calc(.96rem * var(--NIHONGO-system-scale, 1));
+    font-weight: 900;
+    line-height: 1.42;
+}

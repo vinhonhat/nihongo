@@ -6,13 +6,13 @@
 // CORE_APP_VERSION chỉ là bản dự phòng để so sánh/cảnh báo khi đang chạy cache cũ.
 // =====================================================
 
-const CORE_APP_VERSION = '1.2.9.2-light-fix';
+const CORE_APP_VERSION = '1.3.1';
 const APP_VERSION = CORE_APP_VERSION;
 const APP_VERSION_KEY = 'nihongo_app_version';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.2.9.2 Nihongo',
+    displayVersion: 'V1.3.1 Nihongo',
     get versionText() { return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + this.displayVersion.replace(' Nihongo', ''); },
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
@@ -54,14 +54,6 @@ function getNihongoRuntimeVersion() {
     return String((NIHONGO_REMOTE_VERSION_INFO && NIHONGO_REMOTE_VERSION_INFO.version) || APP_VERSION);
 }
 
-function normalizeNihongoVersion(version) {
-    return String(version || '')
-        .trim()
-        .replace(/^V/i, '')
-        .replace(/\s*Nihongo\s*$/i, '')
-        .replace(/[-+_].*$/, '');
-}
-
 
 const NIHONGO_REMOTE_VERSION_URL = 'version.json';
 const NIHONGO_OFFLINE_CACHE_NAME = 'nihongo-offline-runtime';
@@ -88,7 +80,13 @@ function buildNihongoOfflineAssetList() {
         'games/nihongo/data/n0/vocab.js',
         'games/nihongo/data/n0/kanji.js',
         'games/nihongo/data/n0/listening.js',
-        'games/nihongo/data/n0/grammar.js'
+        'games/nihongo/data/n0/grammar.js',
+        'games/nihongo/data/specialized/index.js',
+        'games/nihongo/data/specialized/it.js',
+        'games/nihongo/data/specialized/factory.js',
+        'games/nihongo/data/specialized/office.js',
+        'games/nihongo/data/specialized/combini.js',
+        'games/nihongo/data/specialized/daily.js'
     ];
 
     ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
@@ -531,6 +529,29 @@ const GAME_CONFIG = {
         };
     }
 });
+
+
+// =====================================================
+// N6 / CHUYÊN NGÀNH V1.3.1
+// Giữ menu kiểu V1.2.9.2, chỉ thêm một cấp mới sau N1.
+// N6 dùng dữ liệu riêng tại games/nihongo/data/specialized/.
+// =====================================================
+GAME_CONFIG.nihongo_n6_vocab_learn = {
+    title: 'Từ vựng chuyên ngành',
+    folder: 'nihongo',
+    css: 'games/nihongo/nihongo.css',
+    js: 'games/nihongo/nihongo.js',
+    moduleId: 'nihongo_n6_vocab_learn',
+    type: 'registered'
+};
+GAME_CONFIG.nihongo_n6_search = {
+    title: 'Tra cứu chuyên ngành',
+    folder: 'nihongo',
+    css: 'games/nihongo/nihongo.css',
+    js: 'games/nihongo/nihongo.js',
+    moduleId: 'nihongo_n6_search',
+    type: 'registered'
+};
 
 function registerGame(gameId, gameLogic) {
     gameModules[gameId] = gameLogic;
@@ -1344,7 +1365,7 @@ async function checkAppVersionForUpdateHint() {
         }
     }
 
-    if (remoteVersion && normalizeNihongoVersion(remoteVersion) !== normalizeNihongoVersion(APP_VERSION)) {
+    if (remoteVersion && remoteVersion !== APP_VERSION) {
         hasNewAppVersion = true;
         if (hint) {
             hint.style.display = 'block';

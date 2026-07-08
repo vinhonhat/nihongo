@@ -36,6 +36,11 @@ const NIHONGO_LEVELS = {
         "label": "N1",
         "icon": "👑",
         "note": "Cao cấp: từ vựng học thuật, Kanji và đề khó"
+    },
+    "n6": {
+        "label": "Chuyên ngành",
+        "icon": "🏢",
+        "note": "Từ vựng theo ngành nghề: IT, nhà máy, văn phòng, combini, đời sống"
     }
 };
 const GAME_GROUPS = [
@@ -530,6 +535,19 @@ const GAME_MENU_DATA = [
         "color": "linear-gradient(135deg, #f6d365 0%, #fda085 100%)",
         "badge": "Test"
     }
+,
+    {
+        "id": "nihongo_n6_vocab_learn",
+        "label": "Từ vựng chuyên ngành",
+        "icon": "🏢",
+        "group": "vocab",
+        "levels": [
+            "n6"
+        ],
+        "color": "linear-gradient(135deg, #22c1c3 0%, #fdbb2d 100%)",
+        "badge": "N6"
+    }
+
  ];
 
 // V1.2.5: phần học Ngữ pháp và Mẫu câu đang dùng cùng dữ liệu,
@@ -578,6 +596,22 @@ function clearNihongoMenuSearchSession() {
     safeSessionRemove('nihongo_search_query');
     safeSessionRemove('nihongo_search_scope');
 }
+
+function getSpecializedLessonsForMenu() {
+    const fields = Array.isArray(window.NIHONGO_SPECIALIZED_FIELDS) ? window.NIHONGO_SPECIALIZED_FIELDS : [];
+    const data = window.NIHONGO_SPECIALIZED_DATA || {};
+    return fields
+        .filter(field => field && field.id)
+        .map(field => {
+            const count = Array.isArray(data[field.id]) ? data[field.id].length : 0;
+            return {
+                id: field.id,
+                label: `${field.icon || '🏢'} ${field.label || field.id}`,
+                title: field.label || field.id,
+                vocabCount: count
+            };
+        });
+}
 function nihongoMenuEscape(value) {
     return String(value ?? '')
         .replace(/&/g, '&amp;')
@@ -608,6 +642,7 @@ function getCurrentGroup(level) {
 }
 
 function getLessonsForLevel(level) {
+    if (level === 'n6') return getSpecializedLessonsForMenu();
     const data = window.NIHONGO_DATA && window.NIHONGO_DATA[level];
     const meta = data && Array.isArray(data.lessonsMeta) ? data.lessonsMeta : [];
     return meta.filter(item => item && item.id);
@@ -626,15 +661,17 @@ function renderLessonSelector(level) {
     if (!lessons.length) return '';
     const current = getCurrentLesson(level);
     const levelLabel = (NIHONGO_LEVELS[level] && NIHONGO_LEVELS[level].label) || level.toUpperCase();
+    const selectorLabel = level === 'n6' ? 'Chuyên ngành:' : 'Bài:';
+    const allLabel = level === 'n6' ? '🏢 Tất cả chuyên ngành' : `📚 Toàn bộ ${levelLabel}`;
     const options = [
-        `<option value="all" ${current === 'all' ? 'selected' : ''}>📚 Toàn bộ ${levelLabel}</option>`
+        `<option value="all" ${current === 'all' ? 'selected' : ''}>${allLabel}</option>`
     ].concat(lessons.map(item => {
         const count = Number(item.vocabCount || 0);
         const countText = count ? ` - ${count} từ` : ' - trống';
         return `<option value="${item.id}" ${item.id === current ? 'selected' : ''}>${item.label || item.title || item.id}${countText}</option>`;
     })).join('');
 
-    return `<div class="smart-level-line smart-lesson-line"><span>Bài:</span><select class="smart-level-select smart-lesson-select" onchange="selectNihongoLesson(this.value)">${options}</select></div>`;
+    return `<div class="smart-level-line smart-lesson-line"><span>${selectorLabel}</span><select class="smart-level-select smart-lesson-select" onchange="selectNihongoLesson(this.value)">${options}</select></div>`;
 }
 function selectNihongoLesson(lessonId) {
     const level = getCurrentNihongoLevel();
@@ -787,7 +824,7 @@ function renderNihongoMenuSearchPanel(level) {
     const levelInfo = NIHONGO_LEVELS[level] || { label: level.toUpperCase(), icon: '🔎' };
     const levelOptions = Object.entries(NIHONGO_LEVELS)
         .filter(([levelId]) => levelId !== level)
-        .map(([levelId, item]) => `<option value="${levelId}">${item.icon} Chỉ ${item.label}</option>`)
+        .map(([levelId, item]) => `<option value="${levelId}">${item.icon} ${item.label}</option>`)
         .join('');
 
     return `
@@ -805,7 +842,7 @@ function renderNihongoMenuSearchPanel(level) {
                 </select>
                 <button class="nihongo-menu-search-btn" type="button" onclick="startNihongoMenuSearch()">Tìm</button>
             </div>
-            <div class="nihongo-menu-search-note">Nếu đang ở N4 thì mặc định chỉ tìm trong N4. Chọn “Toàn bộ” để tra tất cả cấp.</div>
+            <div class="nihongo-menu-search-note">Mặc định tìm trong cấp đang chọn. Nếu chọn Chuyên ngành, phạm vi sẽ theo chuyên ngành đang chọn. Chọn “Toàn bộ” để tìm cả bài học và chuyên ngành.</div>
         </div>`;
 }
 

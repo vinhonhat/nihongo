@@ -1,7 +1,7 @@
-// Nihongo Quest service worker V1.2.9.2
+// Nihongo Quest service worker V1.3.1
 // - Cache app/data để PWA học offline.
 // - version.json luôn network/no-store để kiểm tra bản mới.
-const CACHE_NAME = 'nihongo-quest-shell-v1-2-9-2';
+const CACHE_NAME = 'nihongo-quest-shell-v1-3-1';
 const OFFLINE_CACHE_NAME = 'nihongo-offline-runtime';
 const VERSION_FILE = 'version.json';
 
