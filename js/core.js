@@ -54,6 +54,14 @@ function getNihongoRuntimeVersion() {
     return String((NIHONGO_REMOTE_VERSION_INFO && NIHONGO_REMOTE_VERSION_INFO.version) || APP_VERSION);
 }
 
+function normalizeNihongoVersion(version) {
+    return String(version || '')
+        .trim()
+        .replace(/^V/i, '')
+        .replace(/\s*Nihongo\s*$/i, '')
+        .replace(/[-+_].*$/, '');
+}
+
 
 const NIHONGO_REMOTE_VERSION_URL = 'version.json';
 const NIHONGO_OFFLINE_CACHE_NAME = 'nihongo-offline-runtime';
@@ -1336,7 +1344,7 @@ async function checkAppVersionForUpdateHint() {
         }
     }
 
-    if (remoteVersion && remoteVersion !== APP_VERSION) {
+    if (remoteVersion && normalizeNihongoVersion(remoteVersion) !== normalizeNihongoVersion(APP_VERSION)) {
         hasNewAppVersion = true;
         if (hint) {
             hint.style.display = 'block';
