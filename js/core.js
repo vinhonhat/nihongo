@@ -2,17 +2,19 @@
 // Điều khiển app V1.1: mở khóa audio, hiện menu, load CSS/JS game khi bấm.
 // =====================================================
 // PHIÊN BẢN APP
-// Từ V1.2.9 trở đi: thông tin hiển thị ưu tiên đọc từ version.json.
-// CORE_APP_VERSION chỉ là bản dự phòng để so sánh/cảnh báo khi đang chạy cache cũ.
+// version.json là nguồn version chính.
+// CORE_APP_VERSION chỉ là bản dự phòng khi không đọc được version.json.
+// Sau bản này, khi đổi data/code chỉ cần đổi version.json + file thật sự thay đổi.
 // =====================================================
 
-const CORE_APP_VERSION = '1.3.1';
+const CORE_APP_VERSION = '1.3.2';
 const APP_VERSION = CORE_APP_VERSION;
 const APP_VERSION_KEY = 'nihongo_app_version';
+const APP_VERSION_INFO_KEY = 'nihongo_app_version_info';
 
 const NIHONGO_APP_META = {
     name: 'Nihongo Quest',
-    displayVersion: 'V1.3.1 Nihongo',
+    displayVersion: 'Đang kiểm tra phiên bản...',
     get versionText() { return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + this.displayVersion.replace(' Nihongo', ''); },
     author: 'Quang Vinh - Vinh ở Nhật',
     contact: 'https://vinhonhat.github.io'
@@ -23,6 +25,31 @@ let NIHONGO_REMOTE_VERSION_INFO = null;
 
 function buildNihongoVersionText(displayVersion) {
     return 'Ứng dụng web học tiếng Nhật Nihongo Quest ' + String(displayVersion || '').replace(' Nihongo', '');
+}
+
+function normalizeNihongoVersionValue(value) {
+    return String(value || '').trim();
+}
+
+function readStoredNihongoVersionInfo() {
+    try {
+        const raw = localStorage.getItem(APP_VERSION_INFO_KEY);
+        if (!raw) return null;
+        const info = JSON.parse(raw);
+        return info && typeof info === 'object' ? info : null;
+    } catch (err) {
+        return null;
+    }
+}
+
+function saveStoredNihongoVersionInfo(info) {
+    try {
+        if (info && typeof info === 'object') {
+            localStorage.setItem(APP_VERSION_INFO_KEY, JSON.stringify(info));
+        }
+    } catch (err) {
+        // Bỏ qua nếu trình duyệt chặn localStorage. App vẫn chạy bình thường.
+    }
 }
 
 function applyNihongoVersionInfo(info) {
@@ -51,7 +78,8 @@ function applyNihongoVersionInfo(info) {
 }
 
 function getNihongoRuntimeVersion() {
-    return String((NIHONGO_REMOTE_VERSION_INFO && NIHONGO_REMOTE_VERSION_INFO.version) || APP_VERSION);
+    const info = NIHONGO_REMOTE_VERSION_INFO || readStoredNihongoVersionInfo() || {};
+    return normalizeNihongoVersionValue(info.version || APP_VERSION);
 }
 
 
@@ -1353,10 +1381,17 @@ async function checkAppVersionForUpdateHint() {
     let remoteVersion = APP_VERSION;
     let remoteLabel = (window.NIHONGO_APP_META && window.NIHONGO_APP_META.displayVersion) || APP_VERSION;
 
+    // Dùng thông tin đã lưu để khi offline vẫn hiện đúng version gần nhất.
+    const storedInfo = readStoredNihongoVersionInfo();
+    if (storedInfo) {
+        applyNihongoVersionInfo(storedInfo);
+        if (storedInfo.version) remoteVersion = normalizeNihongoVersionValue(storedInfo.version);
+        if (storedInfo.displayVersion) remoteLabel = String(storedInfo.displayVersion);
+    }
+
     // version.json luôn đọc network/no-store, không dùng cache PWA.
-    // Nếu core đang chạy là bản cũ nhưng version.json trên mạng đã mới hơn,
-    // mới hiện thông báo cập nhật. Không dùng bản đã lưu trong localStorage
-    // để tránh lỗi đã cập nhật rồi mà màn ngoài vẫn báo mãi.
+    // Từ bản V1.3.2: version.json là nguồn version chính.
+    // App so sánh version online với version đã lưu trong máy, không so với CORE_APP_VERSION nữa.
     if (navigator.onLine) {
         try {
             const res = await fetch(NIHONGO_REMOTE_VERSION_URL + '?t=' + Date.now(), {
@@ -1365,16 +1400,24 @@ async function checkAppVersionForUpdateHint() {
             });
             if (res.ok) {
                 const info = await res.json();
-                if (info) applyNihongoVersionInfo(info);
-                if (info && info.version) remoteVersion = String(info.version);
+                if (info) {
+                    applyNihongoVersionInfo(info);
+                    saveStoredNihongoVersionInfo(info);
+                }
+                if (info && info.version) remoteVersion = normalizeNihongoVersionValue(info.version);
                 if (info && info.displayVersion) remoteLabel = String(info.displayVersion);
             }
         } catch (err) {
-            console.warn('Không đọc được version.json, dùng version trong core/version dự phòng:', err);
+            console.warn('Không đọc được version.json, dùng version đã lưu/core dự phòng:', err);
         }
     }
 
-    if (remoteVersion && remoteVersion !== APP_VERSION) {
+    const installedVersion = normalizeNihongoVersionValue(localStorage.getItem(APP_VERSION_KEY));
+    const latestVersion = normalizeNihongoVersionValue(remoteVersion || APP_VERSION);
+
+    // Nếu máy đã từng lưu version và version.json trên mạng khác version đang lưu,
+    // hiện gợi ý cập nhật. Sau khi xoá cache/reload, localStorage trống nên app sẽ lưu bản mới.
+    if (installedVersion && latestVersion && installedVersion !== latestVersion) {
         hasNewAppVersion = true;
         if (hint) {
             hint.style.display = 'block';
@@ -1383,9 +1426,9 @@ async function checkAppVersionForUpdateHint() {
         return;
     }
 
-    // Đang chạy đúng bản mới: cập nhật lại mốc đã lưu rồi ẩn thông báo.
+    // Lần đầu mở hoặc vừa xoá cache xong: lấy version.json hiện tại làm mốc đã cài.
     hasNewAppVersion = false;
-    localStorage.setItem(APP_VERSION_KEY, remoteVersion || APP_VERSION);
+    if (latestVersion) localStorage.setItem(APP_VERSION_KEY, latestVersion);
     if (hint) hint.style.display = 'none';
 }
 
