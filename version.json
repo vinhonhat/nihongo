@@ -1,9 +1,9 @@
 {
-  "version": "1.3.1",
-  "displayVersion": "V1.3.1 Nihongo",
-  "versionText": " Phiên bản V1.3.1",
+  "version": "1.3.2",
+  "displayVersion": "V1.3.2 Nihongo",
+  "versionText": " Phiên bản V1.3.2",
   "author": "Quang Vinh - Vinh ở Nhật",
   "contact": "https://vinhonhat.github.io",
   "releasedAt": "2026-07-08",
-  "notes": "Quay lại bố cục menu V1.2.9.2, thêm cấp N6/Chuyên ngành sau N1. N6 dùng bài/chuyên ngành từ dữ liệu specialized của V1.3.0; tra cứu nhanh giữ kiểu cũ và có thể tìm bài học + chuyên ngành."
+  "notes": "Tối ưu cơ chế cập nhật: version.json là nguồn version chính; từ các bản sau chỉ cần đổi version.json và file data/code thật sự thay đổi, không cần đồng bộ 4 file core.js, sw.js, index.html mỗi lần."
 }
