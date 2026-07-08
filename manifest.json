@@ -1,6 +1,6 @@
 {
   "name": "Nihongo Quest",
-  "short_name": "Nihongo",
+  "short_name": "Nihongo Quest",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
