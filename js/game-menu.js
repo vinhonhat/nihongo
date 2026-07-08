@@ -841,10 +841,14 @@ function renderNihongoMenuSearchPanel(level) {
                     ${levelOptions}
                 </select>
                 <button class="nihongo-menu-search-btn" type="button" onclick="startNihongoMenuSearch()">Tìm</button>
+                <button class="contribute-vocab-btn" type="button" onclick="openNihongoContributionModal()">
+                    ➕ Góp từ
+                </button>
             </div>
             <div class="nihongo-menu-search-note">Mặc định tìm trong cấp đang chọn. Nếu chọn Chuyên ngành, phạm vi sẽ theo chuyên ngành đang chọn. Chọn “Toàn bộ” để tìm cả bài học và chuyên ngành.</div>
         </div>`;
 }
+
 
 function startNihongoMenuSearch() {
     const level = getCurrentNihongoLevel() || 'n5';
@@ -941,3 +945,488 @@ window.cancelAdminGearHold = cancelAdminGearHold;
 window.handleAdminGearClick = handleAdminGearClick;
 window.resetNihongoMenuFromGear = resetNihongoMenuFromGear;
 window.addEventListener('DOMContentLoaded', renderGameMenu);
+
+// =====================================================
+// ĐÓNG GÓP TỪ VỰNG
+// Giao diện tự dựng trong app, gửi dữ liệu vào Google Form.
+// Sau khi tạo Google Form, chỉ cần thay FORM_ID và entry.xxxxx ở dưới.
+// =====================================================
+
+const NIHONGO_CONTRIBUTION_DRAFT_KEY = 'nihongo_contribution_draft_v1';
+
+const NIHONGO_GOOGLE_FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSffnXgE3631cwQsmamJcOVoRKHGoln80GtCmOFgAfyrdzFCzg/formResponse';
+
+const NIHONGO_GOOGLE_FORM_ENTRIES = {
+    word: 'entry.259303754',
+    kana: 'entry.1237546725',
+    romaji: 'entry.1286687669',
+    meaning: 'entry.1018924359',
+    meaningEn: 'entry.2078562331',
+    field: 'entry.573125806',
+    tags: 'entry.365752317',
+    exampleJp: 'entry.345809715',
+    exampleVi: 'entry.2094837595',
+    note: 'entry.1392596545',
+    contributor: 'entry.632020508',
+    source: 'entry.52638904'
+};
+
+// field là select chọn chuyên ngành, không tính là nội dung nháp.
+// Nếu chỉ mở form rồi đóng, app sẽ không hỏi lưu nháp nữa.
+const NIHONGO_CONTRIBUTION_TEXT_FIELDS = [
+    'word',
+    'kana',
+    'romaji',
+    'meaning',
+    'meaningEn',
+    'tags',
+    'exampleJp',
+    'exampleVi',
+    'note',
+    'contributor',
+    'source'
+];
+
+function isNihongoGoogleFormConfigured() {
+    if (!NIHONGO_GOOGLE_FORM_ACTION_URL || NIHONGO_GOOGLE_FORM_ACTION_URL.includes('FORM_ID')) {
+        return false;
+    }
+
+    return Object.values(NIHONGO_GOOGLE_FORM_ENTRIES).every(entry => {
+        return /^entry\.\d+$/.test(String(entry || ''));
+    });
+}
+
+
+function getNihongoContributionFieldOptionsHtml() {
+    const fields = Array.isArray(window.NIHONGO_SPECIALIZED_FIELDS)
+        ? window.NIHONGO_SPECIALIZED_FIELDS
+        : [];
+
+    const fallbackFields = [
+        { id: 'it', label: 'IT / Máy tính', icon: '💻' },
+        { id: 'factory', label: 'Nhà máy / Sản xuất', icon: '🏭' },
+        { id: 'office', label: 'Văn phòng / Kế toán', icon: '🧾' },
+        { id: 'combini', label: 'Combini / Bán hàng', icon: '🏪' },
+        { id: 'daily', label: 'Đời sống', icon: '🏠' }
+    ];
+
+    const sourceFields = fields.length ? fields : fallbackFields;
+    const seen = new Set();
+
+    return sourceFields
+        .filter(field => field && (field.label || field.id))
+        .map(field => {
+            const label = String(field.label || field.id || '').trim();
+            const icon = String(field.icon || '🏢').trim();
+            const value = `${icon} ${label}`.trim();
+            const key = value.toLowerCase();
+
+            if (!label || seen.has(key)) return '';
+            seen.add(key);
+
+            return `<option value="${nihongoMenuEscape(value)}"></option>`;
+        })
+        .join('');
+}
+
+function getNihongoContributionFormValues(form) {
+    const data = new FormData(form);
+    return {
+        word: data.get('word') || '',
+        kana: data.get('kana') || '',
+        romaji: data.get('romaji') || '',
+        meaning: data.get('meaning') || '',
+        meaningEn: data.get('meaningEn') || '',
+        field: data.get('field') || '',
+        tags: data.get('tags') || '',
+        exampleJp: data.get('exampleJp') || '',
+        exampleVi: data.get('exampleVi') || '',
+        note: data.get('note') || '',
+        contributor: data.get('contributor') || '',
+        source: data.get('source') || ''
+    };
+}
+
+function isNihongoContributionDraftEmpty(values) {
+    if (!values) return true;
+
+    return NIHONGO_CONTRIBUTION_TEXT_FIELDS.every(key => {
+        return !String(values[key] || '').trim();
+    });
+}
+
+function saveNihongoContributionDraft(form) {
+    if (!form) return;
+
+    const values = getNihongoContributionFormValues(form);
+
+    if (isNihongoContributionDraftEmpty(values)) {
+        clearNihongoContributionDraft();
+        return;
+    }
+
+    try {
+        localStorage.setItem(NIHONGO_CONTRIBUTION_DRAFT_KEY, JSON.stringify({
+            savedAt: Date.now(),
+            values
+        }));
+    } catch (err) {
+        console.warn('Không lưu được nháp đóng góp:', err);
+    }
+}
+
+function loadNihongoContributionDraft(form) {
+    if (!form) return false;
+
+    let draft = null;
+
+    try {
+        draft = JSON.parse(localStorage.getItem(NIHONGO_CONTRIBUTION_DRAFT_KEY) || 'null');
+    } catch (err) {
+        draft = null;
+    }
+
+    if (!draft || !draft.values) return false;
+    if (isNihongoContributionDraftEmpty(draft.values)) return false;
+
+    Object.entries(draft.values).forEach(([key, value]) => {
+        const field = form.elements[key];
+        if (field) field.value = value;
+    });
+
+    return true;
+}
+
+function clearNihongoContributionDraft() {
+    try {
+        localStorage.removeItem(NIHONGO_CONTRIBUTION_DRAFT_KEY);
+    } catch (err) {
+        console.warn('Không xoá được nháp đóng góp:', err);
+    }
+}
+
+function hasNihongoContributionDraft() {
+    let draft = null;
+
+    try {
+        draft = JSON.parse(localStorage.getItem(NIHONGO_CONTRIBUTION_DRAFT_KEY) || 'null');
+    } catch (err) {
+        draft = null;
+    }
+
+    return !!(draft && draft.values && !isNihongoContributionDraftEmpty(draft.values));
+}
+
+function openNihongoContributionModal() {
+    const old = document.getElementById('nihongo-contribution-modal');
+    if (old) old.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'nihongo-contribution-modal';
+    modal.className = 'nihongo-contribution-modal';
+
+    modal.innerHTML = `
+        <div class="contribution-box">
+            <div class="contribution-head">
+                <div>
+                    <div class="contribution-mini">Nihongo Quest</div>
+                    <h2>Đóng góp từ vựng</h2>
+                    <p>Gửi từ mới để mình kiểm tra và thêm vào dữ liệu học.</p>
+                    <p style="margin:6px 0 0;color:#d93025;font-weight:950;font-size:.84rem;">＊ Các mục màu đỏ là bắt buộc</p>
+                </div>
+                <button type="button" class="contribution-close" onclick="closeNihongoContributionModal()">×</button>
+            </div>
+
+            <form id="nihongo-contribution-form" class="contribution-form">
+                <label style="color:#d93025;font-weight:950;">Từ tiếng Nhật <span aria-hidden="true">＊</span> <span style="font-size:.78rem;">bắt buộc</span></label>
+                <input name="word" required placeholder="例: 見積書">
+
+                <label style="color:#d93025;font-weight:950;">Cách đọc kana <span aria-hidden="true">＊</span> <span style="font-size:.78rem;">bắt buộc</span></label>
+                <input name="kana" required placeholder="例: みつもりしょ">
+
+                <label style="color:#d93025;font-weight:950;">Romaji <span aria-hidden="true">＊</span> <span style="font-size:.78rem;">bắt buộc</span></label>
+                <input name="romaji" required placeholder="例: mitsumorisho">
+
+                <label style="color:#d93025;font-weight:950;">Nghĩa tiếng Việt <span aria-hidden="true">＊</span> <span style="font-size:.78rem;">bắt buộc</span></label>
+                <input name="meaning" required placeholder="例: bảng báo giá">
+
+                <label>Nghĩa tiếng Anh</label>
+                <input name="meaningEn" placeholder="例: quotation">
+
+                <label style="color:#d93025;font-weight:950;">Chuyên ngành <span aria-hidden="true">＊</span> <span style="font-size:.78rem;">bắt buộc</span></label>
+                <input name="field" list="nihongo-contribution-field-list" required placeholder="Chọn sẵn hoặc tự nhập chuyên ngành">
+                <datalist id="nihongo-contribution-field-list">
+                    ${getNihongoContributionFieldOptionsHtml()}
+                </datalist>
+                <div class="contribution-help">Có thể chọn ngành có sẵn hoặc tự gõ ngành mới.</div>
+
+                <label>Từ khóa liên quan (dùng tìm kiếm) </label>
+                <input name="tags" placeholder="例: báo giá, văn phòng, kế toán">
+
+                <label>Ví dụ tiếng Nhật</label>
+                <textarea name="exampleJp" rows="2" placeholder="例: 見積書を送ってください。"></textarea>
+
+                <label>Dịch ví dụ</label>
+                <textarea name="exampleVi" rows="2" placeholder="例: Vui lòng gửi bảng báo giá."></textarea>
+
+                <label>Ghi chú</label>
+                <textarea name="note" rows="2" placeholder="Từ này dùng trong tình huống nào?"></textarea>
+
+                <label>Tên người đóng góp</label>
+                <input name="contributor" placeholder="Tên hoặc biệt danh">
+
+                <label>Nguồn tham khảo</label>
+                <input name="source" placeholder="Từ điển, website, sách, kinh nghiệm...">
+
+                <button type="submit" class="contribution-submit">Gửi đóng góp</button>
+                <div id="contribution-status" class="contribution-status"></div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const form = document.getElementById('nihongo-contribution-form');
+
+    if (hasNihongoContributionDraft()) {
+        const resume = confirm('Bạn có bản đóng góp đang nhập dở.\n\nBấm OK để tiếp tục.\nBấm Huỷ để tạo đóng góp mới.');
+
+        if (resume) {
+            loadNihongoContributionDraft(form);
+        } else {
+            clearNihongoContributionDraft();
+        }
+    }
+
+    form.addEventListener('input', () => {
+        saveNihongoContributionDraft(form);
+    });
+
+    form.addEventListener('change', () => {
+        saveNihongoContributionDraft(form);
+    });
+
+    form.addEventListener('submit', submitNihongoContribution);
+}
+
+function closeNihongoContributionModal() {
+    const modal = document.getElementById('nihongo-contribution-modal');
+    const form = document.getElementById('nihongo-contribution-form');
+
+    if (form) {
+        const values = getNihongoContributionFormValues(form);
+
+        if (!isNihongoContributionDraftEmpty(values)) {
+            const keep = confirm('Bạn chưa gửi đóng góp.\n\nBấm OK để lưu tạm.\nBấm Huỷ để xoá bản nháp.');
+
+            if (keep) {
+                saveNihongoContributionDraft(form);
+            } else {
+                clearNihongoContributionDraft();
+            }
+        }
+    }
+
+    if (modal) modal.remove();
+}
+
+async function submitNihongoContribution(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const status = document.getElementById('contribution-status');
+    const submitBtn = form.querySelector('.contribution-submit');
+
+    if (!isNihongoGoogleFormConfigured()) {
+        if (status) {
+            status.textContent = 'Chưa cấu hình Google Form. Hãy thay FORM_ID và entry.xxxxx trong js/game-menu.js.';
+            status.className = 'contribution-status error';
+        }
+        return;
+    }
+
+    const data = new FormData(form);
+    const body = new FormData();
+
+    Object.entries(NIHONGO_GOOGLE_FORM_ENTRIES).forEach(([key, entryName]) => {
+        body.append(entryName, data.get(key) || '');
+    });
+
+    if (submitBtn) submitBtn.disabled = true;
+
+    if (status) {
+        status.textContent = 'Đang gửi đóng góp...';
+        status.className = 'contribution-status sending';
+    }
+
+    try {
+        await fetch(NIHONGO_GOOGLE_FORM_ACTION_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body
+        });
+
+        clearNihongoContributionDraft();
+
+        if (status) {
+            status.textContent = 'Đã gửi. Cảm ơn bạn đã đóng góp!';
+            status.className = 'contribution-status success';
+        }
+
+        form.reset();
+
+        setTimeout(() => {
+            document.getElementById('nihongo-contribution-modal')?.remove();
+        }, 1200);
+    } catch (error) {
+        console.error(error);
+
+        if (status) {
+            status.textContent = 'Không gửi được. Vui lòng thử lại sau.';
+            status.className = 'contribution-status error';
+        }
+
+        if (submitBtn) submitBtn.disabled = false;
+    }
+}
+
+window.openNihongoContributionModal = openNihongoContributionModal;
+window.closeNihongoContributionModal = closeNihongoContributionModal;
+
+// =====================================================
+// FORM LIÊN HỆ / GÓP Ý
+// Dùng Google Form riêng, không dùng chung form đóng góp từ vựng.
+// Bắt buộc: Tên + Nội dung
+// Không bắt buộc: Email + Số điện thoại
+// =====================================================
+
+const NIHONGO_CONTACT_FORM_ACTION_URL =
+    'https://docs.google.com/forms/d/e/1FAIpQLSfDzGLYdghN2V2GUPqsvbWGLSpEz6f13q4sfx1iP6jm-sj9HQ/formResponse';
+
+const NIHONGO_CONTACT_FORM_ENTRIES = {
+    name: 'entry.1323201463',
+    email: 'entry.1987269523',
+    phone: 'entry.1867146734',
+    message: 'entry.720126449'
+};
+
+function openNihongoContactModal() {
+    const old = document.getElementById('nihongo-contact-modal');
+    if (old) old.remove();
+
+    const modal = document.createElement('div');
+    modal.id = 'nihongo-contact-modal';
+    modal.className = 'nihongo-contribution-modal';
+
+    modal.innerHTML = `
+        <div class="contribution-box">
+            <div class="contribution-head">
+                <div>
+                    <div class="contribution-mini">Nihongo Quest</div>
+                    <h2>Liên hệ / Góp ý</h2>
+                    <p>Gửi góp ý, báo lỗi hoặc nội dung cần liên hệ.</p>
+                    <p style="margin-top:6px;color:#d93025;font-weight:900;font-size:.86rem;">
+                        ＊ Các mục màu đỏ là bắt buộc
+                    </p>
+                </div>
+                <button type="button" class="contribution-close" onclick="closeNihongoContactModal()">×</button>
+            </div>
+
+            <form id="nihongo-contact-form" class="contribution-form">
+                <label style="color:#d93025;font-weight:950;">
+                    Tên của bạn <span aria-hidden="true">＊</span>
+                    <span style="font-size:.78rem;">bắt buộc</span>
+                </label>
+                <input name="name" required placeholder="Ví dụ: Quang Vinh">
+
+                <label>Email</label>
+                <input name="email" type="email" placeholder="Ví dụ: abc@gmail.com">
+
+                <label>Số điện thoại</label>
+                <input name="phone" type="tel" placeholder="Ví dụ: 090xxxxxxx">
+
+                <label style="color:#d93025;font-weight:950;">
+                    Nội dung góp ý / liên hệ <span aria-hidden="true">＊</span>
+                    <span style="font-size:.78rem;">bắt buộc</span>
+                </label>
+                <textarea name="message" rows="5" required placeholder="Nhập nội dung góp ý, báo lỗi hoặc lời nhắn..."></textarea>
+
+                <button type="submit" class="contribution-submit">Gửi liên hệ</button>
+                <div id="contact-status" class="contribution-status"></div>
+            </form>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const form = document.getElementById('nihongo-contact-form');
+    if (form) {
+        form.addEventListener('submit', submitNihongoContactForm);
+    }
+}
+
+function closeNihongoContactModal() {
+    const modal = document.getElementById('nihongo-contact-modal');
+    if (modal) modal.remove();
+}
+
+async function submitNihongoContactForm(event) {
+    event.preventDefault();
+
+    const form = event.currentTarget;
+    const status = document.getElementById('contact-status');
+    const data = new FormData(form);
+
+    const name = String(data.get('name') || '').trim();
+    const message = String(data.get('message') || '').trim();
+
+    if (!name || !message) {
+        if (status) {
+            status.textContent = 'Vui lòng nhập Tên và Nội dung trước khi gửi.';
+            status.className = 'contribution-status error';
+        }
+        return;
+    }
+
+    const body = new FormData();
+    body.append(NIHONGO_CONTACT_FORM_ENTRIES.name, name);
+    body.append(NIHONGO_CONTACT_FORM_ENTRIES.email, data.get('email') || '');
+    body.append(NIHONGO_CONTACT_FORM_ENTRIES.phone, data.get('phone') || '');
+    body.append(NIHONGO_CONTACT_FORM_ENTRIES.message, message);
+
+    if (status) {
+        status.textContent = 'Đang gửi liên hệ...';
+        status.className = 'contribution-status sending';
+    }
+
+    try {
+        await fetch(NIHONGO_CONTACT_FORM_ACTION_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            body
+        });
+
+        if (status) {
+            status.textContent = 'Đã gửi. Cảm ơn bạn đã góp ý!';
+            status.className = 'contribution-status success';
+        }
+
+        form.reset();
+
+        setTimeout(() => {
+            closeNihongoContactModal();
+        }, 1200);
+
+    } catch (error) {
+        console.error(error);
+
+        if (status) {
+            status.textContent = 'Không gửi được. Vui lòng thử lại sau.';
+            status.className = 'contribution-status error';
+        }
+    }
+}
+
+window.openNihongoContactModal = openNihongoContactModal;
+window.closeNihongoContactModal = closeNihongoContactModal;
