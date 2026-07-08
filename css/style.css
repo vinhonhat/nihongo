@@ -1878,3 +1878,74 @@ body {
         gap: 12px !important;
     }
 }
+
+/* =====================================================
+   LEVEL CARD COLOR OVERRIDE - KHÔNG ĐỔI VERSION
+   Mục đích: mỗi cấp có một màu riêng, tránh N2/N1/Chuyên ngành bị giống nhau.
+   Có thể chỉnh màu tại đây, để cuối file để override các rule cũ.
+===================================================== */
+.level-card {
+    color: #ffffff !important;
+}
+
+.level-card-n0 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.92), rgba(255,255,255,.28) 34%, transparent 36%),
+        linear-gradient(135deg, #ff8fb3 0%, #ffd6e7 100%) !important;
+    border-color: rgba(255,143,179,.38) !important;
+}
+
+.level-card-n5 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.88), rgba(255,255,255,.22) 34%, transparent 36%),
+        linear-gradient(135deg, #24d39a 0%, #37bdf8 100%) !important;
+    border-color: rgba(36,211,154,.38) !important;
+}
+
+.level-card-n4 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.86), rgba(255,255,255,.2) 34%, transparent 36%),
+        linear-gradient(135deg, #8e63d9 0%, #e58bd4 100%) !important;
+    border-color: rgba(142,99,217,.38) !important;
+}
+
+.level-card-n3 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.84), rgba(255,255,255,.18) 34%, transparent 36%),
+        linear-gradient(135deg, #1e9bff 0%, #18d67a 100%) !important;
+    border-color: rgba(30,155,255,.38) !important;
+}
+
+/* N2: cam vàng, khác hẳn N1 và Chuyên ngành */
+.level-card-n2 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.82), rgba(255,255,255,.18) 34%, transparent 36%),
+        linear-gradient(135deg, #ffb347 0%, #ff6b6b 100%) !important;
+    border-color: rgba(255,179,71,.42) !important;
+}
+
+/* N1: tím xanh đậm, cao cấp hơn và không bị lẫn với N2 */
+.level-card-n1 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.8), rgba(255,255,255,.16) 34%, transparent 36%),
+        linear-gradient(135deg, #5b6cff 0%, #9b5de5 100%) !important;
+    border-color: rgba(91,108,255,.42) !important;
+}
+
+/* Chuyên ngành: xanh công việc / từ điển, tách khỏi dải JLPT */
+.level-card-n6 {
+    background:
+        radial-gradient(circle at 16% 14%, rgba(255,255,255,.8), rgba(255,255,255,.16) 34%, transparent 36%),
+        linear-gradient(135deg, #2b5876 0%, #4e4376 100%) !important;
+    border-color: rgba(255,213,79,.58) !important;
+}
+
+.level-card-label,
+.level-card-note {
+    color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,.34) !important;
+}
+
+.level-card-icon {
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,.18)) !important;
+}
