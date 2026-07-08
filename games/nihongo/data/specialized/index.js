@@ -8,6 +8,7 @@ window.NIHONGO_SPECIALIZED_FIELDS = [
     { id: 'factory', label: 'Nhà máy / Sản xuất', icon: '🏭' },
     { id: 'office', label: 'Văn phòng / Kế toán', icon: '🧾' },
     { id: 'combini', label: 'Combini / Bán hàng', icon: '🏪' },
+    { id: 'medical', label: 'Khám bệnh', icon: '⚕️' },
     { id: 'daily', label: 'Đời sống', icon: '🏠' }
 ];
 

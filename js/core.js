@@ -86,7 +86,8 @@ function buildNihongoOfflineAssetList() {
         'games/nihongo/data/specialized/factory.js',
         'games/nihongo/data/specialized/office.js',
         'games/nihongo/data/specialized/combini.js',
-        'games/nihongo/data/specialized/daily.js'
+        'games/nihongo/data/specialized/daily.js',
+        'games/nihongo/data/specialized/medical.js'
     ];
 
     ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {
