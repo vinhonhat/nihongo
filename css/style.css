@@ -2105,5 +2105,30 @@ body {
     }
 }
 
+/* =====================================================
+   SETTINGS - CONTACT / FEEDBACK BUTTON
+===================================================== */
 
+.settings-contact-action {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.settings-contact-btn {
+    border: 1px solid rgba(255, 122, 135, .42);
+    background: #fff7fb;
+    color: #7a3448;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-weight: 950;
+    cursor: pointer;
+    box-shadow: none;
+}
+
+.settings-contact-btn:hover {
+    background: #fff0f4;
+    box-shadow: 0 4px 12px rgba(255, 122, 135, .14);
+}
 

@@ -134,11 +134,13 @@
                 Tác giả: <span data-app-meta="author">Quang Vinh - Vinh ở Nhật</span><br>
                 
             </div>
-            <button type="button"
-                onclick="if (window.openNihongoContactModal) { openNihongoContactModal(); } else { alert('Form liên hệ chưa sẵn sàng. Hãy tải lại app một lần.'); }"
-                style="margin-top:6px;border:1px solid rgba(255,122,135,.38);background:#fff7fb;color:#7a3448;border-radius:12px;padding:8px 12px;font-weight:900;cursor:pointer;box-shadow:none;">
-                📝 liên hệ & góp ý
-            </button>
+            <div class="settings-contact-action">
+                <button type="button"
+                    class="settings-contact-btn"
+                    onclick="if (window.openNihongoContactModal) { openNihongoContactModal(); } else { alert('Form liên hệ chưa sẵn sàng. Hãy tải lại app một lần.'); }">
+                    📝 Liên hệ & góp ý
+                </button>
+            </div>
         </div>
     </div>
 
