@@ -545,7 +545,7 @@ const GAME_MENU_DATA = [
             "n6"
         ],
         "color": "linear-gradient(135deg, #22c1c3 0%, #fdbb2d 100%)",
-        "badge": "N6"
+        "badge": "senmon"
     }
 
  ];
