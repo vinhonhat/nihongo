@@ -123,7 +123,8 @@ function buildNihongoOfflineAssetList() {
         'games/nihongo/data/specialized/hotel.js',
         'games/nihongo/data/specialized/restaurant.js',
         'games/nihongo/data/specialized/food_drink.js',
-        'games/nihongo/data/specialized/food.js'
+        'games/nihongo/data/specialized/food.js',
+        'games/nihongo/data/specialized/work_study.js'
     ];
 
     ['n5', 'n4', 'n3', 'n2', 'n1'].forEach(level => {

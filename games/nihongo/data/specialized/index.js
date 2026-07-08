@@ -16,7 +16,8 @@ window.NIHONGO_SPECIALIZED_FIELDS = [
     { id: 'hotel', label: 'khách sạn', icon: '🏨' },
     { id: 'restaurant', label: 'nhà hàng', icon: '🍽️' },
     { id: 'food_drink', label: 'ăn uống', icon: '🥤' },
-    { id: 'food', label: 'thực phẩm-nhà máy thực phẩm', icon: '🏭' }
+    { id: 'food', label: 'thực phẩm-nhà máy thực phẩm', icon: '🏭' },
+     { id: 'work_study', label: 'Học tập-Công việc', icon: '🎓' }
 ];
 
 window.NIHONGO_SPECIALIZED_DATA = window.NIHONGO_SPECIALIZED_DATA || {};
