@@ -1421,7 +1421,7 @@ async function checkAppVersionForUpdateHint() {
         hasNewAppVersion = true;
         if (hint) {
             hint.style.display = 'block';
-            hint.textContent = `Có bản cập nhật mới ${remoteLabel}. Nhấn đúp “Vào chơi” để xoá cache và tải lại.`;
+            hint.textContent = `Có bản cập nhật mới ${remoteLabel}. Nhấn đúp “Bắt Đầu” để xoá cache và tải lại.`;
         }
         return;
     }
@@ -1700,7 +1700,7 @@ function showInstallInvitePopup() {
             <div class="install-invite-icon">📲</div>
             <div class="install-invite-title">Cài Nihongo Quest?</div>
             <div class="install-invite-text">
-                Cài ra màn hình chính để mở bài học nhanh hơn.
+                Cài ra màn hình chính để tra cứu offline và mở nhanh hơn.
             </div>
 
             <div class="install-invite-actions">
